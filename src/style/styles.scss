@@ -1,0 +1,37 @@
+@charset "utf-8";
+@import "~bulma/bulma";
+
+.spaced
+{
+	margin-top:3rem;
+	margin-bottom:3rem;
+}
+.bio-box
+{
+	max-width:860px; margin:5px auto;
+}
+.lined
+{
+	border-bottom:1px solid #ccc;
+}
+.padded
+{
+	padding:1rem;	
+}
+.card.short
+{
+	width:320px;
+	display:inline-block;
+	margin: 1.5rem;
+	margin-left:0;
+}
+.xlevel
+{
+	.xlevel-item
+	{
+		display:inline-block;
+		margin:0.5rem;
+		margin-left:0;
+	}
+}
+
