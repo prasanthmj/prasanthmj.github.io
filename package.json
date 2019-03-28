@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "build": "webpack --config webpack.config.js --mode development",
+    "postbuild":"cp docs/index.html .",
     "start": "webpack-dev-server --open"
   },
   "devDependencies": {
