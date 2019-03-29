@@ -21,7 +21,7 @@ module.exports = {
     }]
   },
   devServer: {
-     contentBase: './docs'
+     contentBase: './'
   },
   plugins: [
     new ExtractTextPlugin('css/styles.css'),

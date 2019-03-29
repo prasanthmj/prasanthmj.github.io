@@ -25,13 +25,36 @@
 	margin: 1.5rem;
 	margin-left:0;
 }
+
 .xlevel
 {
 	.xlevel-item
 	{
 		display:inline-block;
-		margin:0.5rem;
+		margin:0.5rem 2rem;
 		margin-left:0;
 	}
+}
+a.colored-icon
+{
+	color:#2A8FBD;
+}
+
+i.colored-icon
+{
+	//color:#53777A;
+	color:#2A8FBD;
+}
+a
+{
+	color:#1693A5;
+	&:hover
+	{
+		color:#CC333F;
+	}
+}
+.title
+{
+	font-size:1.8rem;
 }
 
