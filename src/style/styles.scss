@@ -58,3 +58,14 @@ a
 	font-size:1.8rem;
 }
 
+.profile-pic
+{
+	@include until($desktop)
+	{
+		margin:1rem auto;	
+	}
+	@include from($desktop)
+	{
+		float:right;
+	}
+}

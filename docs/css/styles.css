@@ -6964,3 +6964,11 @@ a {
 
 .title {
   font-size: 1.8rem; }
+
+@media screen and (max-width: 1087px) {
+  .profile-pic {
+    margin: 1rem auto; } }
+
+@media screen and (min-width: 1088px) {
+  .profile-pic {
+    float: right; } }
