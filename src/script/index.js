@@ -13,8 +13,11 @@ function ready(callback){
 
 ready(function()
 {
-	document.getElementById('contactlink').setAttribute('href',
-	'mail'+'to'+':'+'prasan'+'thmj'+'@'+'g'+'mail'+'.com');
+    var em = 'mail'+'to'+':'+'prasan'+'thmj'+'@'+'g'+'mail'+'.com';
+    
+	document.getElementById('contactlink').setAttribute('href',em);
+
+    document.getElementById('contact2').setAttribute('href',em);
 });
 
 
