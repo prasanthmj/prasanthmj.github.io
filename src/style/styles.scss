@@ -64,6 +64,7 @@ a
 	{
 		margin:1rem auto;	
 	}
+	
 	@include from($desktop)
 	{
 		float:right;
