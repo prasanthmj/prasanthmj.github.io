@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>compiler on Prasanth Janardhanan</title>
+    <link>/tags/compiler/</link>
+    <description>Recent content in compiler on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/compiler/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building a simple query parser using PEG in Go</title>
+      <link>/go/peg-parser-in-go/</link>
+      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/go/peg-parser-in-go/</guid>
+      <description>In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
+The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.</description>
+    </item>
+    
+  </channel>
+</rss>

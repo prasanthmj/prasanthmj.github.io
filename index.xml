@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Prasanth Janardhanan</title>
+    <link>/</link>
+    <description>Recent content on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building a simple query parser using PEG in Go</title>
+      <link>/go/peg-parser-in-go/</link>
+      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/go/peg-parser-in-go/</guid>
+      <description>In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
+The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.</description>
+    </item>
+    
+    <item>
+      <title>How to support custom Javascript scripting in Go Applications</title>
+      <link>/go/javascript-parser-in-go/</link>
+      <pubDate>Wed, 06 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/go/javascript-parser-in-go/</guid>
+      <description>Why will someone need a Javascript Parser, written natively in Go? Isn&amp;rsquo;t it a crazy, Architecture Astronauts solution that is looking for a problem? Not necessarily.
+There was a time when applications allowed some kind of scripting to extend them and to make them fit into any workflow. For example VBScript for Microsoft office products. However, very few Web applications have the infrastructure to allow custom scripts inside them. There are a few that does support; one example is Google Apps Script.</description>
+    </item>
+    
+    <item>
+      <title>How to load from a JSON file to Javascript class object (Javascript/Typescript Serialization)</title>
+      <link>/typescript/serialize-javascript-objects/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/typescript/serialize-javascript-objects/</guid>
+      <description>It is a common requirement to load a nested Javascript class from a JSON file. Sometimes you want to send the JSON across a network and load it back to a Javascript class.
+For better clarity, let us understand the difference between a Javascript class instance and an Object. Take this class for example:
+This is a class that draws a rectangle on the canvas
+class Rectangle{ public x:number=0 public y:number=0 public width:number=0 public height:number=0 public draw(ctx:CanvasRenderingContext2D) { ctx.</description>
+    </item>
+    
+    <item>
+      <title>Creating an isolated cluster - provisioning a cluster and a Bastion host using Ansible</title>
+      <link>/terraform/ansible-cloud-setup/</link>
+      <pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/terraform/ansible-cloud-setup/</guid>
+      <description>This is the second part of the series on setting up a cluster using Terraform and Ansible. In the first part, we had set up the bare cluster Virtual Machines. The set up included a virtual private network, a bastion server, and a separately configurable cluster of nodes.
+The nodes are ready but not software or configuration is done so far. In the next step, we will provision all the nodes in our cloud</description>
+    </item>
+    
+    <item>
+      <title>Setting up a Bastion host and a three-node cluster on Hetzner cloud using Terraform and Ansible</title>
+      <link>/terraform/terraform-hetzner-cloud-setup-example/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/terraform/terraform-hetzner-cloud-setup-example/</guid>
+      <description>Infrastructure as code has a great benefit - you can make a cluster available in a few minutes. Then, switch the configuration with a few updates to the configuration. If you ever had long hours staring at blinking LEDs while it installed from a stack of CDs, you will know what a relief this is.
+Terraform makes it possible to declaratively create the cloud infrastructure, supports all major cloud providers, and is easy to learn if you can spare an afternoon.</description>
+    </item>
+    
+    <item>
+      <title>Background task processor in Go with persistence support using BadgerDB</title>
+      <link>/go/go-task-queue-with-badgerdb-backend/</link>
+      <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/go/go-task-queue-with-badgerdb-backend/</guid>
+      <description>Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks. For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress. A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.</description>
+    </item>
+    
+    <item>
+      <title>A Simple Wrapper to BadgerDB Key-Value store in Go</title>
+      <link>/go/badgerdb-wrapper/</link>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/go/badgerdb-wrapper/</guid>
+      <description>BadgerDB is an embeddable key-value store written in Go. It is a persistent store.
+In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.
+Usage import( &amp;#34;github.com/prasanthmj/sett&amp;#34; ) s := sett.</description>
+    </item>
+    
+    <item>
+      <title>Build a very fast, highly customizable static website using Hugo in less than 10 minutes</title>
+      <link>/build-websites/build-static-website-hugo/</link>
+      <pubDate>Fri, 12 Jun 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/build-websites/build-static-website-hugo/</guid>
+      <description>Hugo is a fast static website builder written in Go language. The advantage of static sites is that the site can be hosted easily since it does not require any server-side scripting like PHP, Ruby, or a database like MySql. Static sites are very fast since there is very little server-side processing involved. Most importantly, there are several platforms where you can host your website for Free! That&amp;rsquo;s right, absolute 0 monthly costs.</description>
+    </item>
+    
+    <item>
+      <title></title>
+      <link>/resume/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/resume/</guid>
+      <description>Prasanth Janardhanan Over 21 years of Software industry experience. Currently focusing on building high-performance systems using Go lang. In the past, worked on building high-performance systems, refactoring codebases, and building user interfaces for complex systems. I have worked on web technologies as well as embedded systems, worked with most programming languages from C/C++, Python, Perl, Bash scripting to Typescript. I do hands-on coding for the projects that I am involved in.</description>
+    </item>
+    
+    <item>
+      <title>About Prasanth Janardhanan</title>
+      <link>/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>Hi, I am Prasanth Janardhanan. I am a student of Computer Science - for more than 21 years and counting. I make a living by identifying and removing accidental complexity from systems. I believe most of the problems whether in a cluster of computers or a group of people, essentially boils down to a communication problem.
+Apart from the professional software development I work on for companies, I do build software that others may find useful.</description>
+    </item>
+    
+    <item>
+      <title>My Projects</title>
+      <link>/projects/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/projects/</guid>
+      <description>qUP qUP is a background task processor with persistence support written in Go. It uses BadgerDb for persistence.
+Machine Wrapper around the machinery Go library for background task execution.
+Chimes A JWT only API authentication library. The client-side is written in TypeScript and the server side in Go.
+Boel A Javascript Form Data validation library. The syntax is made to look naturally declarative. Boel also supports conditional validations and customization to the validation messages.</description>
+    </item>
+    
+  </channel>
+</rss>

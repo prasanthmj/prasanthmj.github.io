@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>key-value store on Prasanth Janardhanan</title>
+    <link>/tags/key-value-store/</link>
+    <description>Recent content in key-value store on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Sat, 22 Aug 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/key-value-store/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A Simple Wrapper to BadgerDB Key-Value store in Go</title>
+      <link>/go/badgerdb-wrapper/</link>
+      <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/go/badgerdb-wrapper/</guid>
+      <description>BadgerDB is an embeddable key-value store written in Go. It is a persistent store.
+In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.
+Usage import( &amp;#34;github.com/prasanthmj/sett&amp;#34; ) s := sett.</description>
+    </item>
+    
+  </channel>
+</rss>

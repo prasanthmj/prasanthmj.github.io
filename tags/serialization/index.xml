@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>serialization on Prasanth Janardhanan</title>
+    <link>/tags/serialization/</link>
+    <description>Recent content in serialization on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Fri, 11 Dec 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/serialization/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How to load from a JSON file to Javascript class object (Javascript/Typescript Serialization)</title>
+      <link>/typescript/serialize-javascript-objects/</link>
+      <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/typescript/serialize-javascript-objects/</guid>
+      <description>It is a common requirement to load a nested Javascript class from a JSON file. Sometimes you want to send the JSON across a network and load it back to a Javascript class.
+For better clarity, let us understand the difference between a Javascript class instance and an Object. Take this class for example:
+This is a class that draws a rectangle on the canvas
+class Rectangle{ public x:number=0 public y:number=0 public width:number=0 public height:number=0 public draw(ctx:CanvasRenderingContext2D) { ctx.</description>
+    </item>
+    
+  </channel>
+</rss>

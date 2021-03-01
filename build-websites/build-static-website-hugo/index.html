@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Build a very fast, highly customizable static website using Hugo in less than 10 minutes </title><meta name="keywords" content="build a static website, static website, Hugo" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Build a very fast, highly customizable static website using Hugo in less than 10 minutes</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/build-a-static-website" class="text-gray-600">build a static website</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/static-website" class="text-gray-600">static website</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/hugo" class="text-gray-600">Hugo</a> </li>
+    
+</ul>
+  
+<p>Hugo is a fast static website builder written in Go language. The advantage of static sites is that the site can be hosted easily since it does not require any server-side scripting like PHP, Ruby, or a database like MySql.
+Static sites are very fast since there is very little server-side processing involved. Most importantly, there are several platforms where you can host your website for Free! That&rsquo;s right, absolute 0 monthly costs.</p>
+<p>In fact, if your website is content-oriented, you should make a static site rather than taking the troublesome, error-prone route of setting up a complicated CMS like WordPress.</p>
+<h2 id="what-is-a-static-website">What is a static website?</h2>
+<p>In the case of CMS like WordPress, the content you write is saved in the database. When the user requests for a page, it triggers the PHP code to fetch the content from the database, combine different parts. Let the theme and scores of plug-ins do their part to the content and then finally return the content to the user. As you can see, there are so many pieces working together to deliver the page. In order to cope with the inefficiencies of these parts, you have to set up caches, powerful server and many more.</p>
+<p>In the case of a static website, you write the content on your local computer or laptop and then run a program. The program combines the content, with the other essential parts of your website (like header, footer, logos) and generates the page. You upload the generated page to a webserver. When the user requests a page, all that the web server has to do is to serve the ready-to-serve page! No database, no scripts no complication.</p>
+<h2 id="why-hugo">Why Hugo</h2>
+<p>Hugo is very fast. If you have used other static site generators you will notice the difference immediately.<br>
+Secondly, Hugo is designed with building content sites in mind. So you tend to organize the content better. If you use the features right, your users will be able to find the content easier.
+If you know HTML and CSS, you can build your site your way. In fact, I would recommend you build your theme for your website than using a third-party &ldquo;theme&rdquo;. If you are like me, you will love the control this gives you.</p>
+<h2 id="get-started">Get Started</h2>
+<h3 id="install-hugo">Install Hugo</h3>
+<p>Go to the Hugo Getting started page and follow the instructions to install Hugo. In my case, on a mac laptop with <code>brew</code> installed, the step is simple:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brew install hugo
+</code></pre></div><h3 id="create-a-new-hugo-website">Create a new Hugo website</h3>
+<p>In your terminal, issue the following command:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brew new site mywebsite
+</code></pre></div><p>Hugo creates a folder mywebsite  with several sub-folders in it
+<img src="../images/hugo-folder-structure.png" alt=""></p>
+<p>Let us see how does our new website looks like.
+<code>cd</code> to your mywebsite folder and run <code>hugo serve</code></p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0086b3">cd</span> mywebsite
+hugo serve
+</code></pre></div><p>Hugo throws a message that our website is ready at address localhost:1313</p>
+<p>Enter that address in your browser and &hellip;
+&hellip; Nothing!</p>
+<p>You will get a blank page.</p>
+<p>Don&rsquo;t worry this is because we don&rsquo;t have any content or theme yet</p>
+<p>Press Ctrl+C to stop the Hugo server and return back to the command prompt</p>
+<h2 id="create-a-theme">Create a theme</h2>
+<p>By a theme, we define a structure and style of our website. It is a good exercise to make your own theme because that will give a better idea of how each part comes together to a complete site.</p>
+<p>Now issue the following command to generate a blank Hugo theme:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">hugo new theme mytheme
+</code></pre></div><p>Hugo creates a sub-folder <code>mytheme</code> inside the <code>themes</code> folder</p>
+<h2 id="select-the-theme">select the theme</h2>
+<p>Open your text editor (VSCode is nice. You can use your favorite one)</p>
+<p>There is a config.toml file in the root folder of the website (mywebsite/config.toml) Open the file <code>config.toml</code>.
+This is the file where you configure the settings of the website.
+Add the following line to the <code>config.toml</code> file.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">theme=<span style="color:#d14">&#34;mytheme&#34;</span>
+</code></pre></div><p>Your config.toml will look like this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">baseURL = <span style="color:#d14">&#34;http://example.org/&#34;</span>
+languageCode = <span style="color:#d14">&#34;en-us&#34;</span>
+title = <span style="color:#d14">&#34;My New Hugo Site&#34;</span>
+theme=<span style="color:#d14">&#34;mytheme&#34;</span>
+</code></pre></div><p>Now, Let us look into the contents of the mytheme folder</p>
+<h2 id="index-page">Index page</h2>
+<p>You can see there is an index.html page in the mytheme folder. This template is used to render the home page.
+Let&rsquo;s just add some content and see whether that appears in our new website
+Update index.html</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#000080">h1</span>&gt;This is the Home page&lt;/<span style="color:#000080">h1</span>&gt;
+</code></pre></div><p>Run <code>hugo serve</code> again. This time when you open localhost:1313 you will see the content we entered in the index.html file.
+<img src="../images/home-page.png" alt=""></p>
+<h4 id="layouts">Layouts</h4>
+<p>Now open the folder named layouts.
+The <code>layouts</code> folder contains the HTML files that define the overall layout of the website.
+You can have multiple layouts. The <code>_default</code> folder contains the layout that is used by default.
+There is a file named <code>baseof.html</code> This file is the base HTML template file.</p>
+<p>Open the <code>baseof.html</code> file. There will be some default contents in the <code>baseof.html</code> file. Replace the contents with the following:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#999;font-weight:bold;font-style:italic">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#000080">html</span>&gt;
+    &lt;<span style="color:#000080">body</span>&gt;
+        &lt;<span style="color:#000080">h1</span>&gt;My New Hugo Site&lt;/<span style="color:#000080">h1</span>&gt;
+        &lt;<span style="color:#000080">hr</span>&gt;
+        {{- block &#34;main&#34; . }}{{- end }}
+    &lt;/<span style="color:#000080">body</span>&gt;
+&lt;/<span style="color:#000080">html</span>&gt;
+</code></pre></div><p>Then open the index.html page again and update the contents like this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">{{ define &#34;main&#34; }}
+&lt;<span style="color:#000080">h1</span>&gt;This is the Home page&lt;/<span style="color:#000080">h1</span>&gt;
+{{end}}
+</code></pre></div><p>Reload your webpage in the browser and you should see the home page like this:
+<img src="../images/templated-home-page.png" alt=""></p>
+<p>Hugo replaces this block definition: <code>{{- block &quot;main&quot; . }}{{- end }}</code> in the <code>baseof.html</code> template with the main block from the index page and  renders the resulting page.</p>
+<h2 id="pages">Pages</h2>
+<p>Let us now create a page. First, we have to update the template for single pages. open <code>themes/personal/layouts/_default/single.html</code> file and update it:</p>
+<pre><code>{{ define &quot;main&quot; }}
+{{ .Content }}
+{{end}}
+</code></pre><p>This means that for the main block we had defined in the <code>baseof.html</code> template, just place the content of the page. (We will see all the variables you can use in the template later. <code>Content</code> is the content of the page being rendered. <code>Title</code> is the title of the page)</p>
+<p>Create a folder <code>lesson1</code> in the <code>content</code> folder. Then create a file <code>page1.md</code>. <code>.md</code> files are called Markdown files. It is a simple text file format, very useful for writing content. The default content format of Hugo is Markdown</p>
+<p>Enter some content for <code>page1.md</code> like this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-md" data-lang="md"><span style="color:#aaa">## This is Page 1
+</span></code></pre></div><p>Now go to the web address localhost:1313/lesson1/page1/</p>
+<p>You should see the web page rendered like this:
+<img src="../images/page-1-displayed.png" alt=""></p>
+<p>Notice again how the <code>baseof.html</code> template is used to render the page.</p>
+<h2 id="style-using-bootstrap">Style using Bootstrap</h2>
+<p>Next step is to add some styling to our website.  Since focus of this tutorial is to see the workings of Hugo, lets style with Bootstrap for this first version. Bootstrap is beginner friendly and helps getting started quickly. Go to <a href="https://getbootstrap.com/">getbootstrap.com</a> for a quick introduction.</p>
+<p>Let&rsquo;s modify <code>baseof.html</code>. First, add link to the bootstrap css file. Then add a <a href="https://getbootstrap.com/docs/4.0/components/navbar/">Navbar</a> and a footer. Alternatively, you can customize one of the <a href="https://getbootstrap.com/docs/4.0/examples/">examples</a> from bootstrap website.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#999;font-weight:bold;font-style:italic">&lt;!DOCTYPE html&gt;</span>
+&lt;<span style="color:#000080">html</span>&gt;
+    &lt;<span style="color:#000080">head</span>&gt;
+        &lt;<span style="color:#000080">meta</span> <span style="color:#008080">charset</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;utf-8&#34;</span>&gt;
+        &lt;<span style="color:#000080">meta</span> <span style="color:#008080">name</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;viewport&#34;</span> <span style="color:#008080">content</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;width=device-width, initial-scale=1, shrink-to-fit=no&#34;</span>&gt;
+        &lt;<span style="color:#000080">title</span>&gt;My New Hugo Site&lt;/<span style="color:#000080">title</span>&gt;
+        <span style="color:#998;font-style:italic">&lt;!-- Bootstrap CSS --&gt;</span>
+        &lt;<span style="color:#000080">link</span> <span style="color:#008080">rel</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;stylesheet&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css&#34;</span> <span style="color:#008080">integrity</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l&#34;</span> <span style="color:#008080">crossorigin</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;anonymous&#34;</span>&gt;
+
+    &lt;/<span style="color:#000080">head</span>&gt;
+    &lt;<span style="color:#000080">body</span>&gt;
+        &lt;<span style="color:#000080">nav</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar navbar-expand-md navbar-dark bg-secondary&#34;</span>&gt;
+            &lt;<span style="color:#000080">div</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;container-fluid&#34;</span>&gt;
+              &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar-brand&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;MySite&lt;/<span style="color:#000080">a</span>&gt;
+              &lt;<span style="color:#000080">div</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;collapse navbar-collapse&#34;</span> <span style="color:#008080">id</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbarsExampleDefault&#34;</span>&gt;
+                &lt;<span style="color:#000080">ul</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar-nav me-auto mb-2 mb-md-0&#34;</span>&gt;
+                  &lt;<span style="color:#000080">li</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-item&#34;</span>&gt;
+                    &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-link active&#34;</span> <span style="color:#008080">aria-current</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;page&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;Home&lt;/<span style="color:#000080">a</span>&gt;
+                  &lt;/<span style="color:#000080">li</span>&gt;
+                  &lt;<span style="color:#000080">li</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-item&#34;</span>&gt;
+                    &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-link&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;Link&lt;/<span style="color:#000080">a</span>&gt;
+                  &lt;/<span style="color:#000080">li</span>&gt;
+                &lt;/<span style="color:#000080">ul</span>&gt;
+                &lt;/<span style="color:#000080">div</span>&gt;
+            &lt;/<span style="color:#000080">div</span>&gt;
+        &lt;/<span style="color:#000080">nav</span>&gt;
+        &lt;<span style="color:#000080">main</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;container mt-2 min-vh-100&#34;</span> &gt;
+                {{- block &#34;main&#34; . }}{{- end }}
+        &lt;/<span style="color:#000080">main</span>&gt;
+        &lt;<span style="color:#000080">footer</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bg-dark p-3 mt-4 container-fluid&#34;</span>&gt;
+            &lt;<span style="color:#000080">a</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;text-light&#34;</span>&gt;About&lt;/<span style="color:#000080">a</span>&gt;
+        &lt;/<span style="color:#000080">footer</span>&gt;
+    &lt;/<span style="color:#000080">body</span>&gt;
+&lt;/<span style="color:#000080">html</span>&gt;
+</code></pre></div><p>Don&rsquo;t forget to add the <code>{{- block &quot;main&quot; . }}{{- end }}</code> block.</p>
+<p>Go ahead and preview your updated website. Page 1 should look better now</p>
+<p><img src="../images/hugo-bootstrap.png" alt=""></p>
+<h2 id="publishing-your-website">Publishing your website</h2>
+<p>In order to generate your website, run <code>hugo</code> command. Hugo generates your website in the <code>public</code> folder. Just upload contents of your public folder to a static web hosting service and your website is online!</p>
+<p>There are a number of static site hosting services.</p>
+<ul>
+<li><a href="https://docs.github.com/en/github/working-with-github-pages/creating-a-github-pages-site">Github Pages</a></li>
+<li><a href="https://docs.gitlab.com/ee/user/project/pages/">Gitlab Pages</a></li>
+<li><a href="https://www.netlify.com/">Netlify</a></li>
+</ul>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2021 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

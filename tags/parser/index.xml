@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>parser on Prasanth Janardhanan</title>
+    <link>/tags/parser/</link>
+    <description>Recent content in parser on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/parser/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building a simple query parser using PEG in Go</title>
+      <link>/go/peg-parser-in-go/</link>
+      <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/go/peg-parser-in-go/</guid>
+      <description>In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
+The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.</description>
+    </item>
+    
+    <item>
+      <title>How to support custom Javascript scripting in Go Applications</title>
+      <link>/go/javascript-parser-in-go/</link>
+      <pubDate>Wed, 06 Jan 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/go/javascript-parser-in-go/</guid>
+      <description>Why will someone need a Javascript Parser, written natively in Go? Isn&amp;rsquo;t it a crazy, Architecture Astronauts solution that is looking for a problem? Not necessarily.
+There was a time when applications allowed some kind of scripting to extend them and to make them fit into any workflow. For example VBScript for Microsoft office products. However, very few Web applications have the infrastructure to allow custom scripts inside them. There are a few that does support; one example is Google Apps Script.</description>
+    </item>
+    
+  </channel>
+</rss>

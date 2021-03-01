@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Creating an isolated cluster - provisioning a cluster and a Bastion host using Ansible </title><meta name="keywords" content="hetzner, ansible, terraform" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Creating an isolated cluster - provisioning a cluster and a Bastion host using Ansible</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/hetzner" class="text-gray-600">hetzner</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/ansible" class="text-gray-600">ansible</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/terraform" class="text-gray-600">terraform</a> </li>
+    
+</ul>
+  
+<p>This is the second part of the series on setting up a cluster using Terraform and Ansible. In the <a href="../terraform-hetzner-cloud-setup-example/">first part</a>, we had set up the bare cluster Virtual Machines.
+The set up included a virtual private network, a bastion server, and a separately configurable cluster of nodes.</p>
+<p>The nodes are ready but not software or configuration is done so far. In the next step, we will provision all the nodes in our cloud</p>
+<h2 id="provisioning-bastion-server-using-ansible">Provisioning Bastion Server using Ansible</h2>
+<p>Checkout the Ansible playbook in the folder 2-provision/bastion folder
+The first step we do is to configure the system:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#555">---</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Set timezone to Etc/UTC<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">timezone</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Etc/UTC<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span><span style="color:#998;font-style:italic"># Install Packages</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Update apt<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">apt</span>:<span style="color:#bbb"> </span>update_cache=yes<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Install required system packages<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">apt</span>:<span style="color:#bbb"> </span>name={{ item }} state=latest update_cache=yes force_apt_get=yes<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">loop</span>:<span style="color:#bbb"> </span>[<span style="color:#bbb"> </span><span style="color:#d14">&#39;curl&#39;</span>,<span style="color:#bbb"> </span><span style="color:#d14">&#39;vim&#39;</span>,<span style="color:#bbb"> </span><span style="color:#d14">&#39;ufw&#39;</span>]<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Should be able to add local hosts in /etc/hosts<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">lineinfile</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span>/etc/cloud/cloud.cfg<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">regexp</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;^manage_etc_hosts:&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">line</span>:<span style="color:#bbb"> </span>manage_etc_hosts:false<span style="color:#bbb">
+</span><span style="color:#bbb">  
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Update system<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">package</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;*&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">update_cache</span>:<span style="color:#bbb"> </span><span style="color:#000;font-weight:bold">yes</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>latest<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">register</span>:<span style="color:#bbb"> </span>system_updated<span style="color:#bbb">
+</span></code></pre></div><p>First, we set up the timezone to be UTC. Then we install or upgrade some system packages. We update the file <code>/etc/cloud/cloud.cfg</code> to add a configuration to be able to edit the <code>etc/hosts</code> file. We will be updating the hosts file for accessing the nodes in the cluster easily using names like node1, node2 etc</p>
+<h3 id="user-setup">User setup</h3>
+<p>The next step is to configure user login and ssh. See the role users in the folder <code>2-provision/roles/users</code>. We create a &lsquo;wheel&rsquo; group with <code>sudo</code> permissions. Then we disable root login. Note that this is just one way of configuring user access and ssh configuration. Depending on your requirements and configuration you can customize the user login setup by adding stricter and tighter SSH login restrictions.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#998;font-style:italic"># Sudo Group Setup</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Make sure we have a &#39;wheel&#39; group<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">group</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>wheel<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Allow &#39;wheel&#39; group to have passwordless sudo<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">lineinfile</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span>/etc/sudoers<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">regexp</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;^%wheel&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">line: &#39;%wheel ALL=(ALL) NOPASSWD</span>:<span style="color:#bbb"> </span>ALL&#39;<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">validate</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;/usr/sbin/visudo -cf %s&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Create a new user<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">user</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ deploy_user_name }}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">groups</span>:<span style="color:#bbb"> </span>wheel<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">append</span>:<span style="color:#bbb"> </span><span style="color:#000;font-weight:bold">true</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">create_home</span>:<span style="color:#bbb"> </span><span style="color:#000;font-weight:bold">true</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">shell</span>:<span style="color:#bbb"> </span>/bin/bash<span style="color:#bbb">
+</span><span style="color:#bbb">        
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Set authorized key for remote user<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">authorized_key</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">user</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ deploy_user_name }}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">key</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ lookup(&#39;file&#39;, deploy_user_key_path ) }}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">  
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Disable password login<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">lineinfile</span>:<span style="color:#bbb"> 
+</span><span style="color:#bbb">    </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span>/etc/ssh/sshd_config <span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">regexp</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;^(#\s*)?PasswordAuthentication &#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">line</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;PasswordAuthentication no&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">notify</span>:<span style="color:#bbb"> </span>Restart sshd<span style="color:#bbb">
+</span><span style="color:#bbb">  
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Disable root login<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">lineinfile</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span>/etc/ssh/sshd_config<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">regexp</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;^#?PermitRootLogin&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">line</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;PermitRootLogin no&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">notify</span>:<span style="color:#bbb"> </span>Restart sshd<span style="color:#bbb">
+</span></code></pre></div><h3 id="configuring-node-communications">Configuring node communications</h3>
+<p>The next few steps are to configure the SSH communication with the nodes in the cluster a bit easier. We will assign names to the nodes in the cluster and use the private IP address to communicate between the nodes.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Add IP address of all hosts to hosts file<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">lineinfile</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">dest</span>:<span style="color:#bbb"> </span>/etc/hosts<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">regexp</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#39;.*{{ item.name }}$&#39;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">line</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ item.ip }}  {{item.name}}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">with_items</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>node1<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.5&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>node2<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.6&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>node3<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.7&#34;</span><span style="color:#bbb">   
+</span><span style="color:#bbb">        </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>node4<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.15&#34;</span><span style="color:#bbb">   
+</span><span style="color:#bbb">        </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>node5<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.16&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>node6<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.17&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">                    
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Copy keys used to connect to nodes<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">copy</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">src</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;keys/{{item}}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">dest</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;/home/{{ deploy_user_name }}/.ssh/{{item}}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">mode</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;600&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">owner</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ deploy_user_name }}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">group</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ deploy_user_name }}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">with_items</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>- nodes<span style="color:#bbb">
+</span><span style="color:#bbb">        </span>- nodes.pub<span style="color:#bbb">
+</span><span style="color:#bbb">        
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Make sure ssh/config file exists<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">file</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;/home/{{ deploy_user_name }}/.ssh/config&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>touch        <span style="color:#bbb">
+</span><span style="color:#bbb">         
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Setup SSH config file for nodes<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">blockinfile</span>:<span style="color:#bbb"> 
+</span><span style="color:#bbb">         </span><span style="color:#000080">path</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;/home/{{ deploy_user_name }}/.ssh/config&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">marker</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;# {mark} Added through ansible scripts {{item}}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">block</span>:<span style="color:#bbb">  </span>|<span style="color:#d14">
+</span><span style="color:#d14">            Host {{item}}
+</span><span style="color:#d14">                IdentityFile ~/.ssh/nodes
+</span><span style="color:#d14">                User {{ deploy_user_name }}</span><span style="color:#bbb">            
+</span><span style="color:#bbb">      </span><span style="color:#000080">loop</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>- node1<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>- node2<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>- node3<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>- node4<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>- node5<span style="color:#bbb">
+</span><span style="color:#bbb">         </span>- node6<span style="color:#bbb">
+</span><span style="color:#bbb">         
+</span></code></pre></div><h3 id="installing-tools">Installing tools</h3>
+<p>Next, we install tools required for running the cluster. For example, it will be handy to have <code>kubectl</code> and helm  on the bastion host. So we install these tools.</p>
+<p>Next, we install and configure an NFS share on the bastion host. This is optional. However, this will be handy to have a network share accessible from all nodes of the cluster.</p>
+<h3 id="firewall-setup">Firewall setup</h3>
+<p>We will use <code>ufw</code> for firewall. First, install <code>ufw</code> then allow only SSH incoming. We also open the NFS port only to the private network.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Install ufw<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">apt</span>:<span style="color:#bbb"> 
+</span><span style="color:#bbb">        </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>ufw<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>latest<span style="color:#bbb">
+</span><span style="color:#bbb">        
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>ufw allow ssh<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">ufw</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">rule</span>:<span style="color:#bbb"> </span>allow<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>OpenSSH<span style="color:#bbb">
+</span><span style="color:#bbb">        
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>ufw allow NFS<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">ufw</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">rule</span>:<span style="color:#bbb"> </span>allow<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">port</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;2049&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">src</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.0/16&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">        
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Enable UFW<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">ufw</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">          </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>enabled<span style="color:#bbb">
+</span></code></pre></div><h3 id="provisioning-the-bastion-server">Provisioning the Bastion server</h3>
+<p>Now that we have the scripts ready, let us run Ansible to configure the servers.</p>
+<p>First, you need to generate SSH keys for setting up a login on the bastion host
+Let&rsquo;s name it <code>mycluster-bastion</code>. Then create SSH keys for the nodes. Keep the node keys(private and public) in the folder 2-provision/bastion/keys</p>
+<p>Get the IP address of the bastion host to node.txt Then run the Ansible playbook</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ansible-playbook bastion.yaml -i node.txt --user<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;root&#39;</span> --key-file<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;~/.ssh/tcloud&#34;</span> --ssh-extra-args<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;-p 22 -o ConnectTimeout=10 -o ConnectionAttempts=10 -o StrictHostKeyChecking=no&#39;</span> --extra-vars<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;deploy_user_name=nodeuser deploy_user_key_path=~/.ssh/mycluster-bastion.pub&#34;</span>
+</code></pre></div><p>All these steps can be automated in the <code>run.sh</code> bash script like this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#000;font-weight:bold">function</span> ProvisionBase<span style="color:#000;font-weight:bold">(){</span>
+   <span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
+   <span style="color:#008080">IP</span><span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">$(</span>terraform show | egrep bastion_ip | cut -d<span style="color:#d14">&#39;&#34;&#39;</span> -f <span style="color:#099">2</span> <span style="color:#000;font-weight:bold">)</span>
+   <span style="color:#0086b3">echo</span> <span style="color:#d14">&#34;IP is </span><span style="color:#008080">$IP</span><span style="color:#d14">&#34;</span>
+   <span style="color:#0086b3">cd</span> ../../../2-provision/bastion 
+   <span style="color:#0086b3">printf</span> <span style="color:#d14">&#34;</span><span style="color:#008080">$IP</span><span style="color:#d14">\n&#34;</span> &gt; node.txt
+   
+   <span style="color:#008080">ANSIBLE_FORCE_COLOR</span><span style="color:#000;font-weight:bold">=</span><span style="color:#0086b3">true</span> 
+   ansible-playbook bastion.yaml -i node.txt --user<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;root&#39;</span> --key-file<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;~/.ssh/tcloud&#34;</span> --ssh-extra-args<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;-p 22 -o ConnectTimeout=10 -o ConnectionAttempts=10 -o StrictHostKeyChecking=no&#39;</span> --extra-vars<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;deploy_user_name=nodeuser deploy_user_key_path=~/.ssh/mycluster-bastion.pub&#34;</span>
+   
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></div><p>The script can be run like this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">./run.sh provision base
+</code></pre></div><h2 id="provisioning-the-cluster-nodes">Provisioning the cluster nodes</h2>
+<p>We run the basic system setup on the cluster nodes as well using the same roles used for provisioning the bastion server. Then we setup SSH and user rights using the users role.</p>
+<h2 id="installing-essential-software-on-the-nodes">Installing essential software on the nodes</h2>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>post build setup - nodes<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">hosts</span>:<span style="color:#bbb"> </span>all<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">become</span>:<span style="color:#bbb"> </span><span style="color:#000;font-weight:bold">true</span><span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">tasks</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Initial System Setup<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">include_role</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>../roles/system<span style="color:#bbb">
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Users setup<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">include_role</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>../roles/users  <span style="color:#bbb">
+</span><span style="color:#bbb">         
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Install docker<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">include_role</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">         </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>geerlingguy.docker <span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">vars</span>:<span style="color:#bbb"> 
+</span><span style="color:#bbb">         </span><span style="color:#000080">docker_users</span>:<span style="color:#bbb"> 
+</span><span style="color:#bbb">            </span>- <span style="color:#d14">&#34;{{ deploy_user_name }}&#34;</span><span style="color:#bbb">      
+</span><span style="color:#bbb">                   
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Set authorized key taken from file<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">ansible.posix.authorized_key</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">user</span>:<span style="color:#bbb"> </span>myadmin<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>present<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">key</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;{{ lookup(&#39;file&#39;, &#39;../bastion/keys/nodes.pub&#39;) }}&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">    </span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Enable UFW firewall<span style="color:#bbb">
+</span><span style="color:#bbb">      </span><span style="color:#000080">include_role</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">        </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>../roles/ufw    <span style="color:#bbb">
+</span></code></pre></div><p>The nodes require only a few software installed. We intend to build a Kubernetes cluster. We intend to use Docker for the virtualization layer. So we install docker. Then we copy the SSH keys. Finally, we install and configure UFW firewall.</p>
+<p>The firewall is configured to disallow communications from the public network. All communications to the cluster nodes are through the private network. See the UFW rules configured using Ansible:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml">- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>make sure ufw is installed<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">apt</span>:<span style="color:#bbb"> 
+</span><span style="color:#bbb">    </span><span style="color:#000080">name</span>:<span style="color:#bbb"> </span>ufw<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>latest<span style="color:#bbb">
+</span><span style="color:#bbb">    
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>disable all incoming on eth0<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">ufw</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">     </span><span style="color:#000080">rule</span>:<span style="color:#bbb"> </span>reject<span style="color:#bbb">
+</span><span style="color:#bbb">     </span><span style="color:#000080">direction</span>:<span style="color:#bbb"> </span>in<span style="color:#bbb">
+</span><span style="color:#bbb">     </span><span style="color:#000080">interface</span>:<span style="color:#bbb"> </span>eth0<span style="color:#bbb">
+</span><span style="color:#bbb">
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>allow all from internal network<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">ufw</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">     </span><span style="color:#000080">rule</span>:<span style="color:#bbb"> </span>allow<span style="color:#bbb">
+</span><span style="color:#bbb">     </span><span style="color:#000080">from_ip</span>:<span style="color:#bbb"> </span><span style="color:#d14">&#34;10.0.0.0/16&#34;</span><span style="color:#bbb">
+</span><span style="color:#bbb">     </span><span style="color:#000080">to_ip</span>:<span style="color:#bbb"> </span>any<span style="color:#bbb">
+</span><span style="color:#bbb">     
+</span><span style="color:#bbb"></span>- <span style="color:#000080">name</span>:<span style="color:#bbb"> </span>Enable UFW<span style="color:#bbb">
+</span><span style="color:#bbb">  </span><span style="color:#000080">ufw</span>:<span style="color:#bbb">
+</span><span style="color:#bbb">    </span><span style="color:#000080">state</span>:<span style="color:#bbb"> </span>enabled<span style="color:#bbb">
+</span></code></pre></div><p>Now that the script is ready, we can run Ansible playbook.</p>
+<p>First, create SSH key for the node user <code>mycluster-nodes</code>.
+First, get the public IP addresses of the nodes to a cluster.txt inventory file. Then run the command</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0086b3">cd</span> ./2-provision/cluster
+
+ansible-playbook nodes.yaml -i cluster.txt --user<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;root&#39;</span> --key-file<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;~/.ssh/tcloud&#34;</span> --ssh-extra-args<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;-p 22 -o ConnectTimeout=10 -o ConnectionAttempts=10 -o StrictHostKeyChecking=no&#39;</span> --extra-vars<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;deploy_user_name=nodeuser deploy_user_key_path=~/.ssh/mycluster-nodes.pub&#34;</span>
+</code></pre></div><p>Here is the bash script function that does the same:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#000;font-weight:bold">function</span> provisionCluster<span style="color:#000;font-weight:bold">(){</span>
+   <span style="color:#008080">NAME</span><span style="color:#000;font-weight:bold">=</span><span style="color:#008080">$1</span>
+   <span style="color:#0086b3">cd</span> <span style="color:#d14">&#34;./1-infra/mycluster/</span><span style="color:#008080">$NAME</span><span style="color:#d14">&#34;</span>
+   <span style="color:#008080">NODES</span><span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">$(</span>terraform show | egrep ipv4_address | cut -d<span style="color:#d14">&#39;&#34;&#39;</span> -f <span style="color:#099">2</span> | sort -u<span style="color:#000;font-weight:bold">)</span>
+   <span style="color:#0086b3">cd</span> ../../../2-provision/cluster
+   <span style="color:#0086b3">printf</span> <span style="color:#d14">&#34;</span><span style="color:#008080">$NODES</span><span style="color:#d14">\n&#34;</span> &gt; cluster.txt
+   <span style="color:#008080">ANSIBLE_FORCE_COLOR</span><span style="color:#000;font-weight:bold">=</span><span style="color:#0086b3">true</span> 
+   
+   ansible-playbook nodes.yaml -i cluster.txt --user<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;root&#39;</span> --key-file<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;~/.ssh/tcloud&#34;</span> --ssh-extra-args<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;-p 22 -o ConnectTimeout=10 -o ConnectionAttempts=10 -o StrictHostKeyChecking=no&#39;</span> --extra-vars<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;deploy_user_name=nodeuser deploy_user_key_path=~/.ssh/mycluster-nodes.pub&#34;</span>
+   
+<span style="color:#000;font-weight:bold">}</span>
+</code></pre></div><p>Once the command finishes the cluster nodes are provisioned.</p>
+<p>In order to test whether the setup is working, first SSH to the Bastion host
+Then from the bastion host, ssh to the nodes in the cluster.
+Add the IP address of the bastion host to your <code>/etc/hosts</code> file</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ssh -i ~/.ssh/mycluster-bastion nodeuser@bastion
+
+ssh nodeuser@node1
+
+</code></pre></div><p>If you could get to node1 through SSH, the setup is working as expected. We can proceed to install Kubernetes on this cluster.</p>
+<p>Similarly, you can try logging into node2 and node3.</p>
+<h2 id="ssh-to-the-nodes-through-the-bastion-host">SSH to the nodes through the bastion host</h2>
+<p>You can configure SSH on your local laptop to connect to the node through the bastion host. Here is a sample ssh config file (place the file in ~/.ssh/config )</p>
+<pre><code>Host bastion
+  User nodeuser
+  IdentityFile ~/.ssh/mycluster-bastion
+  
+Host node1
+  IdentityFile ~/.ssh/mycluster-nodes
+  ProxyCommand ssh nodeuser@bastion -W %h:%p
+  
+</code></pre><p>Now you can access node1 directly from your local laptop:</p>
+<pre><code>ssh nodeuser@node1
+</code></pre>
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/terraform/terraform-hetzner-cloud-setup-example/" class="pr-4">&larr; Setting up a Bastion host and a three-node cluster on Hetzner cloud using Terraform and Ansible</a>
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2021 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

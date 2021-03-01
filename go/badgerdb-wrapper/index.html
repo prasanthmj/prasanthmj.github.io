@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>A Simple Wrapper to BadgerDB Key-Value store in Go </title><meta name="keywords" content="badgerdb, golang, key-value store" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">A Simple Wrapper to BadgerDB Key-Value store in Go</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/badgerdb" class="text-gray-600">badgerdb</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/key-value-store" class="text-gray-600">key-value store</a> </li>
+    
+</ul>
+  
+<p><a href="https://github.com/dgraph-io/badger">BadgerDB</a> is an embeddable key-value store written in Go. It is a persistent store.</p>
+<p>In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &ldquo;virtual tables&rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.</p>
+<h2 id="usage">Usage</h2>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">import</span>(
+    <span style="color:#d14">&#34;github.com/prasanthmj/sett&#34;</span>
+)
+
+s <span style="color:#000;font-weight:bold">:=</span> sett.<span style="color:#900;font-weight:bold">Open</span>(sett.<span style="color:#900;font-weight:bold">DefaultOptions</span>(<span style="color:#d14">&#34;./data/mydb&#34;</span>))
+</code></pre></div><p>To set a string key-value pair, call <code>s.SetStr(k, v)</code>
+and to get it back, call <code>s.GetStr(k)</code>.</p>
+<h2 id="virtual-tables">Virtual Tables</h2>
+<p>BadgerDB has no tables. However, we can simulate a table using simple key prefixes.</p>
+<p>Here is how you set value:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;cache&#34;</span>).<span style="color:#900;font-weight:bold">SetStr</span>(k, v)
+</code></pre></div><p>In order to get the value back, call</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">v, err <span style="color:#000;font-weight:bold">:=</span> s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;cache&#34;</span>).<span style="color:#900;font-weight:bold">GetStr</span>(k)
+</code></pre></div><p>Having these virtual tables helps organize the keys by purpose (cache, session for example), and avoids collisions. You can drop the entire table together</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;cache&#34;</span>).<span style="color:#900;font-weight:bold">Drop</span>()
+</code></pre></div><h2 id="expiring-tables-ttl">Expiring tables (TTL)</h2>
+<p>You can set the values in a table to expire after some time. For example, the &ldquo;cache&rdquo; table may hold values for 10 minutes whereas the &ldquo;session&rdquo; table expires values after one hour.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">cache <span style="color:#000;font-weight:bold">:=</span> s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;cache&#34;</span>).<span style="color:#900;font-weight:bold">WithTTL</span>(<span style="color:#099">10</span> <span style="color:#000;font-weight:bold">*</span> time.Minute)
+
+session <span style="color:#000;font-weight:bold">:=</span> s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;session&#34;</span>).<span style="color:#900;font-weight:bold">WithTTL</span>(<span style="color:#099">1</span> <span style="color:#000;font-weight:bold">*</span> time.Hour)
+</code></pre></div><h2 id="saving-structures">Saving structures</h2>
+<p>Sett provides functions to save structures as well.  Sett uses gob package for dynamically creating the structure instances. You have to call gob.Register()
+to register the structures that you use with Sett.</p>
+<p>This is how you would keep user details in a session, for example:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">type</span> UserSession <span style="color:#000;font-weight:bold">struct</span> {
+	ID    <span style="color:#458;font-weight:bold">string</span>
+	Email <span style="color:#458;font-weight:bold">string</span>
+}
+<span style="color:#998;font-style:italic">//register the structure first
+</span><span style="color:#998;font-style:italic"></span>gob.<span style="color:#900;font-weight:bold">Register</span>(<span style="color:#000;font-weight:bold">&amp;</span>UserSession{})
+
+user <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>UserSession{ID:user.ID, Email:user.Email}
+
+s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;session&#34;</span>).<span style="color:#900;font-weight:bold">Set</span>(session_id, user)
+</code></pre></div><h2 id="insert">Insert</h2>
+<p>Sometimes we want to save a record and just need a key to refer to that record. In the case of saving to sessions, we need to save User information and then get a session ID - a short string that should be random.
+We can use Insert() in this case.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">sessionID, err <span style="color:#000;font-weight:bold">:=</span> sessionTable.<span style="color:#900;font-weight:bold">Insert</span>(user)
+</code></pre></div><p>Then we can send the session ID as part of the response.</p>
+<h2 id="cut">Cut</h2>
+<p>&lsquo;Cut&rsquo; is an operation where we get the value and remove the item from the database in a single atomic operation. Imagine you have several concurrent task handlers running. You want to be sure that no two task handlers get the same task. You can use <code>Cut()</code> operation to pick tasks.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+key,err <span style="color:#000;font-weight:bold">:=</span> table.<span style="color:#900;font-weight:bold">Insert</span>(t)
+<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">nil</span> {
+    access_key <span style="color:#000;font-weight:bold">&lt;-</span> key    
+}
+
+</code></pre></div><p>On the other end, the go routine picks the key and processes the task</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">for</span> {
+        <span style="color:#000;font-weight:bold">select</span> {
+        <span style="color:#000;font-weight:bold">case</span> akey <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&lt;-</span>access_key:
+            iobj, err <span style="color:#000;font-weight:bold">:=</span> store.<span style="color:#900;font-weight:bold">Table</span>(tab).<span style="color:#900;font-weight:bold">Cut</span>(akey)
+            <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">nil</span>{
+                <span style="color:#900;font-weight:bold">ProcessTask</span>(iobj)    
+            }
+        <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>closed:
+					<span style="color:#000;font-weight:bold">return</span>
+		}
+            
+    }
+</code></pre></div><h2 id="updating">Updating</h2>
+<p>Update is done in a callback like this:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">s.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;tasks&#34;</span>).<span style="color:#900;font-weight:bold">Update</span>(key, <span style="color:#000;font-weight:bold">func</span>(iv <span style="color:#000;font-weight:bold">interface</span>{}) <span style="color:#458;font-weight:bold">error</span> {
+		tobj <span style="color:#000;font-weight:bold">:=</span> iv.(<span style="color:#000;font-weight:bold">*</span>TaskObj)
+		tobj.Access <span style="color:#000;font-weight:bold">+=</span> <span style="color:#099">1</span>
+		tobj.Status = <span style="color:#d14">&#34;inprogress&#34;</span>
+		<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+}, <span style="color:#000;font-weight:bold">false</span>)
+</code></pre></div>
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    
+    <a href="/go/go-task-queue-with-badgerdb-backend/" class="pl-4">Background task processor in Go with persistence support using BadgerDB &rarr;</a>
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2021 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

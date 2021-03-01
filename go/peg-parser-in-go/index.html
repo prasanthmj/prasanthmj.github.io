@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Building a simple query parser using PEG in Go </title><meta name="keywords" content="go, golang, peg, parser, compiler" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Building a simple query parser using PEG in Go</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/go" class="text-gray-600">go</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/peg" class="text-gray-600">peg</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/parser" class="text-gray-600">parser</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/compiler" class="text-gray-600">compiler</a> </li>
+    
+</ul>
+  
+<p>In another post, <a href="../simple-query-parser/">Simple Query Parser</a> we had built a simple query parser using <a href="https://github.com/alecthomas/participle">Participle</a> - a parser builder for go lang.
+<a href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">Parsing expression grammar (PEG)</a> is a type of grammar. The advantage of PEG is that it doesn&rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.</p>
+<p>The go language port of PEG is <a href="https://pkg.go.dev/github.com/mna/pigeon">pigeon</a>
+The popular Javascript port of PEG is <a href="https://pegjs.org/documentation">pegjs</a>. A good introduction to PEG grammar can be found in the <a href="https://pegjs.org/documentation">pegjs documentation</a> and also <a href="https://github.com/PhilippeSigaud/Pegged/wiki/PEG-Basics">here</a>.</p>
+<p>In this article, we will use pigeon to translate from a .peg grammar file to .go source. Run the command below to get pigeon on your laptop.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">go get -u github.com/mna/pigeon
+</code></pre></div><p>You can run the pigeon command to translate from .peg file to .go like this</p>
+<pre><code>pigeon -o query.go query.peg
+</code></pre><h2 id="a-simple-query-language">A simple query language</h2>
+<p>As mentioned in the previous article, the format of the simple query language is like this:</p>
+<pre><code>item.name=laptop item.spec.ram &gt; 8gb item.spec.ssd=yes item.spec.ssd.capacity &gt; 512gb sort_by:price/asc
+</code></pre><p>This query is used to filter items for sale from an online store.</p>
+<h2 id="the-first-step">The first step</h2>
+<p>Let us first try to parse a simple query like this: <code>something=another</code></p>
+<p>Here is the .peg file for this simple query parser:</p>
+<pre><code>{
+package qp1
+
+type Field struct{
+  Key string
+  Value string
+}
+   
+}
+
+Field
+  = key:Identifier _ &quot;=&quot; _ value:Identifier {
+      return &amp;Field{Key:key.(string), Value:value.(string)}, nil
+  }
+
+_
+  = [ \t]*
+  
+Identifier
+  = [a-zA-Z0-9_]+ { 
+      return string(c.text), nil
+}
+  
+EOF 
+  = !.
+
+</code></pre><p>The first part of the .peg file between <code>{ }</code> braces is copied directly to the generated .go file. This is the place for any code initializations. In this case, the package definition and some structure definitions are added in this block.</p>
+<p>As for grammar, let us start from the bottom. The grammar rule format is like this</p>
+<pre><code>rule
+   = rule definitions
+</code></pre><p>The bottom most lines defines End Oof File, the rule <code>!.</code> when no more characters, then it is the end of file.
+An identifier is defined as a sequence of alpha-numeric characters:</p>
+<pre><code>Identifier 
+  = [a-zA-Z0-9_]+ { 
+      return string(c.text), nil
+}
+</code></pre><p>This rule says that, when such an identifier is found, get its text, convert to string, and return.</p>
+<p>This rule here defines whitespace.</p>
+<pre><code>_
+  = [ \t]*
+</code></pre><p>Yes you can define it in a more verbose and clearer fashion too</p>
+<pre><code>whitespace
+  = [ \t]*
+</code></pre><p>The definition of <code>Field</code> shows how to define a complete grammar rule:</p>
+<pre><code>Field
+  = key:Identifier _ &quot;=&quot; _ value:Identifier 
+</code></pre><p>This rule says that capture the first part of the field - that follows the Identifier definition - to a variable <code>key</code> and the second part - after the <code>=</code> sign , also an identifier - to a variable <code>value</code>.</p>
+<pre><code>Field
+  = key:Identifier _ &quot;=&quot; _ value:Identifier {
+      return &amp;Field{Key:key.(string), Value:value.(string)}, nil
+  }
+</code></pre><p>The function body after the definition picks the parsed values, packages them into a <code>Field</code> struct, and returns it.</p>
+<h3 id="using-the-parser">Using the parser</h3>
+<p>There are two steps: first, generate the parser code in go. For that run:</p>
+<pre><code>pigeon -o query.go query.peg
+</code></pre><p>Then write the code that uses the generated parser:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+	res, err <span style="color:#000;font-weight:bold">:=</span> qp.<span style="color:#900;font-weight:bold">Parse</span>(<span style="color:#d14">&#34;&#34;</span>, []<span style="color:#0086b3">byte</span>(<span style="color:#d14">&#34;some = another&#34;</span>))
+	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+		fmt.<span style="color:#900;font-weight:bold">Println</span>(err)
+		<span style="color:#000;font-weight:bold">return</span>
+	}
+	result, err <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">MarshalIndent</span>(res, <span style="color:#d14">&#34;&#34;</span>, <span style="color:#d14">&#34;   &#34;</span>)
+	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+		fmt.<span style="color:#900;font-weight:bold">Println</span>(err)
+		<span style="color:#000;font-weight:bold">return</span>
+	}
+
+	fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;output:\n%v\n&#34;</span>, <span style="color:#0086b3">string</span>(result))
+}
+</code></pre></div><p>The output will look like this:</p>
+<pre><code>{
+   &quot;Key&quot;: &quot;some&quot;,
+   &quot;Value&quot;: &quot;another&quot;
+}
+</code></pre><h2 id="repeating-definitions">Repeating definitions</h2>
+<p>Let us now make a small update -  the &ldquo;key&rdquo; will allow something similar to object member notation like this:</p>
+<pre><code>item.spec.ssd=something
+</code></pre><p>We need to get the &ldquo;item.spec.ssd&rdquo; part parsed out to a <code>Source</code> structure.</p>
+<p>The <code>Field</code> and <code>Source</code> definitions are defined:</p>
+<pre><code>Field
+  = src:Source _ &quot;=&quot; _ value:Identifier {
+      return &amp;Field{Key:src.(*Source), Value:value.(string)}, nil
+  }
+
+Source
+  = name:Identifier path:(&quot;.&quot; Identifier)* {
+      return makeSource(name,path)
+  }
+</code></pre><p>Make a note of the Source grammar definition. <code>Identifier</code> then <code>.Identifier</code> that can repeat 0 or more times (* means 0 or more repetitions). So the path is optional and can repeat if required.</p>
+<p>Note that it is calling a function <code>makeSource</code> which extracts the parsed values to a <code>Source</code> struct. It has a number of type casting since name and path are of type interface{} We have to type assert and extract the parameters.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
+	Key   <span style="color:#000;font-weight:bold">*</span>Source
+	Value <span style="color:#458;font-weight:bold">string</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Source <span style="color:#000;font-weight:bold">struct</span> {
+	Name <span style="color:#458;font-weight:bold">string</span>
+	Path []<span style="color:#458;font-weight:bold">string</span>
+}
+
+<span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeSource</span>(name <span style="color:#000;font-weight:bold">interface</span>{}, path <span style="color:#000;font-weight:bold">interface</span>{}) (<span style="color:#000;font-weight:bold">*</span>Source, <span style="color:#458;font-weight:bold">error</span>) {
+	ps <span style="color:#000;font-weight:bold">:=</span> path.([]<span style="color:#000;font-weight:bold">interface</span>{})
+
+	paths <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>([]<span style="color:#458;font-weight:bold">string</span>, <span style="color:#099">0</span>)
+	<span style="color:#000;font-weight:bold">for</span> _, p <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> ps {
+		pa <span style="color:#000;font-weight:bold">:=</span> p.([]<span style="color:#000;font-weight:bold">interface</span>{})
+		px <span style="color:#000;font-weight:bold">:=</span> pa[<span style="color:#099">1</span>:]
+		<span style="color:#000;font-weight:bold">for</span> _, pi <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> px {
+			paths = <span style="color:#0086b3">append</span>(paths, pi.(<span style="color:#458;font-weight:bold">string</span>))
+		}
+	}
+
+	<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>Source{Name: name.(<span style="color:#458;font-weight:bold">string</span>), Path: paths}, <span style="color:#000;font-weight:bold">nil</span>
+}
+</code></pre></div><p>When the query <code>item.spec.ssd=another</code> is parsed, this is the output structure:</p>
+<pre><code>{
+   &quot;Key&quot;: {
+      &quot;Name&quot;: &quot;item&quot;,
+      &quot;Path&quot;: [
+         &quot;spec&quot;,
+         &quot;ssd&quot;
+      ]
+   },
+   &quot;Value&quot;: &quot;another&quot;
+}
+</code></pre><h2 id="different-value-types">Different Value Types</h2>
+<p>Now we move on to parsing different types of values - quoted strings, unquoted strings, numbers, and booleans.</p>
+<p>The grammar first:</p>
+<pre><code>Value
+  = val:(
+      Measure
+    / Float
+    / Integer
+    / Identifier
+    / String 
+    ){
+    return makeValue(val)
+  }
+
+String
+  = '&quot;' chars:[^&quot;]* '&quot;' {
+    return stringFromChars(chars), nil
+  } 
+
+Integer
+  = [+-]? [0-9]+ {
+    return strconv.ParseInt(string(c.text), 10, 64)
+  }
+  
+Measure
+  = number:(Integer / Float) unit:Identifier {
+    return makeMeasure(number, unit)
+  }
+  
+Float
+  = [+-]? ([0-9]* &quot;.&quot; [0-9]+ ) {
+      return strconv.ParseFloat(string(c.text), 64)
+    }
+    
+</code></pre><p>Notice the definition of <code>String</code> grammar. It extracts characters between two double quotes. Extraction requires series of deep casting to get it from interface{} slices to bytes and a string. This is the function that extracts the character sequence to the string:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">stringFromChars</span>(chars <span style="color:#000;font-weight:bold">interface</span>{}) <span style="color:#458;font-weight:bold">string</span> {
+	str <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">&#34;&#34;</span>
+	r <span style="color:#000;font-weight:bold">:=</span> chars.([]<span style="color:#000;font-weight:bold">interface</span>{})
+	<span style="color:#000;font-weight:bold">for</span> _, i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> r {
+		j <span style="color:#000;font-weight:bold">:=</span> i.([]<span style="color:#458;font-weight:bold">uint8</span>)
+		str <span style="color:#000;font-weight:bold">+=</span> <span style="color:#0086b3">string</span>(j[<span style="color:#099">0</span>])
+	}
+	<span style="color:#000;font-weight:bold">return</span> str
+}
+</code></pre></div><p>The Value structure has members for each data type like this</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">type</span> Value <span style="color:#000;font-weight:bold">struct</span> {
+	String  <span style="color:#458;font-weight:bold">string</span>
+	Int     <span style="color:#458;font-weight:bold">int64</span>
+	Float   <span style="color:#458;font-weight:bold">float64</span>
+	Measure <span style="color:#000;font-weight:bold">*</span>Measure
+}
+</code></pre></div><p>Out of these, the <code>Measure</code> member is peculiar. It gets a number and its unit together. For example, <code>512gb</code>.</p>
+<h3 id="better-generic-value">Better Generic Value</h3>
+<p>Having all the field types in one Value struct is not an optimal method; it will take more space and could be confusing to use. It doesn&rsquo;t provide any advantage either because we will have to check the type of the value anyways. A better alternative would be to use <code>interface{}</code> for Value. Let us update the definitions.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
+	Key   <span style="color:#000;font-weight:bold">*</span>Source
+	Value <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#998;font-style:italic">// String / Int /Float /Measure
+</span><span style="color:#998;font-style:italic"></span>}
+
+<span style="color:#000;font-weight:bold">type</span> Source <span style="color:#000;font-weight:bold">struct</span> {
+	Name <span style="color:#458;font-weight:bold">string</span>
+	Path []<span style="color:#458;font-weight:bold">string</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Measure <span style="color:#000;font-weight:bold">struct</span> {
+	Number <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#998;font-style:italic">//int64/float64
+</span><span style="color:#998;font-style:italic"></span>	Units  <span style="color:#458;font-weight:bold">string</span>
+}
+</code></pre></div><p>Then the capturing functions are updated as well:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeValue</span>(val <span style="color:#000;font-weight:bold">interface</span>{}) (<span style="color:#000;font-weight:bold">interface</span>{}, <span style="color:#458;font-weight:bold">error</span>) {
+	<span style="color:#000;font-weight:bold">return</span> val, <span style="color:#000;font-weight:bold">nil</span>
+}
+
+<span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeMeasure</span>(num <span style="color:#000;font-weight:bold">interface</span>{}, units <span style="color:#000;font-weight:bold">interface</span>{}) (<span style="color:#000;font-weight:bold">*</span>Measure, <span style="color:#458;font-weight:bold">error</span>) {
+	retVal <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>Measure{Number: num, Units: units.(<span style="color:#458;font-weight:bold">string</span>)}
+
+	<span style="color:#000;font-weight:bold">return</span> retVal, <span style="color:#000;font-weight:bold">nil</span>
+}
+</code></pre></div><h2 id="supporting-comparison-operators">Supporting comparison operators</h2>
+<p>The next improvement we could attempt would be to support other comparison operators like Greater than , less than.</p>
+<pre><code>Field
+  = src:Source _ op:Operator _ value:Value {
+      return &amp;Field{Key:src.(*Source),Op:op.(string), Value:value}, nil
+  }
+  
+Operator
+  = op:(
+     &quot;&lt;=&quot;
+    / &quot;&gt;=&quot;
+    / &quot;=&quot;
+    / &quot;&lt;&quot;
+    / &quot;&gt;&quot;
+  ){
+    return string(c.text), nil
+  }
+</code></pre><p>Notice that the longer rules come first; &ldquo;&lt;=&rdquo; must be before &ldquo;&lt;&rdquo;. If the &ldquo;&lt;&rdquo; rule comes first, the parser will capture &ldquo;&lt;&rdquo; and stop there. This method helps reduce ambiguity.</p>
+<h2 id="combination-operators">Combination operators</h2>
+<p>We can combine two queries using either AND or OR. For this simple query language, the default combinatory is AND.</p>
+<pre><code>item.name=laptop item.spec.ssd &gt; 512
+</code></pre><p>means that get only the items that are laptops <em>AND</em> SSD size is more than 512</p>
+<p>Since the default is AND, let us introduce an operator for OR. Here is a sample query:</p>
+<pre><code>item.name=laptop  (item.maker=asus | item.maker=coconics)
+</code></pre><p>Let&rsquo;s first try parsing the OR sequence</p>
+<p>Making a few changes to the grammar makes it possible to parse a sequence of OR field queries.</p>
+<pre><code>Query
+  = f:Field _ oq:OrQuery* _ {
+    return makeQuery(f,oq)
+  }
+  
+OrQuery 
+  = _ '|' _ f:Field _ {
+    return f, nil
+  }
+
+Field
+  = src:Source _ op:Operator _ value:Value {
+      return &amp;Field{Key:src.(*Source),Op:op.(string), Value:value}, nil
+  }
+</code></pre><p>Note that the <code>OrQuery*</code> is the second part of the <code>Query</code> definition. So it will match 0 or more <code>| Field</code> expressions. That means Query will match simple query like <code>item.name=laptop</code> as well.</p>
+<h2 id="going-recursive">Going Recursive</h2>
+<p>Consider a query like this:</p>
+<pre><code>item.name=laptop item.spec.ram &gt; 8gb  ( item.spec.ssd=yes | item.spec.ssd.capacity &gt; 512gb)  ( item.maker=asus | item.maker=coconics ) 
+</code></pre><p>The query inside the braces can be counted as sub-queries that are queries themselves. The braces can contain braces, just like an arithmetic expression. In order to accommodate query like this, we have to define grammar recursively. Let&rsquo;s edit the grammar:</p>
+<pre><code>Query
+  = _ fq:FieldQuery _  fqs:FieldQuery* _ {
+    return makeQuery(fq, fqs)
+  }
+  
+FieldQuery
+   = _ '(' _ q:Query _ ')'_ {
+        return makeFQFromQuery(q)
+      }
+   / _ f:Field _ {
+        return makeFQFromField(f)
+     }
+</code></pre><p>Query is defined by FieldQuery and FieldQuery can be a Query inside braces.</p>
+<p>In order to allow any number of Fields followed by any number of OR expressions, let us update the query and include an AndQuery grammar. Here is the complete grammar file:</p>
+<pre><code>
+Query
+  = aq:AndQuery _ oq:OrQuery* _ {
+    return makeQuery(aq,oq)
+  }
+
+OrQuery 
+  = _ '|' _ aq:AndQuery _ {
+    return aq, nil
+  }
+
+AndQuery
+  = _ fq:FieldQuery _  fqs:FieldQuery* _ {
+    return makeAndQuery(fq, fqs)
+  }
+  
+FieldQuery
+   = _ '(' _ q:Query _ ')'_ {
+        return makeFQFromQuery(q)
+      }
+   / _ f:Field _ {
+        return makeFQFromField(f)
+     }
+
+Field
+  = src:Source _ op:Operator _ value:Value {
+      return &amp;Field{Key:src.(*Source),Op:op.(string), Value:value}, nil
+  }
+
+Source
+  = name:Identifier path:(&quot;.&quot; Identifier)* {
+      return makeSource(name,path)
+  }
+
+Operator
+  = op:(
+     &quot;&lt;=&quot;
+    / &quot;&gt;=&quot;
+    / &quot;=&quot;
+    / &quot;&lt;&quot;
+    / &quot;&gt;&quot;
+  ){
+    return string(c.text), nil
+  }
+  
+Value
+  = val:(
+      Measure
+    / Float
+    / Integer
+    / Identifier
+    / String 
+    ){
+    return makeValue(val)
+  }
+
+String
+  = '&quot;' chars:[^&quot;]* '&quot;' {
+    return stringFromChars(chars), nil
+  } 
+
+Integer
+  = [+-]? [0-9]+ {
+    return strconv.ParseInt(string(c.text), 10, 64)
+  }
+  
+Measure
+  = number:(Integer / Float) unit:Identifier {
+    return makeMeasure(number, unit)
+  }
+  
+Float
+  = [+-]? ([0-9]* &quot;.&quot; [0-9]+ ) {
+      return strconv.ParseFloat(string(c.text), 64)
+    }
+
+Identifier
+  = [a-zA-Z0-9_]+ { 
+      return string(c.text), nil
+}
+
+_
+  = [ \t]* { 
+      return &quot;&quot;, nil
+ }
+  
+EOF 
+  = !.
+  
+</code></pre><p>We can make an arbitrarily complex parser with a few lines of PEG grammar. Not only it is functional but is graceful in spotting errors too.</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/go/javascript-parser-in-go/" class="pr-4">&larr; How to support custom Javascript scripting in Go Applications</a>
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2021 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

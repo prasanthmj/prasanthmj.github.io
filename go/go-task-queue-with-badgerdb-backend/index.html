@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Background task processor in Go with persistence support using BadgerDB </title><meta name="keywords" content="badgerdb, golang, task queue" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Background task processor in Go with persistence support using BadgerDB</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/badgerdb" class="text-gray-600">badgerdb</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/task-queue" class="text-gray-600">task queue</a> </li>
+    
+</ul>
+  
+<p>Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks.
+For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress.
+A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.
+qUP (called queue up) is a background task manager. It persists the task status and tracking information to the disc so that restarting the process does not lose the tasks that were in progress. BadgerDB is used for persistence.</p>
+<h2 id="simple-usage">Simple Usage</h2>
+<p>Startup and keep ready worker routines</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">jq <span style="color:#000;font-weight:bold">:=</span> qup.<span style="color:#900;font-weight:bold">NewJobQueue</span>().<span style="color:#900;font-weight:bold">Workers</span>(<span style="color:#099">10</span>)
+<span style="color:#998;font-style:italic">//Bring up the worker pool
+</span><span style="color:#998;font-style:italic"></span>jq.<span style="color:#900;font-weight:bold">Start</span>()
+</code></pre></div><p>Register task executers:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">jq.<span style="color:#900;font-weight:bold">Register</span>(<span style="color:#000;font-weight:bold">&amp;</span>OrderEmail{}, sender)
+</code></pre></div><p>Task executor must implement an interface <code>Execute</code></p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> (this <span style="color:#000;font-weight:bold">*</span>OrderSender) <span style="color:#900;font-weight:bold">Execute</span>(t <span style="color:#000;font-weight:bold">interface</span>{}) <span style="color:#458;font-weight:bold">error</span> {
+    orderEmail,ok <span style="color:#000;font-weight:bold">:=</span>  t.(<span style="color:#000;font-weight:bold">*</span>OrderEmail)
+    
+    <span style="color:#900;font-weight:bold">sendOrderEmail</span>(orderEmail)
+    
+}
+</code></pre></div><p>Push tasks to the queue:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#998;font-style:italic">//Add a delayed job
+</span><span style="color:#998;font-style:italic"></span>j <span style="color:#000;font-weight:bold">:=</span> qup.<span style="color:#900;font-weight:bold">NewJob</span>(<span style="color:#000;font-weight:bold">&amp;</span>OrderEmail{orderID}).<span style="color:#900;font-weight:bold">After</span>(<span style="color:#099">5</span> <span style="color:#000;font-weight:bold">*</span> time.Minute)
+jq.<span style="color:#900;font-weight:bold">QueueUp</span>(j)
+</code></pre></div><p>The OrderEmail task is set to run after 5 minutes. Suppose the process got terminated after 2 minutes. The email will be sent when the process is restarted.
+This wouldn&rsquo;t happen if say, you had implemented the task as a goroutine using <a href="https://golang.org/pkg/time/">time.AfterFunc()</a>.</p>
+<h2 id="asynchronous-task-execution">Asynchronous task execution</h2>
+<p>RESTful API endpoints are expected to return immediately. The client would have a time-out so that it does not wait endlessly. So you have to delegate the long processes to a background task manager.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">j <span style="color:#000;font-weight:bold">:=</span> qup.<span style="color:#900;font-weight:bold">NewJob</span>(<span style="color:#000;font-weight:bold">&amp;</span>SendNotification{UserID: id, Email:email})
+jq.<span style="color:#900;font-weight:bold">QueueUp</span>(j)
+</code></pre></div><p>Here we initialize the task information and push it to the Job Queue and returns immediately - without waiting for the task to finish. qUp executes the task
+in the background. The task originator can check the status of the task later.</p>
+<h2 id="recurring-tasks">Recurring tasks</h2>
+<p>Most applications require running some tasks every x number of minutes. For example, cleaning temporary tables, temporary files, indexing to make searches faster. The background task processor can help in such cases also. Here is an example:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">j <span style="color:#000;font-weight:bold">:=</span> qup.<span style="color:#900;font-weight:bold">NewJob</span>(<span style="color:#000;font-weight:bold">&amp;</span>CleanupTables{}).<span style="color:#900;font-weight:bold">Every</span>(<span style="color:#099">1</span> <span style="color:#000;font-weight:bold">*</span> time.Hour)
+jq.<span style="color:#900;font-weight:bold">QueueUp</span>(j)
+
+</code></pre></div><h2 id="inner-workings-of-qup">Inner Workings of qUp</h2>
+<p>On starting up, qUp starts up N number of worker routines.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> (d <span style="color:#000;font-weight:bold">*</span>JobQueue) <span style="color:#900;font-weight:bold">Start</span>() <span style="color:#458;font-weight:bold">error</span> {
+    
+    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; d.NumWorkers; i<span style="color:#000;font-weight:bold">++</span> {
+		<span style="color:#000;font-weight:bold">go</span> d.<span style="color:#900;font-weight:bold">worker</span>(i <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>)
+	}
+    
+    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+}
+</code></pre></div><p>The worker routines wait for a task to arrive.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> (d <span style="color:#000;font-weight:bold">*</span>JobQueue) <span style="color:#900;font-weight:bold">worker</span>(wid <span style="color:#458;font-weight:bold">int</span>) {
+	d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;Worker %d starting\n&#34;</span>, wid)
+	d.wg.<span style="color:#900;font-weight:bold">Add</span>(<span style="color:#099">1</span>)
+	<span style="color:#000;font-weight:bold">defer</span> d.wg.<span style="color:#900;font-weight:bold">Done</span>()
+	<span style="color:#000;font-weight:bold">for</span> {
+		<span style="color:#000;font-weight:bold">select</span> {
+		<span style="color:#000;font-weight:bold">case</span> jid <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&lt;-</span>d.jobs:
+			d.<span style="color:#900;font-weight:bold">runTask</span>(wid, jid)
+		<span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>d.ticker.C:
+			d.<span style="color:#900;font-weight:bold">periodicChecks</span>()
+		<span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>d.close:
+			d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;Workder %d stopping&#34;</span>, wid)
+			<span style="color:#000;font-weight:bold">return</span>
+		}
+	}
+}
+</code></pre></div><p>The routine that gets the task through the jobs channel executes it calling <code>d.runTask()</code></p>
+<h3 id="adding-a-job-to-the-queue">Adding a job to the queue</h3>
+<p>To add a new job, qUp first adds the job to a &ldquo;ready&rdquo; virtual table. Then it sends the signal through the jobs channel.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> (d <span style="color:#000;font-weight:bold">*</span>JobQueue) <span style="color:#900;font-weight:bold">addJobToReadyQueue</span>(job <span style="color:#000;font-weight:bold">*</span>Job) <span style="color:#458;font-weight:bold">error</span> {
+	jid, err <span style="color:#000;font-weight:bold">:=</span> d.store.<span style="color:#900;font-weight:bold">Table</span>(<span style="color:#d14">&#34;jobqueue.ready&#34;</span>).<span style="color:#900;font-weight:bold">Insert</span>(job)
+	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+		d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;Error adding job to ready queue %v&#34;</span>, err)
+		<span style="color:#000;font-weight:bold">return</span> err
+	}
+
+	d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;Signalling taskID %s Job ID is  %v&#34;</span>, job.Task.<span style="color:#900;font-weight:bold">GetTaskID</span>(), jid)
+	d.<span style="color:#900;font-weight:bold">signalNewJob</span>(jid)
+	<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+}
+</code></pre></div><div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">func</span> (d <span style="color:#000;font-weight:bold">*</span>JobQueue) <span style="color:#900;font-weight:bold">signalNewJob</span>(jid <span style="color:#458;font-weight:bold">string</span>) <span style="color:#458;font-weight:bold">bool</span> {
+	d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;signalNewJob %s &#34;</span>, jid)
+	<span style="color:#998;font-style:italic">//This is to keep track when the job signalled ready
+</span><span style="color:#998;font-style:italic"></span>	<span style="color:#998;font-style:italic">// We will signal again if job is not picked even after some time
+</span><span style="color:#998;font-style:italic"></span>	d.<span style="color:#900;font-weight:bold">markJobReady</span>(jid)
+	<span style="color:#998;font-style:italic">//check whether already shutting down and close channel is signalled
+</span><span style="color:#998;font-style:italic"></span>	<span style="color:#000;font-weight:bold">select</span> {
+	<span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>d.close:
+		<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">false</span>
+	<span style="color:#000;font-weight:bold">default</span>:
+		d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;signalling job %s &#34;</span>, jid)
+		<span style="color:#000;font-weight:bold">select</span> {
+		<span style="color:#000;font-weight:bold">case</span> d.jobs <span style="color:#000;font-weight:bold">&lt;-</span> jid:
+		<span style="color:#000;font-weight:bold">default</span>:
+			<span style="color:#998;font-style:italic">//The queue is full. job got dropped
+</span><span style="color:#998;font-style:italic"></span>			d.log.<span style="color:#900;font-weight:bold">Logf</span>(<span style="color:#d14">&#34;signal dropped %s &#34;</span>, jid)
+			d.<span style="color:#900;font-weight:bold">markJobDropped</span>(jid)
+		}
+
+	}
+	<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">true</span>
+}
+</code></pre></div><h2 id="queue-full">Queue full!</h2>
+<p>There is one thing that can happen while writing to the job channel. All the worker routines are busy. There is no one to pick the call. In this case, we will mark the job as dropped. It doesn&rsquo;t mean we have given up on the job though.</p>
+<p>Remember periodicChecks() that keeps running in the main worker routine loop?
+In the periodicChecks() we will try to pick any dropped jobs.</p>
+<h2 id="shutdown-as-soon-as-possible">Shutdown as soon as possible</h2>
+<p>If a shutdown is triggered by signaling the close channel, the queue will try to stop immediately. So the check for the close channel is placed at every possible point.</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/go/badgerdb-wrapper/" class="pr-4">&larr; A Simple Wrapper to BadgerDB Key-Value store in Go</a>
+    
+    
+    <a href="/go/javascript-parser-in-go/" class="pl-4">How to support custom Javascript scripting in Go Applications &rarr;</a>
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2021 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+
