@@ -29,6 +29,16 @@ There was a time when applications allowed some kind of scripting to extend them
     </item>
     
     <item>
+      <title>Let&#39;s build a search query parser in Go</title>
+      <link>/go/simple-query-parser/</link>
+      <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/go/simple-query-parser/</guid>
+      <description>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
+Imagine we are building an online store that allows searching for products using a simple but structured query language.</description>
+    </item>
+    
+    <item>
       <title>How to load from a JSON file to Javascript class object (Javascript/Typescript Serialization)</title>
       <link>/typescript/serialize-javascript-objects/</link>
       <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
@@ -95,7 +105,7 @@ Usage import( &amp;#34;github.com/prasanthmj/sett&amp;#34; ) s := sett.</descrip
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/resume/</guid>
-      <description>Prasanth Janardhanan Over 21 years of Software industry experience. Currently focusing on building high-performance systems using Go lang. In the past, worked on building high-performance systems, refactoring codebases, and building user interfaces for complex systems. I have worked on web technologies as well as embedded systems, worked with most programming languages from C/C++, Python, Perl, Bash scripting to Typescript. I do hands-on coding for the projects that I am involved in.</description>
+      <description>Prasanth Janardhanan 15+ years of hands-on software development experience. Currently focusing on building high-performance systems using Go lang and Kubernetes. In the past, worked on refactoring codebases, performance tuning cloud-based systems, and building SAAS and desktop products. I have experience in web, cloud, as well as embedded systems, worked with many programming languages from C/C++, Python, Perl, Bash scripting to Typescript. I do hands-on coding and troubleshooting for the projects that I am involved in.</description>
     </item>
     
     <item>

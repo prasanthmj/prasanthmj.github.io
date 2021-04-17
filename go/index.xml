@@ -29,6 +29,16 @@ There was a time when applications allowed some kind of scripting to extend them
     </item>
     
     <item>
+      <title>Let&#39;s build a search query parser in Go</title>
+      <link>/go/simple-query-parser/</link>
+      <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/go/simple-query-parser/</guid>
+      <description>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
+Imagine we are building an online store that allows searching for products using a simple but structured query language.</description>
+    </item>
+    
+    <item>
       <title>Background task processor in Go with persistence support using BadgerDB</title>
       <link>/go/go-task-queue-with-badgerdb-backend/</link>
       <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>

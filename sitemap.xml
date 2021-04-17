@@ -58,6 +58,11 @@
   </url>
   
   <url>
+    <loc>/go/simple-query-parser/</loc>
+    <lastmod>2020-12-20T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/typescript/serialize-javascript-objects/</loc>
     <lastmod>2020-12-11T00:00:00+00:00</lastmod>
   </url>

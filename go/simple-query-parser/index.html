@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Let&#39;s build a search query parser in Go </title><meta name="keywords" content="go, golang, parser, compiler" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Let&#39;s build a search query parser in Go</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/go" class="text-gray-600">go</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/parser" class="text-gray-600">parser</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/compiler" class="text-gray-600">compiler</a> </li>
+    
+</ul>
+  
+<p>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &ldquo;some phrase&rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.</p>
+<p>Imagine we are building an online store that allows searching for products using a simple but structured query language. You can search for a laptop with more than 8GB RAM and more than 512GB SSD using this query:</p>
+<pre><code>item.name=laptop item.spec.ram &gt; 8gb item.spec.ssd=yes item.spec.ssd.capacity &gt; 512gb sort_by:price/asc
+</code></pre><p>The first simplest solution that comes to mind would be to use the strings.Split() Sure, the first version can be done using a set of Split() calls. However, the users of the online shop loved this feature and soon you are asked to support queries such as this:</p>
+<pre><code>item.name=laptop (item.maker=asus | item.maker=coconics) item.spec.ssd=yes
+</code></pre><p>Let us build a mini-compiler for parsing such a query.</p>
+<h2 id="building-a-compiler-in-go">Building a compiler in Go</h2>
+<p>There are many options to get you started.</p>
+<ul>
+<li><a href="https://pkg.go.dev/github.com/mna/pigeon">pigeon · pkg.go.dev</a> Pigeon - PEG parser generator for go</li>
+<li><a href="https://pkg.go.dev/golang.org/x/tools/cmd/goyacc">goyacc · pkg.go.dev</a> Goyacc is a version of yacc for Go</li>
+<li><a href="https://github.com/alecthomas/participle">GitHub - alecthomas/participle: A parser library for Go</a></li>
+</ul>
+<p>participle makes it all simple - just by defining the structs for the parser, you can create the compiler. Should be well suited for a simple query language that we are building.</p>
+<h3 id="starting-simple---simple-key-value-pairs">Starting simple - simple key-value pairs</h3>
+<p>Let us make an MVP(Minimum Viable Product or MiniViaPro) version of the parser first.</p>
+<p>This should parse queries where the key and value are separated by equal to sign</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">package</span> v1
+
+<span style="color:#000;font-weight:bold">import</span> (
+	participle <span style="color:#d14">&#34;github.com/alecthomas/participle/v2&#34;</span>
+)
+
+<span style="color:#000;font-weight:bold">type</span> Query <span style="color:#000;font-weight:bold">struct</span> {
+	Fields []<span style="color:#000;font-weight:bold">*</span>Field <span style="color:#d14">`@@*`</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
+	Key   <span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`@Ident &#34;=&#34;`</span>
+	Value <span style="color:#000;font-weight:bold">*</span>Value <span style="color:#d14">`@@`</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Value <span style="color:#000;font-weight:bold">struct</span> {
+	Number <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">float64</span> <span style="color:#d14">`  @Float | @Int`</span>
+	String <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`| @String`</span>
+	Bool   <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">bool</span>    <span style="color:#d14">`| ( @&#34;true&#34; | &#34;false&#34; )`</span>
+	Nil    <span style="color:#458;font-weight:bold">bool</span>     <span style="color:#d14">`| @&#34;nil&#34;`</span>
+}
+
+<span style="color:#000;font-weight:bold">var</span> parser = participle.<span style="color:#900;font-weight:bold">MustBuild</span>(<span style="color:#000;font-weight:bold">&amp;</span>Query{})
+
+<span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">ParseQuery</span>(q <span style="color:#458;font-weight:bold">string</span>) (<span style="color:#000;font-weight:bold">*</span>Query, <span style="color:#458;font-weight:bold">error</span>) {
+	<span style="color:#000;font-weight:bold">var</span> expr Query
+
+	err <span style="color:#000;font-weight:bold">:=</span> parser.<span style="color:#900;font-weight:bold">ParseString</span>(<span style="color:#d14">&#34;&#34;</span>, q, <span style="color:#000;font-weight:bold">&amp;</span>expr)
+	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+		<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>, err
+	}
+
+	<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>expr, <span style="color:#000;font-weight:bold">nil</span>
+}
+
+</code></pre></div><p>What does the structure definition mean?</p>
+<ul>
+<li>Query contains 0 or more Fields</li>
+<li>Field has key. Key is a string and follows the lexical rules of an identifier. Participle has an inbuilt lexical scanner that has these definitions.</li>
+<li>Key is followed by &ldquo;=&rdquo; and then a Value</li>
+<li>Value can be Number, String , Boolean or nil</li>
+</ul>
+<p>Let us try parsing this query:</p>
+<pre><code>a=100 b=&quot;something&quot;
+</code></pre><p>The returned query structure is like this:</p>
+<pre><code> {
+   &quot;Fields&quot;: [
+      {
+         &quot;Key&quot;: &quot;a&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: 100,
+            &quot;String&quot;: null,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      },
+      {
+         &quot;Key&quot;: &quot;b&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: null,
+            &quot;String&quot;: &quot;\&quot;something\&quot;&quot;,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      }
+   ]
+}
+</code></pre><p>Not bad for a five-minute code!</p>
+<p>Notice the string value &ldquo;something&rdquo; ? It contains the quotes as well. It is easy to get rid of that by updating the options:</p>
+<pre><code>var parser = participle.MustBuild(&amp;Query{},
+	participle.Unquote(&quot;String&quot;),
+)
+</code></pre><p>Let us expand this grammar to include other operators such as greater than and less than.</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
+	Key   <span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`@Ident`</span>
+	Op    <span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`@(&#34;=&#34; | &#34;&lt;&#34; | &#34;&gt;&#34; | &#34;&lt;&#34; &#34;=&#34; | &#34;&gt;&#34; &#34;=&#34; )`</span>
+	Value <span style="color:#000;font-weight:bold">*</span>Value <span style="color:#d14">`@@`</span>
+}
+
+</code></pre></div><p>Added an Op (for operator) member to the Field. The operator can be &lt; or &gt; or &lt;= or &gt;=</p>
+<p>Let us now try with this query:</p>
+<pre><code>item=&quot;laptop&quot; price &lt;= 10000 memory &gt; 512 
+</code></pre><p>But, this throws an error like this:</p>
+<pre><code>Error 1:22: unexpected token &quot;=&quot; (expected Value)
+</code></pre><p>Why so? because when the parser see &lt; symbol, it matches with the first rule and it does not match the second one.</p>
+<p>This will work as expected :</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go">
+<span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
+	Key   <span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`@Ident`</span>
+	Op    <span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`@(&#34;=&#34; | &#34;&lt;&#34; &#34;=&#34; | &#34;&lt;&#34; | &#34;&gt;&#34; &#34;=&#34; | &#34;&gt;&#34; )`</span>
+	Value <span style="color:#000;font-weight:bold">*</span>Value <span style="color:#d14">`@@`</span>
+}
+
+</code></pre></div><p>The resulting  AST for our previous query:</p>
+<pre><code>{
+   &quot;Fields&quot;: [
+      {
+         &quot;Key&quot;: &quot;item&quot;,
+         &quot;Op&quot;: &quot;=&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: null,
+            &quot;String&quot;: &quot;laptop&quot;,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      },
+      {
+         &quot;Key&quot;: &quot;price&quot;,
+         &quot;Op&quot;: &quot;\u003c=&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: 10000,
+            &quot;String&quot;: null,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      },
+      {
+         &quot;Key&quot;: &quot;memory&quot;,
+         &quot;Op&quot;: &quot;\u003e&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: 512,
+            &quot;String&quot;: null,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      }
+   ]
+}
+</code></pre><h2 id="make-the-key-name-as-a-json-path">Make the key name as a JSON path</h2>
+<p>In our original query spec, we mentioned the item name as item.name and item price as item.price. So we have to follow the spec. Let us modify the grammar</p>
+<pre><code>type Field struct {
+	Source *Source `@@`
+	Op     string  `@(&quot;=&quot; | &quot;&lt;&quot; &quot;=&quot; | &quot;&lt;&quot; | &quot;&gt;&quot; &quot;=&quot; | &quot;&gt;&quot;  )`
+	Value  *Value  `@@`
+}
+
+type Source struct {
+	Name string   `@Ident`
+	Path []string `(&quot;.&quot; @Ident)*`
+}
+</code></pre><p>The Source has a name and then the path to the attribute. The path can contain 0 or more path parts.</p>
+<p>Let&rsquo;s try the query:</p>
+<pre><code>item.name=&quot;laptop&quot; item.price &lt;= 10000 item.spec.memory &gt; 512 
+</code></pre><p>and we get the AST as:</p>
+<pre><code>{
+   &quot;Fields&quot;: [
+      {
+         &quot;Source&quot;: {
+            &quot;Name&quot;: &quot;item&quot;,
+            &quot;Path&quot;: [
+               &quot;name&quot;
+            ]
+         },
+         &quot;Op&quot;: &quot;=&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: null,
+            &quot;String&quot;: &quot;laptop&quot;,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      },
+      {
+         &quot;Source&quot;: {
+            &quot;Name&quot;: &quot;item&quot;,
+            &quot;Path&quot;: [
+               &quot;price&quot;
+            ]
+         },
+         &quot;Op&quot;: &quot;\u003c=&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: 10000,
+            &quot;String&quot;: null,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      },
+      {
+         &quot;Source&quot;: {
+            &quot;Name&quot;: &quot;item&quot;,
+            &quot;Path&quot;: [
+               &quot;spec&quot;,
+               &quot;memory&quot;
+            ]
+         },
+         &quot;Op&quot;: &quot;\u003e&quot;,
+         &quot;Value&quot;: {
+            &quot;Number&quot;: 512,
+            &quot;String&quot;: null,
+            &quot;Bool&quot;: null,
+            &quot;Nil&quot;: false
+         }
+      }
+   ]
+}
+</code></pre><h3 id="string-without-quotes">String without quotes</h3>
+<p>One simple improvement we can do at this point is to make the quotes optional for the string. For example, item.name=laptop instead of item.name=&ldquo;laptop&rdquo;. Let us try using the @Ident (identifier) token for this purpose</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">type</span> Value <span style="color:#000;font-weight:bold">struct</span> {
+	Number <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">float64</span> <span style="color:#d14">`  @Float | @Int`</span>
+	String <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`| @String | @Ident `</span>
+	Bool   <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">bool</span>    <span style="color:#d14">`| ( @&#34;true&#34; | &#34;false&#34; )`</span>
+	Nil    <span style="color:#458;font-weight:bold">bool</span>     <span style="color:#d14">`| @&#34;nil&#34;`</span>
+}
+</code></pre></div><h2 id="custom-lexical-grammar">Custom lexical grammar</h2>
+<p>So far we used the built-in lexical tokens. We can define our own lexical grammar. This may make the parser definition a bit more cleaner.
+We will move the comparison operators to the lexical grammar.</p>
+<p>Here is the custom lexical grammar definition:</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">var</span> queryLexer = lexer.<span style="color:#900;font-weight:bold">Must</span>(stateful.<span style="color:#900;font-weight:bold">NewSimple</span>([]stateful.Rule{
+	{<span style="color:#d14">&#34;Ident&#34;</span>, <span style="color:#d14">`[a-zA-Z]\w*`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Number&#34;</span>, <span style="color:#d14">`[-+]?(\d*\.)?\d+`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Comparison&#34;</span>, <span style="color:#d14">`[=]|[&lt;&gt;]=?`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Dot&#34;</span>, <span style="color:#d14">`\.`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;String&#34;</span>, <span style="color:#d14">`(?:[a-zA-Z0-9_\-\.]+)|(?:\&#34;(?:[^\&#34;]|\\.)*\&#34;)`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Whitespace&#34;</span>, <span style="color:#d14">`[ \t]+`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+}))
+</code></pre></div><p>The lexical grammar is nothing but a set of regular expressions. We name each type of token. Then we use the names in the parser grammar definition.</p>
+<p>Now we update the parser grammar definitions to reach the final code :</p>
+<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-go" data-lang="go"><span style="color:#000;font-weight:bold">package</span> v4
+
+<span style="color:#000;font-weight:bold">import</span> (
+	participle <span style="color:#d14">&#34;github.com/alecthomas/participle/v2&#34;</span>
+	<span style="color:#d14">&#34;github.com/alecthomas/participle/v2/lexer&#34;</span>
+	<span style="color:#d14">&#34;github.com/alecthomas/participle/v2/lexer/stateful&#34;</span>
+)
+
+<span style="color:#000;font-weight:bold">type</span> Query <span style="color:#000;font-weight:bold">struct</span> {
+	Fields []<span style="color:#000;font-weight:bold">*</span>Field <span style="color:#d14">`@@*`</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
+	Source <span style="color:#000;font-weight:bold">*</span>Source <span style="color:#d14">`@@`</span>
+	Op     <span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`@Comparison`</span>
+	Value  <span style="color:#000;font-weight:bold">*</span>Value  <span style="color:#d14">`@@`</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Source <span style="color:#000;font-weight:bold">struct</span> {
+	Name <span style="color:#458;font-weight:bold">string</span>   <span style="color:#d14">`@Ident`</span>
+	Path []<span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`(Dot @Ident)*`</span>
+}
+
+<span style="color:#000;font-weight:bold">type</span> Value <span style="color:#000;font-weight:bold">struct</span> {
+	Number <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">float64</span> <span style="color:#d14">`  @Number`</span>
+	String <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`| @String | @Ident`</span>
+	Bool   <span style="color:#000;font-weight:bold">*</span><span style="color:#458;font-weight:bold">bool</span>    <span style="color:#d14">`| ( @&#34;true&#34; | &#34;false&#34; )`</span>
+	Nil    <span style="color:#458;font-weight:bold">bool</span>     <span style="color:#d14">`| @&#34;nil&#34;`</span>
+}
+
+<span style="color:#000;font-weight:bold">var</span> queryLexer = lexer.<span style="color:#900;font-weight:bold">Must</span>(stateful.<span style="color:#900;font-weight:bold">NewSimple</span>([]stateful.Rule{
+	{<span style="color:#d14">&#34;Ident&#34;</span>, <span style="color:#d14">`[a-zA-Z]\w*`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Number&#34;</span>, <span style="color:#d14">`[-+]?(\d*\.)?\d+`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Comparison&#34;</span>, <span style="color:#d14">`[=]|[&lt;&gt;]=?`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Dot&#34;</span>, <span style="color:#d14">`\.`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;String&#34;</span>, <span style="color:#d14">`\&#34;(?:[^\&#34;]|\\.)*\&#34;`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+	{<span style="color:#d14">&#34;Whitespace&#34;</span>, <span style="color:#d14">`[ \t]+`</span>, <span style="color:#000;font-weight:bold">nil</span>},
+}))
+
+<span style="color:#000;font-weight:bold">var</span> parser = participle.<span style="color:#900;font-weight:bold">MustBuild</span>(<span style="color:#000;font-weight:bold">&amp;</span>Query{},
+	participle.<span style="color:#900;font-weight:bold">Lexer</span>(queryLexer),
+	participle.<span style="color:#900;font-weight:bold">Elide</span>(<span style="color:#d14">&#34;Whitespace&#34;</span>),
+	participle.<span style="color:#900;font-weight:bold">UseLookahead</span>(<span style="color:#099">2</span>),
+	participle.<span style="color:#900;font-weight:bold">Unquote</span>(<span style="color:#d14">&#34;String&#34;</span>),
+)
+
+<span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">ParseQuery</span>(q <span style="color:#458;font-weight:bold">string</span>) (<span style="color:#000;font-weight:bold">*</span>Query, <span style="color:#458;font-weight:bold">error</span>) {
+	<span style="color:#000;font-weight:bold">var</span> expr Query
+
+	err <span style="color:#000;font-weight:bold">:=</span> parser.<span style="color:#900;font-weight:bold">ParseString</span>(<span style="color:#d14">&#34;&#34;</span>, q, <span style="color:#000;font-weight:bold">&amp;</span>expr)
+	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+		<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>, err
+	}
+
+	<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>expr, <span style="color:#000;font-weight:bold">nil</span>
+}
+</code></pre></div><p>We have not yet reached the point where we can compile the original query style proposed in the beginning yet. Let us take stock of what remains</p>
+<pre><code>item.name=laptop item.spec.ram &gt; 8gb item.spec.ssd=yes item.spec.ssd.capacity &gt; 512gb sort_by:price/asc
+</code></pre><ol>
+<li>Capture the unit of the measurement ( 512gb )</li>
+<li>true, yes y all carries the same meaning ( ssd=yes being valid query)</li>
+<li>combine queries using the OR operator recursively as in:
+<pre><code>item.name=laptop (item.maker=asus | item.maker=coconics) item.spec.ssd=yes
+</code></pre></li>
+<li>Handling errors better so mistakes are gracefully handled</li>
+</ol>
+<p>The <a href="../peg-parser-in-go/">next article</a> explains how to make a fairly complicated parser
+using PEG parser.</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/go/go-task-queue-with-badgerdb-backend/" class="pr-4">&larr; Background task processor in Go with persistence support using BadgerDB</a>
+    
+    
+    <a href="/go/javascript-parser-in-go/" class="pl-4">How to support custom Javascript scripting in Go Applications &rarr;</a>
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2021 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+
