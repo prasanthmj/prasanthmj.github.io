@@ -43,9 +43,9 @@
 <p>If not done already, now is the time to set up terraform on your local laptop. The <a href="https://www.terraform.io/downloads.html">instructions at terraform website</a> are fairly straightforward.</p>
 <h2 id="create-an-ssh-key-and-add-to-hetzner">Create an SSH Key and add to Hetzner</h2>
 <p>You will need the SSH key to log on to your cloud servers. First, create a new ssh key.</p>
-<pre><code>ssh-keygen -f ~/.ssh/tcloud -t ed25519
+<pre tabindex="0"><code>ssh-keygen -f ~/.ssh/tcloud -t ed25519
 </code></pre><p>Then copy the public key.</p>
-<pre><code>cat ~/.ssh/tcloud.pub
+<pre tabindex="0"><code>cat ~/.ssh/tcloud.pub
 </code></pre><p>Go to Hetzner cloud console. In the left side panel, look for an icon labeled Security.
 Add the SSH key copied in the last step.</p>
 <p><img src="/terraform/hetzner-console.png" alt="Hetzner cloud console"></p>
@@ -69,7 +69,7 @@ Finally, we will set up a load balancer that will route the external traffic to 
 <p>See the <a href="https://github.com/prasanthmj/onecluster/tree/main/1-infra/modules/base">1-infra/modules/base</a> folder.</p>
 <p>There are 4 files.</p>
 <p>The variables.tf file contains values that we can customize.</p>
-<pre><code>variable &quot;bastion&quot; {
+<pre tabindex="0"><code>variable &#34;bastion&#34; {
     type = object({
         name         = string
         server_type  = string
@@ -78,13 +78,13 @@ Finally, we will set up a load balancer that will route the external traffic to 
 }
 </code></pre><p>For example, you can set the server_type variable to &ldquo;cx11&rdquo; that is the smallest VM type with 2GB RAM and 1 vCPU.</p>
 <p>The variables can have default values. See that the private_ip_range variable has a default value. Makes it convenient when you use this base module.</p>
-<pre><code>variable &quot;private_ip_range&quot; {
+<pre tabindex="0"><code>variable &#34;private_ip_range&#34; {
   type=string
-  default = &quot;10.0.0.0/16&quot;
+  default = &#34;10.0.0.0/16&#34;
 }
 </code></pre><p>The <a href="https://github.com/prasanthmj/onecluster/blob/main/1-infra/modules/base/main.tf">main.tf</a> file contains the code that sets up our infrastructure.</p>
 <p>This block of code sets up the network:</p>
-<pre><code>resource &quot;hcloud_network&quot; &quot;private_net&quot; {
+<pre tabindex="0"><code>resource &#34;hcloud_network&#34; &#34;private_net&#34; {
   name     = var.network_name
   ip_range = var.private_ip_range
   labels = {
@@ -92,105 +92,103 @@ Finally, we will set up a load balancer that will route the external traffic to 
   }
 }
 
-resource &quot;hcloud_network_subnet&quot; &quot;private_subnet&quot; {
+resource &#34;hcloud_network_subnet&#34; &#34;private_subnet&#34; {
   network_id   = hcloud_network.private_net.id
-  type         = &quot;server&quot;
+  type         = &#34;server&#34;
   network_zone = var.private_network_zone
   ip_range     = var.private_ip_range
 }
 </code></pre><p>Notice how the variables are used rather than hard-coding all the parameters.</p>
 <p>The next part of main.tf creates a bastion node and connects it to the network:</p>
-<pre><code>resource &quot;hcloud_server&quot; &quot;bastion&quot; {
+<pre tabindex="0"><code>resource &#34;hcloud_server&#34; &#34;bastion&#34; {
   name        = var.bastion.name
-  image       = &quot;ubuntu-20.04&quot; 
+  image       = &#34;ubuntu-20.04&#34; 
   server_type = var.bastion.server_type
   location    = var.hcloud_location
-  ssh_keys    = [&quot;accesskey&quot;]
+  ssh_keys    = [&#34;accesskey&#34;]
 }
 
-resource &quot;hcloud_server_network&quot; &quot;server_network_bastion&quot; {
+resource &#34;hcloud_server_network&#34; &#34;server_network_bastion&#34; {
   network_id = hcloud_network.private_net.id
   server_id  = hcloud_server.bastion.id
   ip         = var.bastion.private_ip
 }
 </code></pre><p><a href="https://github.com/prasanthmj/onecluster/blob/main/1-infra/modules/base/outputs.tf">outputs.tf</a> contains the output values from this terraform module. For the Base module, we will need the IP address of the bastion host.</p>
-<pre><code>output &quot;bastion_ip&quot;{
+<pre tabindex="0"><code>output &#34;bastion_ip&#34;{
   value = hcloud_server.bastion.ipv4_address
-  description = &quot;Bastion Server IP&quot;
+  description = &#34;Bastion Server IP&#34;
 }
 </code></pre><p>The code in the folder 1-infra/modules/base is a reusable Terraform module.
 We will now write the code that uses the module, customizes the variables and builds the infrastructure.</p>
 <p>See the file: <a href="https://github.com/prasanthmj/onecluster/blob/main/1-infra/mycluster/base/main.tf">mycloud/base/main.tf</a>
 In the first part, we specify the infrastructure provider &ldquo;hcloud&rdquo;
 Then initialize our &ldquo;base&rdquo; module. We have to provide values for all the variables that does not have a default value.</p>
-<pre><code>terraform {
-  required_version = &quot;&gt;= 0.13&quot;
+<pre tabindex="0"><code>terraform {
+  required_version = &#34;&gt;= 0.13&#34;
 }
 
-provider &quot;hcloud&quot; {
+provider &#34;hcloud&#34; {
 }
 
-module &quot;base&quot; {
-  source = &quot;../../modules/base&quot;
+module &#34;base&#34; {
+  source = &#34;../../modules/base&#34;
   
   bastion ={
-    name = &quot;bastion&quot;
-    server_type = &quot;cx31&quot;
-    private_ip   = &quot;10.0.0.2&quot;    
+    name = &#34;bastion&#34;
+    server_type = &#34;cx31&#34;
+    private_ip   = &#34;10.0.0.2&#34;    
   }
-  network_name=&quot;mycloud-main&quot;
+  network_name=&#34;mycloud-main&#34;
 }
 
-output &quot;bastion_ip&quot;{
+output &#34;bastion_ip&#34;{
   value = module.base.bastion_ip
-  description = &quot;Bastion Server IP&quot;
+  description = &#34;Bastion Server IP&#34;
 }
 </code></pre><h2 id="create-the-base-infrastructure">Create the Base infrastructure.</h2>
 <p>Now that the code is ready, let us setup our base infrastructure.
 Make sure that the environment variable &ldquo;HCLOUD_TOKEN&rdquo; is setup to be the API token from Hetzner.</p>
 <p>Then run the command</p>
-<pre><code>cd ./1-infra/mycluster/base
+<pre tabindex="0"><code>cd ./1-infra/mycluster/base
 terraform init
 </code></pre><h4 id="using-a-bash-script">Using a bash script</h4>
 <p>Alternatively, you can make use of the bash script run.sh . Create a file named .env Then save HCLOUD_TOKEN in the .env file like this:</p>
-<pre><code>HCLOUD_TOKEN=asjdfhkjsdhfjdshkjhfkdsjhfkjdshfkjdshkjhfkj
+<pre tabindex="0"><code>HCLOUD_TOKEN=asjdfhkjsdhfjdshkjhfkdsjhfkjdshfkjdshkjhfkj
 </code></pre><p>Run the script like this:</p>
-<pre><code>./run.sh init base
+<pre tabindex="0"><code>./run.sh init base
 </code></pre><p>You can see the corresponding code in the bash script</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#000;font-weight:bold">function</span> initBase<span style="color:#000;font-weight:bold">(){</span>
-   <span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
-   terraform init
-<span style="color:#000;font-weight:bold">}</span>
-</code></pre></div><p>Once the initialization is done, run the &ldquo;apply&rdquo; command</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
-terraform apply
-</code></pre></div><p>If everything goes fine, this should build the base network and print out the IP address of the bastion host.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">function</span> initBase<span style="color:#000;font-weight:bold">(){</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
+</span></span><span style="display:flex;"><span>   terraform init
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span></code></pre></div><p>Once the initialization is done, run the &ldquo;apply&rdquo; command</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
+</span></span><span style="display:flex;"><span>terraform apply
+</span></span></code></pre></div><p>If everything goes fine, this should build the base network and print out the IP address of the bastion host.</p>
 <p>(Alternatively, using the bash script: <code>./run.sh deploy base</code> )</p>
 <p>Try logging on to the bastion host through SSH. Use the IP address from the previous step. For example:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">ssh -i ~/.ssh/tcloud root@115.103.34.228
-</code></pre></div><h2 id="set-up-a-3-node-cluster">Set up a 3 node cluster</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>ssh -i ~/.ssh/tcloud root@115.103.34.228
+</span></span></code></pre></div><h2 id="set-up-a-3-node-cluster">Set up a 3 node cluster</h2>
 <p>Now that we have a base infrastructure setup, let us build a 3 node cluster.
 See the modules/hcloud folder</p>
 <p>Let us start from main.tf:</p>
-<pre><code>data &quot;hcloud_network&quot; &quot;private_net&quot; {
+<pre tabindex="0"><code>data &#34;hcloud_network&#34; &#34;private_net&#34; {
     name = var.network_name
 }
-
 </code></pre><p>First we get the network name from the variables and use it to initialize the network for this module.</p>
 <p>The next block of code builds the cluster nodes(servers)</p>
-<pre><code>resource &quot;hcloud_server&quot; &quot;cloud_nodes&quot; {
+<pre tabindex="0"><code>resource &#34;hcloud_server&#34; &#34;cloud_nodes&#34; {
   for_each = var.nodes
 
   name        = each.value.name
-  image       = &quot;ubuntu-20.04&quot; 
+  image       = &#34;ubuntu-20.04&#34; 
   server_type = each.value.server_type
   location    = var.hcloud_location
-  ssh_keys    = [&quot;accesskey&quot;]
+  ssh_keys    = [&#34;accesskey&#34;]
 }
-
 </code></pre><p><code>foreach</code> runs a loop.
 Let us quickly switch to the variables.tf file to better understand how this <code>foreach</code> works.</p>
-<pre><code>variable &quot;nodes&quot; {
+<pre tabindex="0"><code>variable &#34;nodes&#34; {
     type = map(object({
         name         = string
         server_type  = string
@@ -200,34 +198,34 @@ Let us quickly switch to the variables.tf file to better understand how this <co
 </code></pre><p>The variable in this case is a &ldquo;map&rdquo;. The name of the variable is &ldquo;nodes&rdquo;. Each of the element contains an object with values: name, server_type, and private_ip variables.</p>
 <p>Back in the foreach loop, we can access the <code>name</code> like this: <code>each.value.name</code> and the <code>server_type</code> like this: <code>each.value.server_type</code></p>
 <p>Let us see how the values are passed in mycloud/prod/main.tf</p>
-<pre><code>module &quot;cluster&quot; {
-    source = &quot;../../modules/hcloud&quot;
+<pre tabindex="0"><code>module &#34;cluster&#34; {
+    source = &#34;../../modules/hcloud&#34;
 
     nodes = {
         1 = {
-            name = &quot;node1&quot;
-            server_type = &quot;cx21&quot;
-            private_ip   = &quot;10.0.0.5&quot;
+            name = &#34;node1&#34;
+            server_type = &#34;cx21&#34;
+            private_ip   = &#34;10.0.0.5&#34;
         }
         
         2 = {
-            name = &quot;node2&quot;
-            server_type = &quot;cx21&quot;
-            private_ip   = &quot;10.0.0.6&quot;
+            name = &#34;node2&#34;
+            server_type = &#34;cx21&#34;
+            private_ip   = &#34;10.0.0.6&#34;
         }
         
         3 = {
-            name = &quot;node3&quot;
-            server_type = &quot;cx21&quot;
-            private_ip   = &quot;10.0.0.7&quot;
+            name = &#34;node3&#34;
+            server_type = &#34;cx21&#34;
+            private_ip   = &#34;10.0.0.7&#34;
         }
     }
 }
 </code></pre><p>Now that we have the nodes setup, we can add additional components to our cluster. Let us first add a small volume to each node. Volumes is like a virtual Hard Disk. Having a separate HDD for application data is convenient. Here is the code:</p>
-<pre><code>resource &quot;hcloud_volume&quot; &quot;volumes&quot; {
+<pre tabindex="0"><code>resource &#34;hcloud_volume&#34; &#34;volumes&#34; {
   for_each = var.nodes
   
-  name = &quot;${each.value.name}-volx&quot;
+  name = &#34;${each.value.name}-volx&#34;
   size = 10
   server_id = hcloud_server.cloud_nodes[each.key].id
   automount = false
@@ -237,7 +235,7 @@ The other interesting line is where it makes a name for the volume here
 <code>name = &quot;${each.value.name}-volx&quot;</code> That line just combines the name of the node and makes it easy check which volume corresponds to which node.</p>
 <h3 id="connect-the-node-to-the-network">Connect the node to the network</h3>
 <p>The next block connects each of the node to the network and sets the private IP address of the node.</p>
-<pre><code>resource &quot;hcloud_server_network&quot; &quot;server_network&quot; {
+<pre tabindex="0"><code>resource &#34;hcloud_server_network&#34; &#34;server_network&#34; {
   for_each = var.nodes
 
   network_id = data.hcloud_network.private_net.id
@@ -247,20 +245,20 @@ The other interesting line is where it makes a name for the volume here
 </code></pre><h3 id="load-balancer">Load balancer</h3>
 <p>We will need a load balancer to distribute the external traffic to the nodes in the cluster.</p>
 <p>Here is the code to setup one:</p>
-<pre><code>resource &quot;hcloud_load_balancer&quot; &quot;load_balancer&quot; {
-  name       = &quot;${var.cluster_name}-lb&quot;
+<pre tabindex="0"><code>resource &#34;hcloud_load_balancer&#34; &#34;load_balancer&#34; {
+  name       = &#34;${var.cluster_name}-lb&#34;
   load_balancer_type = var.load_balancer.type
   location   = var.hcloud_location
-  dynamic &quot;target&quot;{
+  dynamic &#34;target&#34;{
     for_each = var.nodes
     content{
-      type = &quot;server&quot;
+      type = &#34;server&#34;
       server_id= hcloud_server.cloud_nodes[target.key].id
     }
   }
 }
 </code></pre><p>We will also add the load balancer to our private network. Remember we allow only local traffic for the nodes in our cluster. So the load balancer will only communicate through the private IP address of the nodes in the cluster.</p>
-<pre><code>resource &quot;hcloud_load_balancer_network&quot; &quot;server_network_lb&quot; {
+<pre tabindex="0"><code>resource &#34;hcloud_load_balancer_network&#34; &#34;server_network_lb&#34; {
   load_balancer_id = hcloud_load_balancer.load_balancer.id
   network_id = data.hcloud_network.private_net.id
   ip = var.load_balancer.private_ip
@@ -268,64 +266,63 @@ The other interesting line is where it makes a name for the volume here
 </code></pre><h3 id="setup-a-cluster">Setup a cluster</h3>
 <p>We have the module ready that can create a cluster in our private network. See the code in the folder: mycloud/prod</p>
 <p>In the first part we initialize the map of nodes for the cluster:</p>
-<pre><code>module &quot;cluster&quot; {
-    source = &quot;../../modules/hcloud&quot;
+<pre tabindex="0"><code>module &#34;cluster&#34; {
+    source = &#34;../../modules/hcloud&#34;
     
-    cluster_name = &quot;prod&quot;
-    network_name = &quot;simfatic-main&quot;
+    cluster_name = &#34;prod&#34;
+    network_name = &#34;simfatic-main&#34;
 
     nodes = {
         1 = {
-            name = &quot;node1&quot;
-            server_type = &quot;cx21&quot;
-            private_ip   = &quot;10.0.0.5&quot;
+            name = &#34;node1&#34;
+            server_type = &#34;cx21&#34;
+            private_ip   = &#34;10.0.0.5&#34;
         }
         
         2 = {
-            name = &quot;node2&quot;
-            server_type = &quot;cx21&quot;
-            private_ip   = &quot;10.0.0.6&quot;
+            name = &#34;node2&#34;
+            server_type = &#34;cx21&#34;
+            private_ip   = &#34;10.0.0.6&#34;
         }
         
         3 = {
-            name = &quot;node3&quot;
-            server_type = &quot;cx21&quot;
-            private_ip   = &quot;10.0.0.7&quot;
+            name = &#34;node3&#34;
+            server_type = &#34;cx21&#34;
+            private_ip   = &#34;10.0.0.7&#34;
         }
     }
 
     load_balancer = {
-        type=&quot;lb11&quot;
-        private_ip=&quot;10.0.0.3&quot;
+        type=&#34;lb11&#34;
+        private_ip=&#34;10.0.0.3&#34;
     }
 
-    hcloud_location = &quot;nbg1&quot;
+    hcloud_location = &#34;nbg1&#34;
 }
-
 </code></pre><p>You may have noticed that making a separate module makes it easy to build clusters of different size and shapes. You can add more nodes in the main.tf to build a larger cluster. You can change the server-type variable to vertically scale.</p>
 <p>There can be many cluster setups each one for a different purpose. For example the cluster <code>staging</code> can be used to run tests on apps just about to be released. A <code>dev-cluster</code> can be used for development time tests. Any of these clusters can be stood up on demand.</p>
 <h3 id="output">Output</h3>
-<pre><code>output &quot;nodes&quot; {
+<pre tabindex="0"><code>output &#34;nodes&#34; {
   value = module.cluster.nodes
-  description = &quot;Node Details&quot;
+  description = &#34;Node Details&#34;
 }
-output &quot;load_balancer&quot;{
+output &#34;load_balancer&#34;{
   value = module.cluster.load_balancer
-  description = &quot;LoadBalancer IP&quot;
+  description = &#34;LoadBalancer IP&#34;
 }
 </code></pre><p>The output configuration provides the external IP addresses of the nodes and the load balancer. We can uses these IP addresses in the next step - that is to provision the nodes using Ansible.</p>
 <h3 id="build-a-cluster">Build a cluster</h3>
 <p>go to the folder run terraform init</p>
-<pre><code>cd mycluster/prod
+<pre tabindex="0"><code>cd mycluster/prod
 terraform init
 </code></pre><p>Then run terraform apply</p>
-<pre><code>terraform apply
+<pre tabindex="0"><code>terraform apply
 </code></pre><h2 id="destroy-the-cluster">Destroy the cluster</h2>
 <p>Once you have the terraform code working, you are ready with the &ldquo;infrastructure as code&rdquo;. You can build the cluster on demand any time you want. That also means that you can destroy the ones that you don&rsquo;t need. In order to destroy the test cluster run the command</p>
-<pre><code>cd mycloud/prod
+<pre tabindex="0"><code>cd mycloud/prod
 terraform destroy
 </code></pre><p>to destroy the base setup:</p>
-<pre><code>cd mycloud/base
+<pre tabindex="0"><code>cd mycloud/base
 terraform destroy
 </code></pre><h2 id="next-steps">Next steps</h2>
 <p>It is only the bare nodes that we have setup so far. Before you can run any useful application on this cluster, you need to provision these nodes. For example, setup user and admin accounts, Firewall, SSH so that the admin user can login, so on and so forth. Fortunately, Ansible makes the setup pretty easy just like terraform made it easy for the infrastructure.
@@ -345,7 +342,7 @@ It is the topic of discussion for another session.</p>
     </div>
     <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
         <div class="text-xs text-gray-700 float-right h-24">
-            &copy; 2021 Prasanth Janardhanan
+            &copy; 2022 Prasanth Janardhanan
         </div>
     </footer>
 </body>

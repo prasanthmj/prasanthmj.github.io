@@ -49,17 +49,17 @@ If you know HTML and CSS, you can build your site your way. In fact, I would rec
 <h2 id="get-started">Get Started</h2>
 <h3 id="install-hugo">Install Hugo</h3>
 <p>Go to the Hugo Getting started page and follow the instructions to install Hugo. In my case, on a mac laptop with <code>brew</code> installed, the step is simple:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brew install hugo
-</code></pre></div><h3 id="create-a-new-hugo-website">Create a new Hugo website</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>brew install hugo
+</span></span></code></pre></div><h3 id="create-a-new-hugo-website">Create a new Hugo website</h3>
 <p>In your terminal, issue the following command:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">brew new site mywebsite
-</code></pre></div><p>Hugo creates a folder mywebsite  with several sub-folders in it
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>brew new site mywebsite
+</span></span></code></pre></div><p>Hugo creates a folder mywebsite  with several sub-folders in it
 <img src="../images/hugo-folder-structure.png" alt=""></p>
 <p>Let us see how does our new website looks like.
 <code>cd</code> to your mywebsite folder and run <code>hugo serve</code></p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash"><span style="color:#0086b3">cd</span> mywebsite
-hugo serve
-</code></pre></div><p>Hugo throws a message that our website is ready at address localhost:1313</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#0086b3">cd</span> mywebsite
+</span></span><span style="display:flex;"><span>hugo serve
+</span></span></code></pre></div><p>Hugo throws a message that our website is ready at address localhost:1313</p>
 <p>Enter that address in your browser and &hellip;
 &hellip; Nothing!</p>
 <p>You will get a blank page.</p>
@@ -68,26 +68,26 @@ hugo serve
 <h2 id="create-a-theme">Create a theme</h2>
 <p>By a theme, we define a structure and style of our website. It is a good exercise to make your own theme because that will give a better idea of how each part comes together to a complete site.</p>
 <p>Now issue the following command to generate a blank Hugo theme:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">hugo new theme mytheme
-</code></pre></div><p>Hugo creates a sub-folder <code>mytheme</code> inside the <code>themes</code> folder</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>hugo new theme mytheme
+</span></span></code></pre></div><p>Hugo creates a sub-folder <code>mytheme</code> inside the <code>themes</code> folder</p>
 <h2 id="select-the-theme">select the theme</h2>
 <p>Open your text editor (VSCode is nice. You can use your favorite one)</p>
 <p>There is a config.toml file in the root folder of the website (mywebsite/config.toml) Open the file <code>config.toml</code>.
 This is the file where you configure the settings of the website.
 Add the following line to the <code>config.toml</code> file.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">theme=<span style="color:#d14">&#34;mytheme&#34;</span>
-</code></pre></div><p>Your config.toml will look like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-toml" data-lang="toml">baseURL = <span style="color:#d14">&#34;http://example.org/&#34;</span>
-languageCode = <span style="color:#d14">&#34;en-us&#34;</span>
-title = <span style="color:#d14">&#34;My New Hugo Site&#34;</span>
-theme=<span style="color:#d14">&#34;mytheme&#34;</span>
-</code></pre></div><p>Now, Let us look into the contents of the mytheme folder</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>theme=<span style="color:#d14">&#34;mytheme&#34;</span>
+</span></span></code></pre></div><p>Your config.toml will look like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-toml" data-lang="toml"><span style="display:flex;"><span>baseURL = <span style="color:#d14">&#34;http://example.org/&#34;</span>
+</span></span><span style="display:flex;"><span>languageCode = <span style="color:#d14">&#34;en-us&#34;</span>
+</span></span><span style="display:flex;"><span>title = <span style="color:#d14">&#34;My New Hugo Site&#34;</span>
+</span></span><span style="display:flex;"><span>theme=<span style="color:#d14">&#34;mytheme&#34;</span>
+</span></span></code></pre></div><p>Now, Let us look into the contents of the mytheme folder</p>
 <h2 id="index-page">Index page</h2>
 <p>You can see there is an index.html page in the mytheme folder. This template is used to render the home page.
 Let&rsquo;s just add some content and see whether that appears in our new website
 Update index.html</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">&lt;<span style="color:#000080">h1</span>&gt;This is the Home page&lt;/<span style="color:#000080">h1</span>&gt;
-</code></pre></div><p>Run <code>hugo serve</code> again. This time when you open localhost:1313 you will see the content we entered in the index.html file.
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>&lt;<span style="color:#000080">h1</span>&gt;This is the Home page&lt;/<span style="color:#000080">h1</span>&gt;
+</span></span></code></pre></div><p>Run <code>hugo serve</code> again. This time when you open localhost:1313 you will see the content we entered in the index.html file.
 <img src="../images/home-page.png" alt=""></p>
 <h4 id="layouts">Layouts</h4>
 <p>Now open the folder named layouts.
@@ -95,72 +95,72 @@ The <code>layouts</code> folder contains the HTML files that define the overall 
 You can have multiple layouts. The <code>_default</code> folder contains the layout that is used by default.
 There is a file named <code>baseof.html</code> This file is the base HTML template file.</p>
 <p>Open the <code>baseof.html</code> file. There will be some default contents in the <code>baseof.html</code> file. Replace the contents with the following:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#999;font-weight:bold;font-style:italic">&lt;!DOCTYPE html&gt;</span>
-&lt;<span style="color:#000080">html</span>&gt;
-    &lt;<span style="color:#000080">body</span>&gt;
-        &lt;<span style="color:#000080">h1</span>&gt;My New Hugo Site&lt;/<span style="color:#000080">h1</span>&gt;
-        &lt;<span style="color:#000080">hr</span>&gt;
-        {{- block &#34;main&#34; . }}{{- end }}
-    &lt;/<span style="color:#000080">body</span>&gt;
-&lt;/<span style="color:#000080">html</span>&gt;
-</code></pre></div><p>Then open the index.html page again and update the contents like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html">{{ define &#34;main&#34; }}
-&lt;<span style="color:#000080">h1</span>&gt;This is the Home page&lt;/<span style="color:#000080">h1</span>&gt;
-{{end}}
-</code></pre></div><p>Reload your webpage in the browser and you should see the home page like this:
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#000080">html</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#000080">body</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">h1</span>&gt;My New Hugo Site&lt;/<span style="color:#000080">h1</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">hr</span>&gt;
+</span></span><span style="display:flex;"><span>        {{- block &#34;main&#34; . }}{{- end }}
+</span></span><span style="display:flex;"><span>    &lt;/<span style="color:#000080">body</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#000080">html</span>&gt;
+</span></span></code></pre></div><p>Then open the index.html page again and update the contents like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span>{{ define &#34;main&#34; }}
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#000080">h1</span>&gt;This is the Home page&lt;/<span style="color:#000080">h1</span>&gt;
+</span></span><span style="display:flex;"><span>{{end}}
+</span></span></code></pre></div><p>Reload your webpage in the browser and you should see the home page like this:
 <img src="../images/templated-home-page.png" alt=""></p>
 <p>Hugo replaces this block definition: <code>{{- block &quot;main&quot; . }}{{- end }}</code> in the <code>baseof.html</code> template with the main block from the index page and  renders the resulting page.</p>
 <h2 id="pages">Pages</h2>
 <p>Let us now create a page. First, we have to update the template for single pages. open <code>themes/personal/layouts/_default/single.html</code> file and update it:</p>
-<pre><code>{{ define &quot;main&quot; }}
+<pre tabindex="0"><code>{{ define &#34;main&#34; }}
 {{ .Content }}
 {{end}}
 </code></pre><p>This means that for the main block we had defined in the <code>baseof.html</code> template, just place the content of the page. (We will see all the variables you can use in the template later. <code>Content</code> is the content of the page being rendered. <code>Title</code> is the title of the page)</p>
 <p>Create a folder <code>lesson1</code> in the <code>content</code> folder. Then create a file <code>page1.md</code>. <code>.md</code> files are called Markdown files. It is a simple text file format, very useful for writing content. The default content format of Hugo is Markdown</p>
 <p>Enter some content for <code>page1.md</code> like this:</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-md" data-lang="md"><span style="color:#aaa">## This is Page 1
-</span></code></pre></div><p>Now go to the web address localhost:1313/lesson1/page1/</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-md" data-lang="md"><span style="display:flex;"><span><span style="color:#aaa">## This is Page 1
+</span></span></span></code></pre></div><p>Now go to the web address localhost:1313/lesson1/page1/</p>
 <p>You should see the web page rendered like this:
 <img src="../images/page-1-displayed.png" alt=""></p>
 <p>Notice again how the <code>baseof.html</code> template is used to render the page.</p>
 <h2 id="style-using-bootstrap">Style using Bootstrap</h2>
 <p>Next step is to add some styling to our website.  Since focus of this tutorial is to see the workings of Hugo, lets style with Bootstrap for this first version. Bootstrap is beginner friendly and helps getting started quickly. Go to <a href="https://getbootstrap.com/">getbootstrap.com</a> for a quick introduction.</p>
 <p>Let&rsquo;s modify <code>baseof.html</code>. First, add link to the bootstrap css file. Then add a <a href="https://getbootstrap.com/docs/4.0/components/navbar/">Navbar</a> and a footer. Alternatively, you can customize one of the <a href="https://getbootstrap.com/docs/4.0/examples/">examples</a> from bootstrap website.</p>
-<div class="highlight"><pre style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-html" data-lang="html"><span style="color:#999;font-weight:bold;font-style:italic">&lt;!DOCTYPE html&gt;</span>
-&lt;<span style="color:#000080">html</span>&gt;
-    &lt;<span style="color:#000080">head</span>&gt;
-        &lt;<span style="color:#000080">meta</span> <span style="color:#008080">charset</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;utf-8&#34;</span>&gt;
-        &lt;<span style="color:#000080">meta</span> <span style="color:#008080">name</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;viewport&#34;</span> <span style="color:#008080">content</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;width=device-width, initial-scale=1, shrink-to-fit=no&#34;</span>&gt;
-        &lt;<span style="color:#000080">title</span>&gt;My New Hugo Site&lt;/<span style="color:#000080">title</span>&gt;
-        <span style="color:#998;font-style:italic">&lt;!-- Bootstrap CSS --&gt;</span>
-        &lt;<span style="color:#000080">link</span> <span style="color:#008080">rel</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;stylesheet&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css&#34;</span> <span style="color:#008080">integrity</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l&#34;</span> <span style="color:#008080">crossorigin</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;anonymous&#34;</span>&gt;
-
-    &lt;/<span style="color:#000080">head</span>&gt;
-    &lt;<span style="color:#000080">body</span>&gt;
-        &lt;<span style="color:#000080">nav</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar navbar-expand-md navbar-dark bg-secondary&#34;</span>&gt;
-            &lt;<span style="color:#000080">div</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;container-fluid&#34;</span>&gt;
-              &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar-brand&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;MySite&lt;/<span style="color:#000080">a</span>&gt;
-              &lt;<span style="color:#000080">div</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;collapse navbar-collapse&#34;</span> <span style="color:#008080">id</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbarsExampleDefault&#34;</span>&gt;
-                &lt;<span style="color:#000080">ul</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar-nav me-auto mb-2 mb-md-0&#34;</span>&gt;
-                  &lt;<span style="color:#000080">li</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-item&#34;</span>&gt;
-                    &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-link active&#34;</span> <span style="color:#008080">aria-current</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;page&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;Home&lt;/<span style="color:#000080">a</span>&gt;
-                  &lt;/<span style="color:#000080">li</span>&gt;
-                  &lt;<span style="color:#000080">li</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-item&#34;</span>&gt;
-                    &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-link&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;Link&lt;/<span style="color:#000080">a</span>&gt;
-                  &lt;/<span style="color:#000080">li</span>&gt;
-                &lt;/<span style="color:#000080">ul</span>&gt;
-                &lt;/<span style="color:#000080">div</span>&gt;
-            &lt;/<span style="color:#000080">div</span>&gt;
-        &lt;/<span style="color:#000080">nav</span>&gt;
-        &lt;<span style="color:#000080">main</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;container mt-2 min-vh-100&#34;</span> &gt;
-                {{- block &#34;main&#34; . }}{{- end }}
-        &lt;/<span style="color:#000080">main</span>&gt;
-        &lt;<span style="color:#000080">footer</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bg-dark p-3 mt-4 container-fluid&#34;</span>&gt;
-            &lt;<span style="color:#000080">a</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;text-light&#34;</span>&gt;About&lt;/<span style="color:#000080">a</span>&gt;
-        &lt;/<span style="color:#000080">footer</span>&gt;
-    &lt;/<span style="color:#000080">body</span>&gt;
-&lt;/<span style="color:#000080">html</span>&gt;
-</code></pre></div><p>Don&rsquo;t forget to add the <code>{{- block &quot;main&quot; . }}{{- end }}</code> block.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-html" data-lang="html"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">&lt;!DOCTYPE html&gt;</span>
+</span></span><span style="display:flex;"><span>&lt;<span style="color:#000080">html</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#000080">head</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">meta</span> <span style="color:#008080">charset</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;utf-8&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">meta</span> <span style="color:#008080">name</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;viewport&#34;</span> <span style="color:#008080">content</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;width=device-width, initial-scale=1, shrink-to-fit=no&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">title</span>&gt;My New Hugo Site&lt;/<span style="color:#000080">title</span>&gt;
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">&lt;!-- Bootstrap CSS --&gt;</span>
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">link</span> <span style="color:#008080">rel</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;stylesheet&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css&#34;</span> <span style="color:#008080">integrity</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l&#34;</span> <span style="color:#008080">crossorigin</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;anonymous&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    &lt;/<span style="color:#000080">head</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;<span style="color:#000080">body</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">nav</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar navbar-expand-md navbar-dark bg-secondary&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>            &lt;<span style="color:#000080">div</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;container-fluid&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>              &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar-brand&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;MySite&lt;/<span style="color:#000080">a</span>&gt;
+</span></span><span style="display:flex;"><span>              &lt;<span style="color:#000080">div</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;collapse navbar-collapse&#34;</span> <span style="color:#008080">id</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbarsExampleDefault&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>                &lt;<span style="color:#000080">ul</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;navbar-nav me-auto mb-2 mb-md-0&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>                  &lt;<span style="color:#000080">li</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-item&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>                    &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-link active&#34;</span> <span style="color:#008080">aria-current</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;page&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;Home&lt;/<span style="color:#000080">a</span>&gt;
+</span></span><span style="display:flex;"><span>                  &lt;/<span style="color:#000080">li</span>&gt;
+</span></span><span style="display:flex;"><span>                  &lt;<span style="color:#000080">li</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-item&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>                    &lt;<span style="color:#000080">a</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;nav-link&#34;</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span>&gt;Link&lt;/<span style="color:#000080">a</span>&gt;
+</span></span><span style="display:flex;"><span>                  &lt;/<span style="color:#000080">li</span>&gt;
+</span></span><span style="display:flex;"><span>                &lt;/<span style="color:#000080">ul</span>&gt;
+</span></span><span style="display:flex;"><span>                &lt;/<span style="color:#000080">div</span>&gt;
+</span></span><span style="display:flex;"><span>            &lt;/<span style="color:#000080">div</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;/<span style="color:#000080">nav</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">main</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;container mt-2 min-vh-100&#34;</span> &gt;
+</span></span><span style="display:flex;"><span>                {{- block &#34;main&#34; . }}{{- end }}
+</span></span><span style="display:flex;"><span>        &lt;/<span style="color:#000080">main</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;<span style="color:#000080">footer</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;bg-dark p-3 mt-4 container-fluid&#34;</span>&gt;
+</span></span><span style="display:flex;"><span>            &lt;<span style="color:#000080">a</span> <span style="color:#008080">href</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#&#34;</span> <span style="color:#008080">class</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;text-light&#34;</span>&gt;About&lt;/<span style="color:#000080">a</span>&gt;
+</span></span><span style="display:flex;"><span>        &lt;/<span style="color:#000080">footer</span>&gt;
+</span></span><span style="display:flex;"><span>    &lt;/<span style="color:#000080">body</span>&gt;
+</span></span><span style="display:flex;"><span>&lt;/<span style="color:#000080">html</span>&gt;
+</span></span></code></pre></div><p>Don&rsquo;t forget to add the <code>{{- block &quot;main&quot; . }}{{- end }}</code> block.</p>
 <p>Go ahead and preview your updated website. Page 1 should look better now</p>
 <p><img src="../images/hugo-bootstrap.png" alt=""></p>
 <h2 id="publishing-your-website">Publishing your website</h2>
@@ -184,7 +184,7 @@ There is a file named <code>baseof.html</code> This file is the base HTML templa
     </div>
     <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
         <div class="text-xs text-gray-700 float-right h-24">
-            &copy; 2021 Prasanth Janardhanan
+            &copy; 2022 Prasanth Janardhanan
         </div>
     </footer>
 </body>
