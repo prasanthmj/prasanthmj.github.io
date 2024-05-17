@@ -2,6 +2,66 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>/ai/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/chatgpt-4o/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/ai/llms-to-transform-ui/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/human-computer-interaction/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/large-language-models/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/llms/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/ui/</loc>
+    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/ai/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/deepmind/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/gaming/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/innovation/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/medicine/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/proteins/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/ai/gaming-and-ai/</loc>
+    <lastmod>2024-05-06T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/chain-of-thought/</loc>
+    <lastmod>2024-03-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/chatgpt/</loc>
+    <lastmod>2024-03-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/ai/chain-of-thought/</loc>
+    <lastmod>2024-03-25T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/llm/</loc>
+    <lastmod>2024-03-25T00:00:00+00:00</lastmod>
+  </url><url>
     <loc>/go/peg-parser-in-go/</loc>
     <lastmod>2021-01-15T00:00:00+00:00</lastmod>
   </url><url>
@@ -21,12 +81,6 @@
     <lastmod>2021-01-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/peg/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/</loc>
-    <lastmod>2021-01-15T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/</loc>
     <lastmod>2021-01-15T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/go/javascript-parser-in-go/</loc>
