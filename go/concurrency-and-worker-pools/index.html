@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>The Evolution of Concurrency Patterns in Go: From Goroutines to Advanced Worker Pools </title><meta name="keywords" content="Concurrency, Worker Pools" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">The Evolution of Concurrency Patterns in Go: From Goroutines to Advanced Worker Pools</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/concurrency" class="text-gray-600">Concurrency</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/worker-pools" class="text-gray-600">Worker Pools</a> </li>
+    
+</ul>
+  
+<p>Remember when you first dipped your toes into the world of concurrent programming? If you&rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&rsquo;s the thing: in today&rsquo;s tech landscape, mastering concurrency isn&rsquo;t just a cool party trick—it&rsquo;s becoming as essential as knowing how to loop.</p>
+<p>Enter Go (or Golang, if you&rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &ldquo;concurrency made easy!&rdquo; And you know what? For the most part, it delivered. Go&rsquo;s goroutines and channels made concurrent programming feel less like rocket science and more like, well, actual programming.</p>
+<p>But here&rsquo;s where it gets interesting. As we&rsquo;ve pushed Go into more complex, real-world scenarios, we&rsquo;ve started to see the limitations of its out-of-the-box concurrency tools. Don&rsquo;t get me wrong—goroutines and channels are fantastic. They&rsquo;re like the Swiss Army knife of concurrency. But sometimes, you need a whole toolbox.</p>
+<p>That&rsquo;s where patterns like Worker Pools come in. Think of them as the power tools of Go concurrency. They build on the foundations laid by goroutines and channels to create more sophisticated, efficient ways of handling concurrent tasks.</p>
+<p>In this article, we&rsquo;re going to take a journey. We&rsquo;ll start with the basics—goroutines, channels, and the sync package. These are your concurrency ABCs. But we won&rsquo;t stop there. We&rsquo;ll explore why these tools, as awesome as they are, sometimes fall short in complex scenarios.</p>
+<p>Then, we&rsquo;ll dive into the world of Worker Pools. We&rsquo;ll look at why they&rsquo;re needed, how they work, and how to implement them. We&rsquo;ll even roll up our sleeves and build an advanced Worker Pool with batch processing capabilities. Trust me, it&rsquo;s cooler than it sounds.</p>
+<p>But why should you care? Well, if you&rsquo;re building any kind of scalable application in Go—whether it&rsquo;s a high-throughput web service, a data processing pipeline, or yeah, even a video builder app—understanding these advanced concurrency patterns isn&rsquo;t just helpful. It&rsquo;s crucial.</p>
+<p>By the end of this article, you&rsquo;ll have a deeper understanding of Go&rsquo;s concurrency model and the tools to tackle even the most complex concurrent programming challenges. You&rsquo;ll be able to write Go code that&rsquo;s not just concurrent, but efficiently concurrent.</p>
+<h2 id="2-simple-concurrency-primitives-in-go">2. Simple Concurrency Primitives in Go</h2>
+<p>Alright, let&rsquo;s get our hands dirty with some Go concurrency basics. If Go&rsquo;s concurrency model were a toolbox, these primitives would be your trusty hammer, screwdriver, and wrench. They&rsquo;re simple, they&rsquo;re powerful, and they&rsquo;re the building blocks for everything else we&rsquo;ll discuss.</p>
+<h3 id="21-goroutines-the-basic-unit-of-concurrency">2.1 Goroutines: The basic unit of concurrency</h3>
+<p>First up, we&rsquo;ve got goroutines. Think of them as Go&rsquo;s secret sauce for concurrency. They&rsquo;re like threads, but on steroids (and a strict diet plan).</p>
+<p>Here&rsquo;s the cool part: spinning up a goroutine is as easy as slapping the <code>go</code> keyword in front of a function call. Like this:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">doSomething</span>()
+</span></span></code></pre></div><p>Bam! You&rsquo;ve just told Go to run <code>doSomething()</code> concurrently. It&rsquo;s that simple.</p>
+<p>But what makes goroutines so special? For one, they&rsquo;re lightweight. We&rsquo;re talking kilobytes of memory here. You can spin up thousands of them without breaking a sweat. Try doing that with OS threads, and your computer will give you the digital equivalent of a death stare.</p>
+<h3 id="22-channels-communication-and-synchronization">2.2 Channels: Communication and synchronization</h3>
+<p>Now, goroutines are great and all, but they&rsquo;d be pretty useless if they couldn&rsquo;t talk to each other. That&rsquo;s where channels come in. They&rsquo;re like pipes that connect goroutines, allowing them to pass messages back and forth.</p>
+<p>Creating a channel is straightforward:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>ch <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> <span style="color:#458;font-weight:bold">int</span>)
+</span></span></code></pre></div><p>You can send values on a channel with <code>ch &lt;- 42</code>, and receive them with <code>value := &lt;-ch</code>. It&rsquo;s like passing notes in class, but way cooler and less likely to get you in trouble.</p>
+<p>Channels aren&rsquo;t just for communication, though. They&rsquo;re also great for synchronization. Want to wait for a bunch of goroutines to finish? Use a channel. Need to limit the number of goroutines running at once? Channels can do that too.</p>
+<h3 id="23-sync-package-mutexes-waitgroups-and-more">2.3 Sync package: Mutexes, WaitGroups, and more</h3>
+<p>Sometimes, you need more fine-grained control over your concurrent operations. That&rsquo;s where the <code>sync</code> package comes in. It&rsquo;s like the Swiss Army knife of synchronization primitives.</p>
+<p>Need to protect a piece of shared data? Use a <code>Mutex</code>:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">var</span> mu sync.Mutex
+</span></span><span style="display:flex;"><span>mu.<span style="color:#900;font-weight:bold">Lock</span>()
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Access or modify shared data
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>mu.<span style="color:#900;font-weight:bold">Unlock</span>()
+</span></span></code></pre></div><p>Want to wait for a bunch of goroutines to finish? <code>WaitGroup</code> has got your back:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">var</span> wg sync.WaitGroup
+</span></span><span style="display:flex;"><span>wg.<span style="color:#900;font-weight:bold">Add</span>(<span style="color:#099">3</span>)
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> wg.<span style="color:#900;font-weight:bold">Done</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Do some work
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}()
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Repeat for other goroutines
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>wg.<span style="color:#900;font-weight:bold">Wait</span>() <span style="color:#998;font-style:italic">// Block until all goroutines are done
+</span></span></span></code></pre></div><h3 id="24-limitations-of-simple-concurrency-primitives-in-complex-scenarios">2.4 Limitations of simple concurrency primitives in complex scenarios</h3>
+<p>Now, I know what you&rsquo;re thinking. &ldquo;These tools seem pretty great! What&rsquo;s the catch?&rdquo; Well, you&rsquo;re right to be suspicious. While these primitives are powerful, they can start to show their limitations in more complex scenarios.</p>
+<p>For instance, creating a goroutine for every task might work fine for a small number of operations, but what happens when you&rsquo;re dealing with thousands or millions of tasks? You might find yourself drowning in goroutines, each competing for system resources.</p>
+<p>Or consider error handling. With basic goroutines, it&rsquo;s not always straightforward to propagate errors back to the main thread. And don&rsquo;t even get me started on the potential for deadlocks if you&rsquo;re not careful with your channel operations.</p>
+<p>That&rsquo;s not to say these tools aren&rsquo;t useful. They absolutely are! But as your concurrent needs grow more complex, you might find yourself yearning for something more&hellip; sophisticated.</p>
+<p>And that, my friends, is where we&rsquo;ll pick up in the next. We&rsquo;ll dive into the common challenges you might face when using these simple primitives in real-world scenarios. Trust me, it&rsquo;s going to get interesting!</p>
+<h2 id="3-common-challenges-in-practical-concurrent-programming">3. Common Challenges in Practical Concurrent Programming</h2>
+<p>So, you&rsquo;ve mastered goroutines and channels, and you&rsquo;re feeling pretty good about your concurrency skills. Then you tackle your first big project, and suddenly it&rsquo;s like trying to herd cats while juggling flaming torches. Welcome to the world of practical concurrent programming!</p>
+<h3 id="31-resource-management-and-limitations">3.1 Resource management and limitations</h3>
+<p>First up: resource management. It&rsquo;s the beast that lurks in the shadows of every concurrent program.</p>
+<p>Here&rsquo;s the thing about goroutines - they&rsquo;re cheap, but they&rsquo;re not free. Each one gobbles up a little memory, and if you&rsquo;re not careful, &ldquo;a little&rdquo; can turn into &ldquo;a lot&rdquo; real quick. I once saw a program spin up a goroutine for every pixel in a 4K image. Spoiler alert: it didn&rsquo;t end well.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">for</span> _, pixel <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> hugeImage {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">processPixel</span>(pixel)  <span style="color:#998;font-style:italic">// Don&#39;t do this!
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></div><p>And it&rsquo;s not just memory. Your CPU cores, network connections, database connections - all of these are finite resources. Spawn too many goroutines, and you might find your program choking on its own ambition.</p>
+<h3 id="32-error-handling-and-propagation">3.2 Error handling and propagation</h3>
+<p>Next up: error handling. In sequential code, it&rsquo;s straightforward. In concurrent code? It&rsquo;s like trying to catch water with a sieve.</p>
+<p>Consider this innocent-looking code:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>    result, err <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">riskyOperation</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Now what?
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>}()
+</span></span></code></pre></div><p>If <code>riskyOperation()</code> fails, where does that error go? Into the void, that&rsquo;s where. It&rsquo;s like that old philosophical question: if a goroutine errors and no one&rsquo;s there to catch it, does it make a sound?</p>
+<p>Propagating errors back to the main thread becomes a juggling act. You need to set up channels, maybe use <code>select</code> statements, and suddenly your elegant concurrent code is starting to look like a plate of spaghetti.</p>
+<h3 id="33-scalability-concerns">3.3 Scalability concerns</h3>
+<p>Scalability - it&rsquo;s the holy grail of concurrent programming. In theory, more cores should mean faster execution. In practice? Well, let&rsquo;s just say Amdahl&rsquo;s law can be a real party pooper.</p>
+<p>The problem is, not all parts of your program can be parallelized. And as you add more concurrent operations, you might hit diminishing returns. Or worse, you might see your performance tank as contentions for shared resources increase.</p>
+<h3 id="34-deadlocks-and-race-conditions">3.4 Deadlocks and race conditions</h3>
+<p>Ah, deadlocks and race conditions. The dynamic duo of concurrent programming nightmares. They&rsquo;re like ghosts - scary, hard to spot, and they only show up when you least expect them.</p>
+<p>Here&rsquo;s a classic recipe for a deadlock:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>ch <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> <span style="color:#458;font-weight:bold">int</span>)
+</span></span><span style="display:flex;"><span>ch <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#099">42</span>  <span style="color:#998;font-style:italic">// This will block forever
+</span></span></span></code></pre></div><p>And race conditions? They&rsquo;re even trickier. Two goroutines accessing shared data without proper synchronization - it&rsquo;s a race to see who can corrupt the data first!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">var</span> counter <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>() { counter<span style="color:#000;font-weight:bold">++</span> }()
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>() { counter<span style="color:#000;font-weight:bold">++</span> }()
+</span></span><span style="display:flex;"><span>fmt.<span style="color:#900;font-weight:bold">Println</span>(counter)  <span style="color:#998;font-style:italic">// What&#39;s the value? Who knows!
+</span></span></span></code></pre></div><h3 id="35-coordinating-multiple-concurrent-operations">3.5 Coordinating multiple concurrent operations</h3>
+<p>Last but not least, there&rsquo;s the challenge of coordination. It&rsquo;s one thing to spin up a bunch of goroutines. It&rsquo;s another to make them work together harmoniously.</p>
+<p>Think about a scenario where you need to process a large dataset in parallel, but each piece depends on the results of others. Or maybe you need to implement a timeout for a set of concurrent operations. Suddenly, you&rsquo;re not just writing concurrent code - you&rsquo;re choreographing a ballet.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">processDataset</span>(data []<span style="color:#458;font-weight:bold">int</span>) {
+</span></span><span style="display:flex;"><span>    results <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> <span style="color:#458;font-weight:bold">int</span>, <span style="color:#0086b3">len</span>(data))
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, item <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> data {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">processItem</span>(item, results)  <span style="color:#998;font-style:italic">// But what if one fails? Or takes too long?
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// How do we collect results? What about timeouts?
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></div><p>These challenges might seem daunting, and honestly, they can be. But don&rsquo;t worry - we&rsquo;re not just here to scare you. In the next chapter, we&rsquo;ll start looking at how we can evolve beyond simple concurrency primitives to tackle these challenges head-on.</p>
+<p>Remember, every challenge is an opportunity in disguise. And in the world of concurrent programming, these challenges are pushing us towards more sophisticated, powerful patterns. Excited?</p>
+<h2 id="4-the-need-for-advanced-concurrency-patterns">4. The Need for Advanced Concurrency Patterns</h2>
+<p>So, we&rsquo;ve seen the good, the bad, and the ugly of Go&rsquo;s basic concurrency tools. Now it&rsquo;s time to ask the million-dollar question: why aren&rsquo;t these enough? Why do we need to complicate things with fancy patterns like Worker Pools?</p>
+<h3 id="41-limitations-of-ad-hoc-goroutine-creation">4.1 Limitations of ad-hoc goroutine creation</h3>
+<p>Remember our pixel processing example from the last chapter? Let&rsquo;s revisit that for a sec:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">for</span> _, pixel <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> hugeImage {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">processPixel</span>(pixel)  <span style="color:#998;font-style:italic">// Still a bad idea!
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></div><p>Sure, this looks clean. It&rsquo;s concise. It&rsquo;s even kind of elegant. But it&rsquo;s also a ticking time bomb.</p>
+<p>Here&rsquo;s the deal: each of those goroutines is like a tiny worker. They&rsquo;re eager, they&rsquo;re ready to go, but they&rsquo;re also a bit&hellip; chaotic. They all start at once, fighting for CPU time and memory. It&rsquo;s like opening the doors on Black Friday — you might get trampled in the rush.</p>
+<p>What we need is a way to control the chaos. To say, &ldquo;Hey, let&rsquo;s process these pixels, but let&rsquo;s do it in a controlled, manageable way.&rdquo; That&rsquo;s where more advanced patterns come in.</p>
+<h3 id="42-the-problem-of-unbounded-concurrency">4.2 The problem of unbounded concurrency</h3>
+<p>Now, let&rsquo;s talk about boundaries — or rather, the lack thereof. When you&rsquo;re creating goroutines willy-nilly, you&rsquo;re essentially writing a blank check for your system resources.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">processOrders</span>(orders []Order) {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, order <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> orders {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">processOrder</span>(order)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Looks innocent, right? But what if <code>orders</code> contains a million items? Suddenly, you&rsquo;re trying to juggle a million goroutines. Your computer&rsquo;s going to give you a look that says, &ldquo;Seriously? You expect me to handle this?&rdquo;</p>
+<p>We need a way to put a cap on things. To say, &ldquo;Let&rsquo;s process these orders, but let&rsquo;s only do, say, 100 at a time.&rdquo; Again, this is where more sophisticated patterns shine.</p>
+<h3 id="43-balancing-parallelism-and-resource-utilization">4.3 Balancing parallelism and resource utilization</h3>
+<p>Here&rsquo;s a fun fact: more concurrency doesn&rsquo;t always mean better performance. I know, shocking, right? It&rsquo;s like adding more cooks to a tiny kitchen — at some point, they&rsquo;re just going to start bumping into each other.</p>
+<p>Let&rsquo;s say you&rsquo;re doing some heavy number crunching:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">crunchNumbers</span>(numbers []<span style="color:#458;font-weight:bold">int</span>) {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, num <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> numbers {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">heavyComputation</span>(num)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If you have 4 CPU cores, creating 1000 goroutines isn&rsquo;t going to make your program 1000 times faster. In fact, it might even slow things down as your CPU wastes time switching between all those goroutines.</p>
+<p>What we need is a way to match our concurrency to our available resources. To say, &ldquo;Let&rsquo;s use all our CPU cores, but let&rsquo;s not go overboard.&rdquo; Spoiler alert: advanced concurrency patterns can help with this too.</p>
+<p>So, what&rsquo;s the bottom line here? Our basic concurrency tools in Go — goroutines and channels — they&rsquo;re great. They&rsquo;re like the hammer and screwdriver in your toolbox. But sometimes, you need a power drill. Or a laser-guided, diamond-tipped super drill.</p>
+<p>That&rsquo;s where advanced concurrency patterns come in. They help us tame the chaos, set boundaries, and make the most of our resources. They let us write concurrent code that&rsquo;s not just concurrent, but efficient, manageable, and scalable.</p>
+<p>And the coolest part? These patterns aren&rsquo;t magic. They&rsquo;re built using the same basic tools we&rsquo;ve been talking about — goroutines and channels. They&rsquo;re just combined in clever ways to solve these common problems.</p>
+<h2 id="5-introduction-to-the-worker-pool-pattern">5. Introduction to the Worker Pool Pattern</h2>
+<p>Picture this: you&rsquo;re running a busy restaurant kitchen. You&rsquo;ve got orders flooding in, and you need to get those dishes out fast. Do you hire a new chef for each order? Of course not! You have a fixed number of chefs, each ready to take on the next task as soon as they&rsquo;re done with the current one.</p>
+<p>That, my friend, is essentially what a Worker Pool does in the world of concurrent programming.</p>
+<h3 id="51-concept-and-basic-structure-of-a-worker-pool">5.1 Concept and basic structure of a worker pool</h3>
+<p>At its core, a Worker Pool is a group of reusable goroutines (our &ldquo;chefs&rdquo;) that stand ready to process a stream of tasks (our &ldquo;orders&rdquo;). Instead of spawning a new goroutine for each task, we maintain a pool of worker goroutines that pick up tasks from a shared queue.</p>
+<p>Here&rsquo;s a basic sketch of what this looks like:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">workerPool</span>(numWorkers <span style="color:#458;font-weight:bold">int</span>, tasks <span style="color:#000;font-weight:bold">&lt;-</span><span style="color:#000;font-weight:bold">chan</span> Task, results <span style="color:#000;font-weight:bold">chan</span><span style="color:#000;font-weight:bold">&lt;-</span> Result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; numWorkers; i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">worker</span>(tasks, results)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">worker</span>(tasks <span style="color:#000;font-weight:bold">&lt;-</span><span style="color:#000;font-weight:bold">chan</span> Task, results <span style="color:#000;font-weight:bold">chan</span><span style="color:#000;font-weight:bold">&lt;-</span> Result) {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> task <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> tasks {
+</span></span><span style="display:flex;"><span>        result <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">process</span>(task)
+</span></span><span style="display:flex;"><span>        results <span style="color:#000;font-weight:bold">&lt;-</span> result
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>See what we did there? We&rsquo;ve got a fixed number of workers, each running in its own goroutine, all sharing the same task queue. It&rsquo;s like a well-oiled machine!</p>
+<h3 id="52-advantages-of-using-worker-pools">5.2 Advantages of using worker pools</h3>
+<p>Now, you might be wondering, &ldquo;Why bother with all this? What&rsquo;s wrong with my trusty <code>go</code> keyword?&rdquo; Well, buckle up, because worker pools bring some serious advantages to the table:</p>
+<ol>
+<li>
+<p><strong>Resource Control</strong>: Remember our problem with unbounded goroutines? Worker pools put a cap on that. You decide how many workers you want, and that&rsquo;s it. No more resource explosions!</p>
+</li>
+<li>
+<p><strong>Improved Performance</strong>: By reusing goroutines, we avoid the overhead of constantly creating and destroying them. It&rsquo;s like keeping your chef&rsquo;s knife sharp instead of grabbing a new one for each vegetable.</p>
+</li>
+<li>
+<p><strong>Load Balancing</strong>: Tasks get distributed among available workers automatically. No single goroutine gets overwhelmed while others twiddle their thumbs.</p>
+</li>
+<li>
+<p><strong>Easier Error Handling</strong>: With a centralized place for tasks to be processed, it&rsquo;s easier to implement robust error handling and reporting.</p>
+</li>
+<li>
+<p><strong>Graceful Shutdown</strong>: Need to close up shop? With a worker pool, you can stop accepting new tasks and wait for existing ones to finish. Try doing that with ad-hoc goroutines!</p>
+</li>
+</ol>
+<h3 id="53-use-cases-and-scenarios-where-worker-pools-excel">5.3 Use cases and scenarios where worker pools excel</h3>
+<p>Worker pools aren&rsquo;t just a cool trick — they&rsquo;re a solution to real-world problems. Here are some scenarios where they really shine:</p>
+<ol>
+<li>
+<p><strong>High-volume data processing</strong>: Got a ton of data to crunch? Worker pools can divvy up the work and make short work of it.</p>
+</li>
+<li>
+<p><strong>Web scraping</strong>: Need to hit a bunch of URLs without overwhelming the target server (or your own)? Worker pools let you control your request rate.</p>
+</li>
+<li>
+<p><strong>Image or video processing</strong>: Each frame or image can be a task, processed in parallel but with controlled resource usage.</p>
+</li>
+<li>
+<p><strong>Database operations</strong>: Execute multiple queries or data manipulations in parallel, while keeping connection pool usage in check.</p>
+</li>
+<li>
+<p><strong>API request handling</strong>: In a high-traffic server, worker pools can manage a flood of incoming requests efficiently.</p>
+</li>
+</ol>
+<p>Let&rsquo;s look at a quick example. Remember our pixel processing problem? Here&rsquo;s how we might approach it with a worker pool:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">processImage</span>(pixels []Pixel) {
+</span></span><span style="display:flex;"><span>    tasks <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> Pixel, <span style="color:#0086b3">len</span>(pixels))
+</span></span><span style="display:flex;"><span>    results <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> ProcessedPixel, <span style="color:#0086b3">len</span>(pixels))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Start the worker pool
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; runtime.<span style="color:#900;font-weight:bold">NumCPU</span>(); i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> <span style="color:#900;font-weight:bold">worker</span>(tasks, results)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Send tasks to the pool
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">for</span> _, pixel <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> pixels {
+</span></span><span style="display:flex;"><span>        tasks <span style="color:#000;font-weight:bold">&lt;-</span> pixel
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#0086b3">close</span>(tasks)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Collect results
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; <span style="color:#0086b3">len</span>(pixels); i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        processedPixel <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&lt;-</span>results
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Do something with the processed pixel
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Look at that! We&rsquo;re processing all our pixels concurrently, but in a controlled, efficient manner. No more goroutine explosions, no more resource chaos.</p>
+<p>Worker pools are like the secret sauce of concurrent programming. They take the raw power of goroutines and channels and turn them into a well-organized, efficient machine.</p>
+<p>But hold onto your hats, because, we&rsquo;re going to roll up our sleeves and build our very own worker pool from scratch. It&rsquo;s going to be a wild ride!</p>
+<h1 id="6-designing-a-basic-worker-pool">6. Designing a Basic Worker Pool</h1>
+<p>Alright, folks, it&rsquo;s time to roll up our sleeves and get our hands dirty with some code. We&rsquo;re about to dive into the nuts and bolts of a basic worker pool. Trust me, it&rsquo;s going to be more fun than trying to juggle flaming torches while riding a unicycle!</p>
+<h2 id="61-core-components-workers-job-queue-and-result-handling">6.1 Core Components: Workers, Job Queue, and Result Handling</h2>
+<p>Picture our worker pool as a well-oiled machine with three main parts:</p>
+<ol>
+<li><strong>Workers</strong>: These are our tireless goroutines, always ready to tackle the next task.</li>
+<li><strong>Job Queue</strong>: Think of this as the conveyor belt feeding tasks to our workers.</li>
+<li><strong>Result Handling</strong>: This is where we collect the fruits of our workers&rsquo; labor.</li>
+</ol>
+<p>Let&rsquo;s break these down, shall we?</p>
+<h3 id="workers">Workers</h3>
+<p>Our workers are like the energizer bunnies of the Go world. They keep going and going, constantly checking for new jobs to process. Each worker is a goroutine that runs in a loop, grabbing jobs from the queue, processing them, and moving on to the next one. No coffee breaks for these guys!</p>
+<h3 id="job-queue">Job Queue</h3>
+<p>The job queue is our task management central. In Go, we typically implement this as a buffered channel. It&rsquo;s like a thread-safe queue that can hold a specified number of jobs. Producers toss jobs into this queue, and our worker bunnies hop along and snatch them up.</p>
+<h3 id="result-handling">Result Handling</h3>
+<p>Now, what good is all this work if we can&rsquo;t see the results? That&rsquo;s where result handling comes in. For our basic implementation, we&rsquo;ll use another channel to collect the results of our processed jobs. It&rsquo;s like a suggestion box, but for job outcomes.</p>
+<h2 id="62-implementing-a-simple-worker-pool-in-go">6.2 Implementing a Simple Worker Pool in Go</h2>
+<p>Enough chit-chat! Let&rsquo;s see some code. Here&rsquo;s our basic worker pool implementation:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">package</span> workerpool
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;sync&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Job <span style="color:#000;font-weight:bold">interface</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">Process</span>(context.Context) <span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> WorkerPool <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    workers  <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    jobQueue <span style="color:#000;font-weight:bold">chan</span> Job
+</span></span><span style="display:flex;"><span>    results  <span style="color:#000;font-weight:bold">chan</span> <span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>    wg       sync.WaitGroup
+</span></span><span style="display:flex;"><span>    ctx      context.Context
+</span></span><span style="display:flex;"><span>    cancel   context.CancelFunc
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">NewWorkerPool</span>(workers, queueSize <span style="color:#458;font-weight:bold">int</span>) <span style="color:#000;font-weight:bold">*</span>WorkerPool {
+</span></span><span style="display:flex;"><span>    ctx, cancel <span style="color:#000;font-weight:bold">:=</span> context.<span style="color:#900;font-weight:bold">WithCancel</span>(context.<span style="color:#900;font-weight:bold">Background</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>WorkerPool{
+</span></span><span style="display:flex;"><span>        workers:  workers,
+</span></span><span style="display:flex;"><span>        jobQueue: <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> Job, queueSize),
+</span></span><span style="display:flex;"><span>        results:  <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> <span style="color:#458;font-weight:bold">error</span>, queueSize),
+</span></span><span style="display:flex;"><span>        ctx:      ctx,
+</span></span><span style="display:flex;"><span>        cancel:   cancel,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">Start</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; wp.workers; i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        wp.wg.<span style="color:#900;font-weight:bold">Add</span>(<span style="color:#099">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> wp.<span style="color:#900;font-weight:bold">worker</span>()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">worker</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> wp.wg.<span style="color:#900;font-weight:bold">Done</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">select</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>wp.ctx.<span style="color:#900;font-weight:bold">Done</span>():
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> job, ok <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&lt;-</span>wp.jobQueue:
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> !ok {
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">return</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            err <span style="color:#000;font-weight:bold">:=</span> job.<span style="color:#900;font-weight:bold">Process</span>(wp.ctx)
+</span></span><span style="display:flex;"><span>            wp.results <span style="color:#000;font-weight:bold">&lt;-</span> err
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">AddJob</span>(job Job) {
+</span></span><span style="display:flex;"><span>    wp.jobQueue <span style="color:#000;font-weight:bold">&lt;-</span> job
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">Close</span>() {
+</span></span><span style="display:flex;"><span>    wp.<span style="color:#900;font-weight:bold">cancel</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#0086b3">close</span>(wp.jobQueue)
+</span></span><span style="display:flex;"><span>    wp.wg.<span style="color:#900;font-weight:bold">Wait</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#0086b3">close</span>(wp.results)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">Results</span>() <span style="color:#000;font-weight:bold">&lt;-</span><span style="color:#000;font-weight:bold">chan</span> <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> wp.results
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Whew! That&rsquo;s a lot to take in, right? Don&rsquo;t worry, we&rsquo;ll break it down. It&rsquo;s like a gourmet meal - best enjoyed piece by piece.</p>
+<ol>
+<li><strong>Job Interface</strong>: This is our menu. It defines what a job should look like.</li>
+<li><strong>WorkerPool Struct</strong>: This is our restaurant. It holds all the bits and pieces we need to run our worker pool.</li>
+<li><strong>NewWorkerPool Function</strong>: This is like our grand opening. It sets up our worker pool with the specified number of workers and queue size.</li>
+<li><strong>Start Method</strong>: This is when we open our doors for business. It spawns our worker goroutines.</li>
+<li><strong>worker Method</strong>: This is where the magic happens. Each worker runs this loop, constantly looking for jobs to process.</li>
+<li><strong>AddJob Method</strong>: This is how we take orders. It adds a job to our queue.</li>
+<li><strong>Close Method</strong>: This is how we close up shop at the end of the day.</li>
+<li><strong>Results Method</strong>: This is how we check our suggestion box&hellip; err, I mean, collect our job results.</li>
+</ol>
+<h2 id="63-handling-job-submission-and-result-collection">6.3 Handling Job Submission and Result Collection</h2>
+<p>Now, let&rsquo;s see how we can use this fancy worker pool we&rsquo;ve built:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">ExampleUsage</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create a new worker pool with 5 workers and a queue size of 100
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    pool <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">NewWorkerPool</span>(<span style="color:#099">5</span>, <span style="color:#099">100</span>)
+</span></span><span style="display:flex;"><span>    pool.<span style="color:#900;font-weight:bold">Start</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create and submit jobs
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; <span style="color:#099">20</span>; i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        job <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>ExampleJob{id: i}
+</span></span><span style="display:flex;"><span>        pool.<span style="color:#900;font-weight:bold">AddJob</span>(job)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Collect results
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">for</span> err <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> pool.<span style="color:#900;font-weight:bold">Results</span>() {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>                fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Job error: %v\n&#34;</span>, err)
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Wait for some time to allow jobs to complete
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    time.<span style="color:#900;font-weight:bold">Sleep</span>(<span style="color:#099">5</span> <span style="color:#000;font-weight:bold">*</span> time.Second)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Shut down the pool
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    pool.<span style="color:#900;font-weight:bold">Close</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> ExampleJob <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    id <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>ExampleJob) <span style="color:#900;font-weight:bold">Process</span>(ctx context.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Simulate some work
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    time.<span style="color:#900;font-weight:bold">Sleep</span>(time.<span style="color:#900;font-weight:bold">Duration</span>(rand.<span style="color:#900;font-weight:bold">Intn</span>(<span style="color:#099">1000</span>)) <span style="color:#000;font-weight:bold">*</span> time.Millisecond)
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Processed job %d\n&#34;</span>, j.id)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>And there you have it! We&rsquo;ve created a worker pool, submitted jobs to it, and collected results. It&rsquo;s like a symphony of goroutines, all working together in perfect harmony.</p>
+<p>By using this pattern, we can efficiently manage concurrent execution of multiple jobs, control the level of concurrency, and handle results in a structured manner. It&rsquo;s like having a team of super-efficient, never-tiring workers at your beck and call.</p>
+<p>But wait, there&rsquo;s more! In the next chapter, we&rsquo;ll explore how to evolve this basic worker pool to handle more complex scenarios. We&rsquo;ll add features like dynamic scaling, graceful shutdown, and more. It&rsquo;s going to be a wild ride, so buckle up!</p>
+<p>Remember, concurrency in Go is like a superpower. And with great power comes great responsibility&hellip; and really cool worker pools.</p>
+<h1 id="7-advanced-worker-pool-design">7. Advanced Worker Pool Design</h1>
+<p>Alright, code warriors, ready to take our worker pool to the next level? We&rsquo;ve got the basics down, but now it&rsquo;s time to soup up our concurrent code machine. We&rsquo;re talking dynamic scaling, graceful shutdowns, and error handling that&rsquo;ll make your fellow devs weep with joy. Buckle up!</p>
+<h2 id="71-dynamic-scaling-of-worker-count">7.1 Dynamic Scaling of Worker Count</h2>
+<p>Remember how we hardcoded the number of workers in our basic pool? Well, that&rsquo;s like buying shoes that never grow - it works for a while, but eventually, you&rsquo;re gonna get some painful pinching. Let&rsquo;s make our worker pool more flexible:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> WorkerPool <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// ... existing fields
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    minWorkers <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    maxWorkers <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    activeWorkers <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    workersMutex sync.Mutex
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">adjustWorkerCount</span>() {
+</span></span><span style="display:flex;"><span>    wp.workersMutex.<span style="color:#900;font-weight:bold">Lock</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> wp.workersMutex.<span style="color:#900;font-weight:bold">Unlock</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    queueSize <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">len</span>(wp.jobQueue)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">switch</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">case</span> queueSize &gt; wp.activeWorkers <span style="color:#000;font-weight:bold">&amp;&amp;</span> wp.activeWorkers &lt; wp.maxWorkers:
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Queue is backing up, let&#39;s add some workers
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        wp.<span style="color:#900;font-weight:bold">addWorker</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">case</span> queueSize <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">0</span> <span style="color:#000;font-weight:bold">&amp;&amp;</span> wp.activeWorkers &gt; wp.minWorkers:
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Queue is empty, maybe we can shed a worker
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        wp.<span style="color:#900;font-weight:bold">removeWorker</span>()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">addWorker</span>() {
+</span></span><span style="display:flex;"><span>    wp.activeWorkers<span style="color:#000;font-weight:bold">++</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">go</span> wp.<span style="color:#900;font-weight:bold">worker</span>()
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">removeWorker</span>() {
+</span></span><span style="display:flex;"><span>    wp.activeWorkers<span style="color:#000;font-weight:bold">--</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Signal to one worker to exit
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    wp.jobQueue <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now our worker pool can flex its muscles, adding workers when the job queue gets backed up and shedding them when things are slow. It&rsquo;s like having a rubber band for a workforce - stretchy!</p>
+<h2 id="72-graceful-shutdown-mechanisms">7.2 Graceful Shutdown Mechanisms</h2>
+<p>Next up, let&rsquo;s talk about shutting things down. We don&rsquo;t want to be those developers who just pull the plug and hope for the best. We&rsquo;re going for a graceful, &ldquo;thanks for all the fish&rdquo; kind of shutdown:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">GracefulShutdown</span>(timeout time.Duration) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    wp.<span style="color:#900;font-weight:bold">cancel</span>() <span style="color:#998;font-style:italic">// Signal all workers to stop
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#0086b3">close</span>(wp.jobQueue) <span style="color:#998;font-style:italic">// Stop accepting new jobs
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Wait for workers to finish, but not forever
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    c <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>(<span style="color:#000;font-weight:bold">chan</span> <span style="color:#000;font-weight:bold">struct</span>{})
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>() {
+</span></span><span style="display:flex;"><span>        wp.wg.<span style="color:#900;font-weight:bold">Wait</span>()
+</span></span><span style="display:flex;"><span>        <span style="color:#0086b3">close</span>(c)
+</span></span><span style="display:flex;"><span>    }()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">select</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>c:
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span> <span style="color:#998;font-style:italic">// All workers finished
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>time.<span style="color:#900;font-weight:bold">After</span>(timeout):
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> errors.<span style="color:#900;font-weight:bold">New</span>(<span style="color:#d14">&#34;shutdown timed out&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This shutdown is smoother than a freshly waxed bowling lane. We signal workers to stop, close the job queue, and wait for everyone to finish up. But we&rsquo;re not naive - we set a timeout just in case some workers decide to take an extended coffee break.</p>
+<h2 id="73-timeout-handling-and-cancellation">7.3 Timeout Handling and Cancellation</h2>
+<p>Speaking of timeouts, let&rsquo;s add some to our job processing. Because waiting forever is so last century:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">worker</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> wp.wg.<span style="color:#900;font-weight:bold">Done</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">select</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>wp.ctx.<span style="color:#900;font-weight:bold">Done</span>():
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> job, ok <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&lt;-</span>wp.jobQueue:
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> !ok {
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">return</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> job <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">return</span> <span style="color:#998;font-style:italic">// Signal to exit
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>            }
+</span></span><span style="display:flex;"><span>            
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// Create a timeout context for this job
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>            jobCtx, cancel <span style="color:#000;font-weight:bold">:=</span> context.<span style="color:#900;font-weight:bold">WithTimeout</span>(wp.ctx, <span style="color:#099">30</span><span style="color:#000;font-weight:bold">*</span>time.Second)
+</span></span><span style="display:flex;"><span>            err <span style="color:#000;font-weight:bold">:=</span> job.<span style="color:#900;font-weight:bold">Process</span>(jobCtx)
+</span></span><span style="display:flex;"><span>            <span style="color:#900;font-weight:bold">cancel</span>() <span style="color:#998;font-style:italic">// Always cancel to release resources
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">==</span> context.DeadlineExceeded {
+</span></span><span style="display:flex;"><span>                    wp.results <span style="color:#000;font-weight:bold">&lt;-</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;job timed out&#34;</span>)
+</span></span><span style="display:flex;"><span>                } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>                    wp.results <span style="color:#000;font-weight:bold">&lt;-</span> err
+</span></span><span style="display:flex;"><span>                }
+</span></span><span style="display:flex;"><span>            } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>                wp.results <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Now our workers won&rsquo;t get stuck on a single job until the heat death of the universe. They&rsquo;ll give up after 30 seconds and move on to the next task. It&rsquo;s like speed dating for jobs!</p>
+<h2 id="74-error-handling-and-job-retry-mechanisms">7.4 Error Handling and Job Retry Mechanisms</h2>
+<p>Last but not least, let&rsquo;s add some error handling with a dash of &ldquo;if at first you don&rsquo;t succeed, try, try again&rdquo;:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Job <span style="color:#000;font-weight:bold">interface</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">Process</span>(context.Context) <span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">Retries</span>() <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">SetRetries</span>(<span style="color:#458;font-weight:bold">int</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">worker</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// ... existing code
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> job.<span style="color:#900;font-weight:bold">Retries</span>() &gt; <span style="color:#099">0</span> {
+</span></span><span style="display:flex;"><span>        err <span style="color:#000;font-weight:bold">:=</span> job.<span style="color:#900;font-weight:bold">Process</span>(jobCtx)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            wp.results <span style="color:#000;font-weight:bold">&lt;-</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        job.<span style="color:#900;font-weight:bold">SetRetries</span>(job.<span style="color:#900;font-weight:bold">Retries</span>() <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> job.<span style="color:#900;font-weight:bold">Retries</span>() <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">0</span> {
+</span></span><span style="display:flex;"><span>            wp.results <span style="color:#000;font-weight:bold">&lt;-</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;job failed after all retries: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// Wait a bit before retrying
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>            time.<span style="color:#900;font-weight:bold">Sleep</span>(time.Second <span style="color:#000;font-weight:bold">*</span> time.<span style="color:#900;font-weight:bold">Duration</span>(<span style="color:#099">3</span><span style="color:#000;font-weight:bold">-</span>job.<span style="color:#900;font-weight:bold">Retries</span>()))
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// ... rest of the code
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></div><p>Now our jobs get multiple shots at success. It&rsquo;s like giving them a video game with extra lives. And we even implement a bit of exponential backoff - the more times a job fails, the longer we wait before trying again. It&rsquo;s not just persistent, it&rsquo;s politely persistent!</p>
+<p>And there you have it, folks! We&rsquo;ve taken our worker pool from a decent Honda Civic to a turbocharged Tesla. We&rsquo;ve got dynamic scaling to handle variable loads, graceful shutdowns that would make Emily Post proud, timeout handling that keeps our workers on their toes, and error handling that&rsquo;s more forgiving than your grandma.</p>
+<p>But wait, there&rsquo;s more! We&rsquo;re going to tackle batch processing. Because sometimes, you don&rsquo;t want to handle one job at a time - you want to go all-you-can-eat buffet on those tasks. Keep those goroutines spinning!</p>
+<h1 id="8-evolving-to-batch-job-processing-the-big-league-of-concurrency">8. Evolving to Batch Job Processing: The Big League of Concurrency</h1>
+<p>Alright, concurrency connoisseurs, it&rsquo;s time to level up! We&rsquo;re about to take our worker pool from Little League to the Major Leagues with batch processing. Grab your favorite caffeinated beverage, because things are about to get wild!</p>
+<h2 id="81-the-need-for-batch-processing-in-real-world-applications">8.1 The Need for Batch Processing in Real-World Applications</h2>
+<p>Picture this: you&rsquo;re processing video frames, and suddenly, you realize that handling them one by one is like trying to empty the ocean with a teaspoon. That&rsquo;s when batch processing swoops in like a caped superhero. Here&rsquo;s why we needed it:</p>
+<ol>
+<li><strong>Efficiency</strong>: Grouping frames together is like carpooling for data. More efficient I/O, better resource utilization. It&rsquo;s green computing!</li>
+<li><strong>Progress Tracking</strong>: Batches give us checkpoints. It&rsquo;s like having mile markers in a marathon - you know how far you&rsquo;ve come and how far you&rsquo;ve got to go.</li>
+<li><strong>Error Handling</strong>: With batches, we can implement more sophisticated error strategies. It&rsquo;s like having a safety net&hellip; under another safety net.</li>
+<li><strong>Resource Management</strong>: Batches help us control memory usage. It&rsquo;s like portion control, but for your RAM.</li>
+</ol>
+<h2 id="82-extending-the-worker-pool-to-handle-job-batches">8.2 Extending the Worker Pool to Handle Job Batches</h2>
+<p>Time to soup up our worker pool. We&rsquo;re going from a Honda Civic to a Ferrari here, folks!</p>
+<h3 id="821-defining-batch-jobs">8.2.1 Defining Batch Jobs</h3>
+<p>First, we need to teach our pool to speak &ldquo;batch&rdquo;:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> BatchJob <span style="color:#000;font-weight:bold">interface</span> {
+</span></span><span style="display:flex;"><span>    Job
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">BatchID</span>() <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> BatchInfo <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    ID            <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    TotalJobs     <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    CompletedJobs <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    Errors        []<span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Our <code>BatchJob</code> is like a <code>Job</code> with a name tag. And <code>BatchInfo</code>? Think of it as the scorecard for each batch.</p>
+<h3 id="822-modifying-the-worker-pool">8.2.2 Modifying the Worker Pool</h3>
+<p>Now, let&rsquo;s give our pool a memory for batches:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> WorkerPool <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// ... existing fields
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    batches       <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">*</span>BatchInfo
+</span></span><span style="display:flex;"><span>    batchesMutex  sync.Mutex
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This is like giving our pool a filofax (remember those?) to keep track of all the batches.</p>
+<h3 id="823-implementing-batch-submission">8.2.3 Implementing Batch Submission</h3>
+<p>Here&rsquo;s how we submit a whole batch of jobs:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">SubmitBatch</span>(batchID <span style="color:#458;font-weight:bold">string</span>, jobs []Job) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    wp.batchesMutex.<span style="color:#900;font-weight:bold">Lock</span>()
+</span></span><span style="display:flex;"><span>    wp.batches[batchID] = <span style="color:#000;font-weight:bold">&amp;</span>BatchInfo{ID: batchID, TotalJobs: <span style="color:#0086b3">len</span>(jobs)}
+</span></span><span style="display:flex;"><span>    wp.batchesMutex.<span style="color:#900;font-weight:bold">Unlock</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, job <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> jobs {
+</span></span><span style="display:flex;"><span>        wp.<span style="color:#900;font-weight:bold">AddJob</span>(job)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>It&rsquo;s like being the coach of a sports team. You&rsquo;re not just sending in one player, you&rsquo;re sending in the whole squad!</p>
+<h2 id="83-implementing-batch-specific-features">8.3 Implementing Batch-Specific Features</h2>
+<h3 id="831-batch-progress-tracking">8.3.1 Batch Progress Tracking</h3>
+<p>We need to know how our batches are doing. It&rsquo;s like having a fitness tracker, but for your jobs:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">markJobComplete</span>(job BatchJob, err <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>    wp.batchesMutex.<span style="color:#900;font-weight:bold">Lock</span>()
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> wp.batchesMutex.<span style="color:#900;font-weight:bold">Unlock</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    batchInfo, exists <span style="color:#000;font-weight:bold">:=</span> wp.batches[job.<span style="color:#900;font-weight:bold">BatchID</span>()]
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !exists {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#998;font-style:italic">// This shouldn&#39;t happen if batches are properly initialized
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    batchInfo.CompletedJobs<span style="color:#000;font-weight:bold">++</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        batchInfo.Errors = <span style="color:#0086b3">append</span>(batchInfo.Errors, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Every completed job is like a step closer to our goal. And if there&rsquo;s an error? We note it down. No sweeping under the rug here!</p>
+<h3 id="832-waiting-for-batch-completion">8.3.2 Waiting for Batch Completion</h3>
+<p>Sometimes, you gotta wait for the whole batch to finish. It&rsquo;s like waiting for all your friends to arrive before starting the party:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">WaitForBatch</span>(batchID <span style="color:#458;font-weight:bold">string</span>, timeout time.Duration) (<span style="color:#000;font-weight:bold">*</span>BatchInfo, <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>    timer <span style="color:#000;font-weight:bold">:=</span> time.<span style="color:#900;font-weight:bold">NewTimer</span>(timeout)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> timer.<span style="color:#900;font-weight:bold">Stop</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ticker <span style="color:#000;font-weight:bold">:=</span> time.<span style="color:#900;font-weight:bold">NewTicker</span>(<span style="color:#099">100</span> <span style="color:#000;font-weight:bold">*</span> time.Millisecond)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> ticker.<span style="color:#900;font-weight:bold">Stop</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">select</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>ticker.C:
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> wp.<span style="color:#900;font-weight:bold">isBatchComplete</span>(batchID) {
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">return</span> wp.<span style="color:#900;font-weight:bold">getBatchResult</span>(batchID), <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>timer.C:
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>, fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;timeout waiting for batch %s&#34;</span>, batchID)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">&lt;-</span>wp.ctx.<span style="color:#900;font-weight:bold">Done</span>():
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>, wp.ctx.<span style="color:#900;font-weight:bold">Err</span>()
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We&rsquo;re patient, but not too patient. If the batch takes too long, we&rsquo;ll call it quits. It&rsquo;s like setting a curfew for your code.</p>
+<h3 id="833-batch-level-error-handling">8.3.3 Batch-Level Error Handling</h3>
+<p>Sometimes, things go wrong. But with batch processing, we can be smart about it:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (wp <span style="color:#000;font-weight:bold">*</span>WorkerPool) <span style="color:#900;font-weight:bold">retryBatchIfNeeded</span>(batchID <span style="color:#458;font-weight:bold">string</span>) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    batchInfo <span style="color:#000;font-weight:bold">:=</span> wp.<span style="color:#900;font-weight:bold">getBatchResult</span>(batchID)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> <span style="color:#0086b3">float64</span>(<span style="color:#0086b3">len</span>(batchInfo.Errors)) <span style="color:#000;font-weight:bold">/</span> <span style="color:#0086b3">float64</span>(batchInfo.TotalJobs) &gt; <span style="color:#099">0.5</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// More than 50% of jobs failed, retry the entire batch
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">return</span> wp.<span style="color:#900;font-weight:bold">retryBatch</span>(batchID)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>If more than half the jobs in a batch fail, we retry the whole batch. It&rsquo;s like a group project - if most of the team messes up, you all try again together.</p>
+<h2 id="84-challenges-and-solutions">8.4 Challenges and Solutions</h2>
+<p>Of course, it wasn&rsquo;t all smooth sailing. We hit some icebergs, but we didn&rsquo;t sink!</p>
+<ol>
+<li>
+<p><strong>Memory Management</strong>: Big batches were eating up memory like pac-man.
+Solution: We implemented a sliding window approach. It&rsquo;s like a conveyor belt - only a subset of the batch is actively processing at any time.</p>
+</li>
+<li>
+<p><strong>Uneven Job Duration</strong>: Some frames were prima donnas, taking way longer than others.
+Solution: Dynamic batch sizing! We adjust batch size based on recent job performance. It&rsquo;s like having a DJ who reads the room and adjusts the playlist.</p>
+</li>
+<li>
+<p><strong>Batch Prioritization</strong>: Some batches were more important than others.
+Solution: We added a priority queue. VIP batches get the red carpet treatment!</p>
+</li>
+<li>
+<p><strong>Partial Batch Completion</strong>: Sometimes we needed results ASAP, even if the batch wasn&rsquo;t done.
+Solution: We added a method to retrieve partial results. It&rsquo;s like taking a sneak peek before the big reveal.</p>
+</li>
+</ol>
+<h2 id="85-real-world-application-video-frame-capture">8.5 Real-World Application: Video Frame Capture</h2>
+<p>Here&rsquo;s how we put it all together in our video frame capture application:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (capturer <span style="color:#000;font-weight:bold">*</span>Capturer) <span style="color:#900;font-weight:bold">captureFramesWithWorkerPool</span>(sc <span style="color:#000;font-weight:bold">*</span>SlidesCapture) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    batchID <span style="color:#000;font-weight:bold">:=</span> fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;capture_%s_%d&#34;</span>, sc.ID, time.<span style="color:#900;font-weight:bold">Now</span>().<span style="color:#900;font-weight:bold">UnixNano</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">var</span> jobs []workerpool.Job
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> batchStart <span style="color:#000;font-weight:bold">:=</span> sc.StartFrame; batchStart <span style="color:#000;font-weight:bold">&lt;=</span> sc.EndFrame; batchStart <span style="color:#000;font-weight:bold">+=</span> BatchSize {
+</span></span><span style="display:flex;"><span>        batchEnd <span style="color:#000;font-weight:bold">:=</span> batchStart <span style="color:#000;font-weight:bold">+</span> BatchSize <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> batchEnd &gt; sc.EndFrame {
+</span></span><span style="display:flex;"><span>            batchEnd = sc.EndFrame
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        job <span style="color:#000;font-weight:bold">:=</span> VideoGenerationJob{
+</span></span><span style="display:flex;"><span>            ID:         sc.ID,
+</span></span><span style="display:flex;"><span>            StartFrame: batchStart,
+</span></span><span style="display:flex;"><span>            EndFrame:   batchEnd,
+</span></span><span style="display:flex;"><span>            Capturer:   capturer,
+</span></span><span style="display:flex;"><span>            batchID:    batchID,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        jobs = <span style="color:#0086b3">append</span>(jobs, job)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    err <span style="color:#000;font-weight:bold">:=</span> capturer.WorkerPool.<span style="color:#900;font-weight:bold">SubmitBatch</span>(batchID, jobs)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to submit batch: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    result, err <span style="color:#000;font-weight:bold">:=</span> capturer.WorkerPool.<span style="color:#900;font-weight:bold">WaitForBatch</span>(batchID, <span style="color:#099">30</span><span style="color:#000;font-weight:bold">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;error waiting for batch completion: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> <span style="color:#0086b3">len</span>(result.Errors) &gt; <span style="color:#099">0</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;encountered %d errors during frame capture&#34;</span>, <span style="color:#0086b3">len</span>(result.Errors))
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This code is like a well-choreographed dance. It creates jobs, submits them in a batch, waits for completion (but not forever), and handles any errors that pop up.</p>
+<p>We&rsquo;ve taken our worker pool and taught it to juggle entire batches of jobs. It&rsquo;s like going from a unicycle to a monster truck - same basic principle, but way more powerful.</p>
+<p>Sure, it added some complexity, but the payoff in performance and control was worth every line of code. Our video processing went from slideshow to smooth sailing.</p>
+<p>But don&rsquo;t get too comfortable! We&rsquo;re going to dive even deeper. We&rsquo;ll look at the nitty-gritty details of our implementation and tackle some of the trickier edge cases. It&rsquo;s going to be like debugging in the Twilight Zone - strange, challenging, but ultimately rewarding.</p>
+<h1 id="9-implementation-deep-dive-advanced-worker-pool-with-batch-support">9. Implementation Deep Dive: Advanced Worker Pool with Batch Support</h1>
+<p>It&rsquo;s time to put on your diving gear because we&rsquo;re about to plunge into the depths of our advanced worker pool implementation. We&rsquo;re talking batches, goroutines, and enough concurrency to make your CPU sweat. Buckle up!</p>
+<h2 id="91-the-guts-of-our-worker-pool-beast">9.1 The Guts of Our Worker Pool Beast</h2>
+<p>Let&rsquo;s dissect this beautiful monster we&rsquo;ve created. Don&rsquo;t worry, no actual goroutines were harmed in the making of this code:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Job <span style="color:#000;font-weight:bold">interface</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">Process</span>(context.Context) <span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> BatchJob <span style="color:#000;font-weight:bold">interface</span> {
+</span></span><span style="display:flex;"><span>    Job
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">BatchID</span>() <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// ... (rest of the code as before)
+</span></span></span></code></pre></div><p>This isn&rsquo;t just any worker pool. Oh no, this is the Swiss Army knife of worker pools. Let&rsquo;s break it down:</p>
+<ol>
+<li><strong>Job and BatchJob Interfaces</strong>: These are like the menu at a fancy restaurant. They tell our worker pool what to expect.</li>
+<li><strong>BatchInfo Struct</strong>: Think of this as our pool&rsquo;s notepad, keeping track of how each batch is doing.</li>
+<li><strong>WorkerPool Struct</strong>: This is mission control. It&rsquo;s where all the magic happens.</li>
+<li><strong>worker Method</strong>: This is our tireless worker bee, buzzing from one job to the next.</li>
+<li><strong>SubmitBatch Method</strong>: This is like the maitre d&rsquo; at a restaurant, ushering in groups of hungry jobs.</li>
+<li><strong>WaitForBatch Method</strong>: This is our patient watchdog, waiting for batches to finish&hellip; but not forever!</li>
+</ol>
+<h2 id="92-design-decisions-method-to-our-madness">9.2 Design Decisions: Method to Our Madness</h2>
+<p>You might be thinking, &ldquo;Why did they do it this way?&rdquo; Well, let me tell you, it wasn&rsquo;t just because we like typing! Here&rsquo;s the method to our madness:</p>
+<ol>
+<li>
+<p><strong>Channels for Job Queue and Results</strong>: We&rsquo;re using buffered channels like they&rsquo;re going out of style. Why? Because we like our job submission and result collection like we like our texting: asynchronous and non-blocking.</p>
+</li>
+<li>
+<p><strong>Separate BatchInfo Struct</strong>: We kept batch info separate from jobs. It&rsquo;s like keeping your socks and underwear in different drawers. Sure, you could mix them, but why would you?</p>
+</li>
+<li>
+<p><strong>Context-Based Cancellation</strong>: We&rsquo;re using contexts for cancellation because we believe in graceful exits. Our worker pool doesn&rsquo;t just crash; it bows out elegantly, like a true professional.</p>
+</li>
+<li>
+<p><strong>Mutex for Batch Operations</strong>: We&rsquo;ve got more locks than a maximum-security prison. Why? Because thread-safety is no joke, folks!</p>
+</li>
+<li>
+<p><strong>Polling in WaitForBatch</strong>: We went with polling here. Is it the most efficient? Maybe not. But it&rsquo;s simple, and sometimes, simple is beautiful.</p>
+</li>
+</ol>
+<h2 id="93-edge-cases-and-pitfalls-the-danger-zone">9.3 Edge Cases and Pitfalls: The Danger Zone</h2>
+<p>Now, let&rsquo;s talk about the booby traps we&rsquo;ve carefully navigated:</p>
+<ol>
+<li>
+<p><strong>Deadlock Prevention</strong>: We&rsquo;re preventing deadlocks like we&rsquo;re in an &ldquo;Escape Room&rdquo;. No one&rsquo;s getting trapped on our watch!</p>
+</li>
+<li>
+<p><strong>Resource Leaks</strong>: We&rsquo;re using <code>defer</code> statements like they&rsquo;re going out of style. Memory leaks? Not in our house!</p>
+</li>
+<li>
+<p><strong>Batch Completion Race Condition</strong>: We&rsquo;re dealing with race conditions like we&rsquo;re NASCAR drivers. Slow and steady doesn&rsquo;t win this race!</p>
+</li>
+<li>
+<p><strong>Error Propagation</strong>: We&rsquo;re propagating errors better than your aunt propagates gossip at Thanksgiving dinner.</p>
+</li>
+<li>
+<p><strong>Timeout Handling</strong>: We&rsquo;ve got timeouts because even we know when to give up. It&rsquo;s not quitting; it&rsquo;s strategic retreating.</p>
+</li>
+<li>
+<p><strong>Graceful Shutdown</strong>: Our shutdown is so graceful, it could win &ldquo;Dancing with the Stars&rdquo;.</p>
+</li>
+<li>
+<p><strong>Batch ID Collisions</strong>: We&rsquo;re assuming batch IDs are unique. In production? We&rsquo;d check for collisions like we&rsquo;re air traffic controllers.</p>
+</li>
+</ol>
+<h2 id="94-future-improvements-the-wish-list">9.4 Future Improvements: The Wish List</h2>
+<p>But wait, there&rsquo;s more! Or at least, there could be. Here&rsquo;s our wish list for future upgrades:</p>
+<ol>
+<li>
+<p><strong>Dynamic Worker Scaling</strong>: Imagine if our worker pool could grow and shrink like Alice in Wonderland. That&rsquo;s the dream!</p>
+</li>
+<li>
+<p><strong>Priority Queue</strong>: Because some jobs are more equal than others.</p>
+</li>
+<li>
+<p><strong>Batch Persistence</strong>: We&rsquo;re thinking of adding a memory to our worker pool. You know, in case of amnesia&hellip; I mean, system failures.</p>
+</li>
+<li>
+<p><strong>More Efficient Batch Completion Checking</strong>: Our current polling system works, but we dream of a day when batches notify us of completion. Like a &ldquo;ding&rdquo; when your laundry&rsquo;s done!</p>
+</li>
+<li>
+<p><strong>Job Retry Mechanism</strong>: Because everyone deserves a second chance. Or third. Or fourth.</p>
+</li>
+<li>
+<p><strong>Metrics and Monitoring</strong>: We want to add so many metrics, it&rsquo;ll make your Grafana dashboard look like Times Square on New Year&rsquo;s Eve.</p>
+</li>
+</ol>
+<p>And there you have it, folks! Our advanced worker pool with batch support. It&rsquo;s not just a pool; it&rsquo;s a whole water park of concurrent fun. We&rsquo;ve built a system that can handle complex, batch-oriented workloads with the grace of a synchronized swimming team and the power of a tsunami.</p>
+<p>But remember, like a fine wine or a good cheese, there&rsquo;s always room for improvement. As you use this in your own projects, let your specific needs guide you. Maybe you need more workers, or fancier error handling. The sky&rsquo;s the limit!</p>
+<p>Next, we&rsquo;ll take this bad boy for a spin. We&rsquo;ll look at some real-world examples that&rsquo;ll make you say, &ldquo;Hot diggity, that&rsquo;s one heck of a worker pool!&rdquo; Stay tuned, and may your goroutines always be plentiful and your race conditions few!</p>
+<h1 id="10-practical-examples-and-use-cases-our-worker-pool-in-the-wild">10. Practical Examples and Use Cases: Our Worker Pool in the Wild</h1>
+<p>Code wranglers and concurrency cowboys! We&rsquo;ve built this magnificent beast of a worker pool, but what good is a race car if you never take it out of the garage? It&rsquo;s time to put the pedal to the metal and see what this baby can do in the real world. Buckle up, because we&rsquo;re about to take a wild ride through some practical examples that&rsquo;ll make your CPU cores spin with delight!</p>
+<h2 id="101-web-scraping-with-rate-limiting-the-polite-piranha">10.1 Web Scraping with Rate Limiting: The Polite Piranha</h2>
+<p>First up, let&rsquo;s talk about web scraping. But we&rsquo;re not just any scraper - we&rsquo;re the polite piranhas of the internet!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> ScraperJob <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    URL     <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    BatchID <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>ScraperJob) <span style="color:#900;font-weight:bold">Process</span>(ctx context.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    time.<span style="color:#900;font-weight:bold">Sleep</span>(time.Second) <span style="color:#998;font-style:italic">// Be nice to the server
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#998;font-style:italic">// Imagine we&#39;re doing actual scraping here
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Scraped %s\n&#34;</span>, j.URL)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>ScraperJob) <span style="color:#900;font-weight:bold">BatchID</span>() <span style="color:#458;font-weight:bold">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> j.BatchID
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>    pool <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">NewWorkerPool</span>(<span style="color:#099">5</span>, <span style="color:#099">100</span>)
+</span></span><span style="display:flex;"><span>    pool.<span style="color:#900;font-weight:bold">Start</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    urls <span style="color:#000;font-weight:bold">:=</span> []<span style="color:#458;font-weight:bold">string</span>{<span style="color:#d14">&#34;https://example.com&#34;</span>, <span style="color:#d14">&#34;https://example.org&#34;</span>, <span style="color:#d14">&#34;https://example.net&#34;</span>}
+</span></span><span style="display:flex;"><span>    batchID <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">&#34;scrape-batch-1&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">var</span> jobs []Job
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, url <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> urls {
+</span></span><span style="display:flex;"><span>        jobs = <span style="color:#0086b3">append</span>(jobs, <span style="color:#000;font-weight:bold">&amp;</span>ScraperJob{URL: url, BatchID: batchID})
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">SubmitBatch</span>(batchID, jobs)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Failed to submit batch: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    result, err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">WaitForBatch</span>(batchID, <span style="color:#099">1</span><span style="color:#000;font-weight:bold">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Error waiting for batch: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Scraped %d URLs with %d errors\n&#34;</span>, result.CompletedJobs, <span style="color:#0086b3">len</span>(result.Errors))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>See what we did there? We&rsquo;re scraping websites faster than a teenager clears their browser history, but we&rsquo;re doing it politely with rate limiting. It&rsquo;s like a high-speed chase, but we&rsquo;re using our turn signals and obeying the speed limit!</p>
+<h2 id="102-parallel-data-processing-in-etl-pipelines-the-data-disco">10.2 Parallel Data Processing in ETL Pipelines: The Data Disco</h2>
+<p>Next up, let&rsquo;s transform some data! We&rsquo;re talking Extract, Transform, Load, baby - but with so much parallelism, it&rsquo;s less ETL and more EDM (Electronic Data Music)!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> DataTransformJob <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    Data    []<span style="color:#458;font-weight:bold">byte</span>
+</span></span><span style="display:flex;"><span>    BatchID <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>DataTransformJob) <span style="color:#900;font-weight:bold">Process</span>(ctx context.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Imagine we&#39;re doing some CPU-intensive data transformation here
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    time.<span style="color:#900;font-weight:bold">Sleep</span>(time.Millisecond <span style="color:#000;font-weight:bold">*</span> time.<span style="color:#900;font-weight:bold">Duration</span>(rand.<span style="color:#900;font-weight:bold">Intn</span>(<span style="color:#099">1000</span>)))
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Processed %d bytes of data\n&#34;</span>, <span style="color:#0086b3">len</span>(j.Data))
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>DataTransformJob) <span style="color:#900;font-weight:bold">BatchID</span>() <span style="color:#458;font-weight:bold">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> j.BatchID
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>    pool <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">NewWorkerPool</span>(runtime.<span style="color:#900;font-weight:bold">NumCPU</span>(), <span style="color:#099">1000</span>)
+</span></span><span style="display:flex;"><span>    pool.<span style="color:#900;font-weight:bold">Start</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    batchID <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">&#34;etl-batch-1&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">var</span> jobs []Job
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; <span style="color:#099">1000</span>; i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        data <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>([]<span style="color:#458;font-weight:bold">byte</span>, <span style="color:#099">1000000</span>) <span style="color:#998;font-style:italic">// 1MB of data
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        rand.<span style="color:#900;font-weight:bold">Read</span>(data)               <span style="color:#998;font-style:italic">// Fill with random data
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        jobs = <span style="color:#0086b3">append</span>(jobs, <span style="color:#000;font-weight:bold">&amp;</span>DataTransformJob{Data: data, BatchID: batchID})
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">SubmitBatch</span>(batchID, jobs)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Failed to submit batch: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    result, err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">WaitForBatch</span>(batchID, <span style="color:#099">5</span><span style="color:#000;font-weight:bold">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Error waiting for batch: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Processed %d chunks of data with %d errors\n&#34;</span>, result.CompletedJobs, <span style="color:#0086b3">len</span>(result.Errors))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>We&rsquo;re processing data faster than a squirrel on espresso! Our worker pool is turning that ETL pipeline into a data disco, with every CPU core getting its groove on.</p>
+<h2 id="103-managing-concurrent-api-requests-the-http-hoedown">10.3 Managing Concurrent API Requests: The HTTP Hoedown</h2>
+<p>Last but not least, let&rsquo;s manage some API requests. We&rsquo;re talking concurrent HTTP requests that&rsquo;ll make your network card do a happy dance!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> APIRequestJob <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    URL     <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Method  <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Payload []<span style="color:#458;font-weight:bold">byte</span>
+</span></span><span style="display:flex;"><span>    BatchID <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>APIRequestJob) <span style="color:#900;font-weight:bold">Process</span>(ctx context.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    client <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>http.Client{Timeout: <span style="color:#099">10</span> <span style="color:#000;font-weight:bold">*</span> time.Second}
+</span></span><span style="display:flex;"><span>    req, err <span style="color:#000;font-weight:bold">:=</span> http.<span style="color:#900;font-weight:bold">NewRequestWithContext</span>(ctx, j.Method, j.URL, bytes.<span style="color:#900;font-weight:bold">NewReader</span>(j.Payload))
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    resp, err <span style="color:#000;font-weight:bold">:=</span> client.<span style="color:#900;font-weight:bold">Do</span>(req)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> resp.Body.<span style="color:#900;font-weight:bold">Close</span>()
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Request to %s completed with status %s\n&#34;</span>, j.URL, resp.Status)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>APIRequestJob) <span style="color:#900;font-weight:bold">BatchID</span>() <span style="color:#458;font-weight:bold">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> j.BatchID
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>    pool <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">NewWorkerPool</span>(<span style="color:#099">50</span>, <span style="color:#099">1000</span>) <span style="color:#998;font-style:italic">// 50 concurrent workers
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    pool.<span style="color:#900;font-weight:bold">Start</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    batchID <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">&#34;api-batch-1&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">var</span> jobs []Job
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; <span style="color:#099">100</span>; i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        jobs = <span style="color:#0086b3">append</span>(jobs, <span style="color:#000;font-weight:bold">&amp;</span>APIRequestJob{
+</span></span><span style="display:flex;"><span>            URL:     fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;https://api.example.com/endpoint%d&#34;</span>, i),
+</span></span><span style="display:flex;"><span>            Method:  <span style="color:#d14">&#34;POST&#34;</span>,
+</span></span><span style="display:flex;"><span>            Payload: []<span style="color:#0086b3">byte</span>(<span style="color:#d14">`{&#34;key&#34;: &#34;value&#34;}`</span>),
+</span></span><span style="display:flex;"><span>            BatchID: batchID,
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">SubmitBatch</span>(batchID, jobs)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Failed to submit batch: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    result, err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">WaitForBatch</span>(batchID, <span style="color:#099">2</span><span style="color:#000;font-weight:bold">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Error waiting for batch: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Completed %d API requests with %d errors\n&#34;</span>, result.CompletedJobs, <span style="color:#0086b3">len</span>(result.Errors))
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Look at that! We&rsquo;re firing off API requests like a hyperactive octopus with a keyboard. Our worker pool is managing those connections smoother than a diplomat at a peace conference.</p>
+<h2 id="104-the-grand-finale-video-frame-processing-extravaganza">10.4 The Grand Finale: Video Frame Processing Extravaganza</h2>
+<p>Now, for the pièce de résistance, let&rsquo;s revisit our video frame processing example. This time, we&rsquo;re going all out!</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> VideoFrame <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    FrameNumber <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    Data        []<span style="color:#458;font-weight:bold">byte</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> FrameProcessingJob <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    Frame   VideoFrame
+</span></span><span style="display:flex;"><span>    BatchID <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>FrameProcessingJob) <span style="color:#900;font-weight:bold">Process</span>(ctx context.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Simulate complex frame processing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    time.<span style="color:#900;font-weight:bold">Sleep</span>(time.<span style="color:#900;font-weight:bold">Duration</span>(<span style="color:#099">50</span><span style="color:#000;font-weight:bold">+</span>rand.<span style="color:#900;font-weight:bold">Intn</span>(<span style="color:#099">100</span>)) <span style="color:#000;font-weight:bold">*</span> time.Millisecond)
+</span></span><span style="display:flex;"><span>    fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Processed frame %d\n&#34;</span>, j.Frame.FrameNumber)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (j <span style="color:#000;font-weight:bold">*</span>FrameProcessingJob) <span style="color:#900;font-weight:bold">BatchID</span>() <span style="color:#458;font-weight:bold">string</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> j.BatchID
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>    pool <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">NewWorkerPool</span>(runtime.<span style="color:#900;font-weight:bold">NumCPU</span>(), <span style="color:#099">1000</span>)
+</span></span><span style="display:flex;"><span>    pool.<span style="color:#900;font-weight:bold">Start</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    videoFrames <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">generateVideoFrames</span>(<span style="color:#099">10000</span>) <span style="color:#998;font-style:italic">// Imagine this generates 10000 frames
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    batchSize <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">500</span>
+</span></span><span style="display:flex;"><span>    batchCount <span style="color:#000;font-weight:bold">:=</span> (<span style="color:#0086b3">len</span>(videoFrames) <span style="color:#000;font-weight:bold">+</span> batchSize <span style="color:#000;font-weight:bold">-</span> <span style="color:#099">1</span>) <span style="color:#000;font-weight:bold">/</span> batchSize
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">0</span>; i &lt; batchCount; i<span style="color:#000;font-weight:bold">++</span> {
+</span></span><span style="display:flex;"><span>        start <span style="color:#000;font-weight:bold">:=</span> i <span style="color:#000;font-weight:bold">*</span> batchSize
+</span></span><span style="display:flex;"><span>        end <span style="color:#000;font-weight:bold">:=</span> (i <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>) <span style="color:#000;font-weight:bold">*</span> batchSize
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> end &gt; <span style="color:#0086b3">len</span>(videoFrames) {
+</span></span><span style="display:flex;"><span>            end = <span style="color:#0086b3">len</span>(videoFrames)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        batchID <span style="color:#000;font-weight:bold">:=</span> fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;video-batch-%d&#34;</span>, i)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">var</span> jobs []Job
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">for</span> _, frame <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> videoFrames[start:end] {
+</span></span><span style="display:flex;"><span>            jobs = <span style="color:#0086b3">append</span>(jobs, <span style="color:#000;font-weight:bold">&amp;</span>FrameProcessingJob{Frame: frame, BatchID: batchID})
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">SubmitBatch</span>(batchID, jobs)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            log.<span style="color:#900;font-weight:bold">Fatalf</span>(<span style="color:#d14">&#34;Failed to submit batch %s: %v&#34;</span>, batchID, err)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">go</span> <span style="color:#000;font-weight:bold">func</span>(bID <span style="color:#458;font-weight:bold">string</span>) {
+</span></span><span style="display:flex;"><span>            result, err <span style="color:#000;font-weight:bold">:=</span> pool.<span style="color:#900;font-weight:bold">WaitForBatch</span>(bID, <span style="color:#099">5</span><span style="color:#000;font-weight:bold">*</span>time.Minute)
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>                log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error waiting for batch %s: %v&#34;</span>, bID, err)
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">return</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Batch %s completed: processed %d frames with %d errors\n&#34;</span>, 
+</span></span><span style="display:flex;"><span>                       bID, result.CompletedJobs, <span style="color:#0086b3">len</span>(result.Errors))
+</span></span><span style="display:flex;"><span>        }(batchID)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Wait for all batches to complete
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    time.<span style="color:#900;font-weight:bold">Sleep</span>(<span style="color:#099">10</span> <span style="color:#000;font-weight:bold">*</span> time.Minute)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Holy frame buffers, Batman! We&rsquo;re processing video frames faster than you can say &ldquo;Oscar-winning special effects&rdquo;! Our worker pool is juggling those frames like a circus performer on caffeine, and it&rsquo;s doing it with style.</p>
+<h2 id="wrapping-up-the-concurrency-symphony">Wrapping Up: The Concurrency Symphony</h2>
+<p>And there you have it, folks! We&rsquo;ve taken our worker pool for a spin through web scraping fields, data processing mountains, API request jungles, and video processing vortexes. It&rsquo;s handled everything we&rsquo;ve thrown at it with the grace of a ballet dancer and the power of a monster truck.</p>
+<p>Our advanced worker pool isn&rsquo;t just a piece of code; it&rsquo;s a concurrency symphony, orchestrating goroutines in perfect harmony. It&rsquo;s turning CPU cores into virtuoso performers, conducting a performance that would make even the most hardened sysadmin shed a tear of joy.</p>
+<p>Remember, with great power comes great responsibility. Use this worker pool wisely, and you&rsquo;ll be processing data, managing API requests, and transforming videos faster than you can say &ldquo;concurrent goroutines&rdquo;.</p>
+<p>Next up, we&rsquo;ll be looking at performance considerations and benchmarks. We&rsquo;ll put our worker pool through its paces and see just how much concurrent processing power we&rsquo;ve unleashed. Stay tuned, keep those goroutines spinning, and may your latency be low and your throughput high!</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/go/peg-parser-in-go/" class="pr-4">&larr; Building a simple query parser using PEG in Go</a>
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2024 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

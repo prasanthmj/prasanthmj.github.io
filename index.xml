@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Tue, 07 May 2024 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 10 Jul 2024 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>The Evolution of Concurrency Patterns in Go: From Goroutines to Advanced Worker Pools</title>
+      <link>/go/concurrency-and-worker-pools/</link>
+      <pubDate>Wed, 10 Jul 2024 00:00:00 +0000</pubDate>
+      
+      <guid>/go/concurrency-and-worker-pools/</guid>
+      <description>Remember when you first dipped your toes into the world of concurrent programming? If you&amp;rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&amp;rsquo;s the thing: in today&amp;rsquo;s tech landscape, mastering concurrency isn&amp;rsquo;t just a cool party trick—it&amp;rsquo;s becoming as essential as knowing how to loop.
+Enter Go (or Golang, if you&amp;rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &amp;ldquo;concurrency made easy!</description>
+    </item>
+    
     <item>
       <title>ChatGpt 4o, the Rise of Conversational Interfaces and the Shifting Landscape of Human-Computer Interaction</title>
       <link>/ai/llms-to-transform-ui/</link>
