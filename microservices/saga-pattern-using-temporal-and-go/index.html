@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Implementing Saga Pattern with Temporal in Go Microservices: Journey Through Distributed Transactions </title><meta name="keywords" content="Concurrency, microservices, saga pattern, golang" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Implementing Saga Pattern with Temporal in Go Microservices: Journey Through Distributed Transactions</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/concurrency" class="text-gray-600">Concurrency</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/microservices" class="text-gray-600">microservices</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/saga-pattern" class="text-gray-600">saga pattern</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+</ul>
+  
+<p><img src="../images/coffee-spill-barista.webp" alt="alt text"></p>
+<p>Picture this: You&rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&rsquo;s call it the &ldquo;Distributed Mocha Supreme&rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&rsquo;s going great until—oops!—they&rsquo;re out of whipped cream. Now what? Do they throw away everything they&rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval? Welcome to the world of distributed transactions in microservices!</p>
+<h3 id="the-distributed-transaction-problem-when-acid-turns-sour">The Distributed Transaction Problem: When ACID Turns Sour</h3>
+<p>Remember the good old days when all our data lived in one big, happy database? Life was simple then. Your transaction either succeeded completely or failed gracefully, thanks to our friend ACID (Atomicity, Consistency, Isolation, Durability). It was like having a safety net under your high-wire database act.</p>
+<p>But then microservices came along, and suddenly we&rsquo;re not just juggling balls—we&rsquo;re juggling chainsaws, while riding a unicycle, in a hurricane. Each microservice has its own database, its own logic, and its own opinion about what constitutes &ldquo;done.&rdquo; Trying to maintain ACID properties across these services is like trying to herd cats&hellip; who are all taking different routes to different destinations.</p>
+<p>In my years of building microservices (including a capital structure management system that would make your head spin), I&rsquo;ve seen countless attempts to solve this problem. Two-phase commits? Great in theory, but about as practical in the real world as expecting everyone to agree on tabs versus spaces. Distributed transactions? More like distributed headaches!</p>
+<h3 id="enter-the-saga-pattern-breaking-down-complex-workflows-like-a-tv-series">Enter the Saga Pattern: Breaking Down Complex Workflows Like a TV Series</h3>
+<p>This is where the Saga pattern swoops in like the superhero we need. Think of it as the &ldquo;Marvel Cinematic Universe&rdquo; of transaction patterns—a series of local transactions that work together to tell a bigger story. Each transaction is like an episode in your favorite TV series, complete with its own plot (transaction logic) and, most importantly, a &ldquo;Previously on&hellip;&rdquo; recap feature (compensation actions) in case things go wrong.</p>
+<p>But implementing Sagas isn&rsquo;t just about writing some code and hoping for the best. It&rsquo;s about carefully choreographing a series of steps, each with its own undo button. It&rsquo;s like playing chess, but all the pieces can move simultaneously, and some of them occasionally decide to take a coffee break.</p>
+<h3 id="why-temporal-is-your-trusty-sidekick-in-this-journey">Why Temporal is Your Trusty Sidekick in This Journey</h3>
+<p>Enter Temporal—the Robin to your Batman, the Samwise to your Frodo, the <code>fmt.Println()</code> to your debugging session. After spending years wrestling with various workflow engines and home-grown solutions, I can tell you that Temporal is a game-changer. It&rsquo;s like having a time machine for your distributed transactions (minus the paradoxes and butterfly effects).</p>
+<p>Temporal handles all the gnarly bits of distributed workflow management:</p>
+<ul>
+<li>State management? ✓</li>
+<li>Retry logic? ✓</li>
+<li>Error handling? ✓</li>
+<li>Making you look like a distributed systems wizard? Double ✓</li>
+</ul>
+<p>I&rsquo;ve used Temporal in production systems where a single workflow touched everything from document analysis to payment processing, and let me tell you—it&rsquo;s not just another tool in your toolbox. It&rsquo;s the power tool that makes all your other tools more effective.</p>
+<p>In this article, we&rsquo;re going to dive deep into implementing the Saga pattern with Temporal in Go. We&rsquo;ll build something real, something you can actually use, and most importantly, something that won&rsquo;t keep you up at night wondering if that one edge case is going to bring down your entire system.</p>
+<p>We&rsquo;ll explore everything from basic concepts to advanced patterns, and I&rsquo;ll share real battle stories from the trenches. By the end, you&rsquo;ll have a solid understanding of not just how to implement Sagas with Temporal, but when and why you should use them.</p>
+<p>So grab your favorite debugging beverage, fire up your IDE, and let&rsquo;s embark on this distributed transaction adventure together. Trust me—by the time we&rsquo;re done, you&rsquo;ll be handling distributed transactions with the confidence of a superhero and the precision of a master chef.</p>
+<h2 id="understanding-sagas-think-choose-your-own-adventure-books">Understanding Sagas: Think &ldquo;Choose Your Own Adventure&rdquo; Books</h2>
+<p>Remember those &ldquo;Choose Your Own Adventure&rdquo; books where one decision leads to another, and if things go wrong, you could always flip back to try a different path? That&rsquo;s essentially what the Saga pattern is for your microservices—except instead of fighting dragons, you&rsquo;re managing distributed transactions (though sometimes they feel equally epic).</p>
+<p>Let&rsquo;s break it down with a real-world scenario I encountered while building a capital structure management system. Imagine you&rsquo;re processing a new financial investment:</p>
+<ol>
+<li>Validate investor credentials</li>
+<li>Check available investment slots</li>
+<li>Process payment</li>
+<li>Generate legal documents</li>
+<li>Update investor portfolio</li>
+<li>Send notifications</li>
+</ol>
+<p>Each step is handled by a different microservice, and each needs to succeed or be properly compensated if something fails. It&rsquo;s like a line of dominoes, but each domino needs to know how to stand itself back up if the line breaks.</p>
+<h2 id="choreography-vs-orchestration-dancing-solo-or-having-a-conductor">Choreography vs. Orchestration: Dancing Solo or Having a Conductor?</h2>
+<p>There are two main ways to implement the Saga pattern, and choosing between them is like picking between freestyle dance and ballet:</p>
+<h3 id="choreography-the-distributed-dance-off">Choreography: The Distributed Dance-Off</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Example of choreographed event flow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">type</span> InvestmentEvent <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    InvestorID    <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Amount        decimal.Decimal
+</span></span><span style="display:flex;"><span>    Status        <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    CompensateFor <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (s <span style="color:#000;font-weight:bold">*</span>PaymentService) <span style="color:#900;font-weight:bold">ProcessPayment</span>(ctx context.Context, event InvestmentEvent) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Process payment and emit next event
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> s.<span style="color:#900;font-weight:bold">processPayment</span>(event); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Emit compensation event
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">return</span> s.eventBus.<span style="color:#900;font-weight:bold">Publish</span>(<span style="color:#d14">&#34;investment.payment.failed&#34;</span>, InvestmentEvent{
+</span></span><span style="display:flex;"><span>            CompensateFor: <span style="color:#d14">&#34;payment&#34;</span>,
+</span></span><span style="display:flex;"><span>            Status: <span style="color:#d14">&#34;failed&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// ... other fields
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        })
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Success! Let the next service know
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> s.eventBus.<span style="color:#900;font-weight:bold">Publish</span>(<span style="color:#d14">&#34;investment.payment.completed&#34;</span>, event)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>In choreography, each service is like a dancer who knows their routine and reacts to others&rsquo; moves. They communicate through events, like dancers responding to musical cues. It&rsquo;s elegant when it works, but like a flash mob, it can get chaotic as complexity grows.</p>
+<h3 id="orchestration-the-symphony-conductor">Orchestration: The Symphony Conductor</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Example of orchestrated workflow with Temporal
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">func</span> (w <span style="color:#000;font-weight:bold">*</span>InvestmentWorkflow) <span style="color:#900;font-weight:bold">Execute</span>(ctx workflow.Context, input InvestmentInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Define our saga steps
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">NewSaga</span>()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Add compensation handlers
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga.<span style="color:#900;font-weight:bold">AddCompensation</span>(<span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.RefundPayment)
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Execute steps with compensation handling
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.ProcessPayment).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> saga.<span style="color:#900;font-weight:bold">Compensate</span>(ctx)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Continue with other steps...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This is where Temporal shines like a spotlight on Broadway. It acts as your conductor, coordinating all the services and ensuring everyone plays their part at the right time. If something goes wrong, it knows exactly how to guide everyone back to harmony.</p>
+<h2 id="compensation-actions-the-ctrlz-of-distributed-systems">Compensation Actions: The &ldquo;Ctrl+Z&rdquo; of Distributed Systems</h2>
+<p>Here&rsquo;s where things get interesting. Each step in your saga needs a compensation action—a way to undo what&rsquo;s been done. It&rsquo;s like having a save point in a video game, but for your business transactions.</p>
+<p>Let&rsquo;s look at some real compensation patterns I&rsquo;ve implemented:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> CompensationAction <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    Step     <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Forward  <span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>    Backward <span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">NewInvestmentSaga</span>() <span style="color:#000;font-weight:bold">*</span>Saga {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>Saga{
+</span></span><span style="display:flex;"><span>        Actions: []CompensationAction{
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                Step: <span style="color:#d14">&#34;ProcessPayment&#34;</span>,
+</span></span><span style="display:flex;"><span>                Forward: <span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">// Process payment
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>                    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                Backward: <span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">// Issue refund
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>                    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                Step: <span style="color:#d14">&#34;GenerateDocuments&#34;</span>,
+</span></span><span style="display:flex;"><span>                Forward: <span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">// Generate docs
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>                    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                Backward: <span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">// Mark documents as void
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>                    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// More steps...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>But here&rsquo;s the trick: compensation isn&rsquo;t always as simple as &ldquo;ctrl+z&rdquo;. Sometimes you need to:</p>
+<ul>
+<li>Add a reversal transaction (like a refund)</li>
+<li>Leave a trace of what happened (for audit purposes)</li>
+<li>Take alternative actions (like sending an apology email)</li>
+<li>Handle the &ldquo;compensation for the compensation&rdquo; (yes, it gets that meta sometimes!)</li>
+</ul>
+<h3 id="the-real-magic-temporals-role">The Real Magic: Temporal&rsquo;s Role</h3>
+<p>This is where Temporal becomes your best friend. Remember that time machine analogy? Here&rsquo;s how Temporal makes saga compensation actually workable:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">InvestmentWorkflow</span>(ctx workflow.Context, input InvestmentInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    options <span style="color:#000;font-weight:bold">:=</span> workflow.ActivityOptions{
+</span></span><span style="display:flex;"><span>        StartToCloseTimeout: time.Hour <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">24</span>,
+</span></span><span style="display:flex;"><span>        RetryPolicy: <span style="color:#000;font-weight:bold">&amp;</span>temporal.RetryPolicy{
+</span></span><span style="display:flex;"><span>            InitialInterval:    time.Second,
+</span></span><span style="display:flex;"><span>            MaximumAttempts:   <span style="color:#099">3</span>,
+</span></span><span style="display:flex;"><span>            BackoffCoefficient: <span style="color:#099">2.0</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ctx = workflow.<span style="color:#900;font-weight:bold">WithActivityOptions</span>(ctx, options)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Saga implementation with Temporal&#39;s durable execution
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">NewSaga</span>()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Each step is automatically tracked and can be compensated
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">for</span> _, action <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> investmentSteps {
+</span></span><span style="display:flex;"><span>        saga.<span style="color:#900;font-weight:bold">AddCompensation</span>(action.Backward)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, action.Forward).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// Temporal handles the compensation orchestration
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>            <span style="color:#000;font-weight:bold">return</span> saga.<span style="color:#900;font-weight:bold">Compensate</span>(ctx)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Temporal maintains the state of your entire saga, handles retries intelligently, and ensures that compensation actions are executed in the right order—even if your system crashes mid-compensation!</p>
+<h2 id="the-power-of-pattern-recognition">The Power of Pattern Recognition</h2>
+<p>The beauty of the Saga pattern with Temporal is that it turns complex distributed transactions into manageable, observable, and maintainable workflows. It&rsquo;s like having a GPS for your distributed systems—you always know where you are, where you&rsquo;re going, and how to get back if you take a wrong turn.</p>
+<h2 id="enter-temporal-your-distributed-systems-time-machine">Enter Temporal: Your Distributed Systems Time Machine</h2>
+<p>Remember that scene in Doctor Strange where he uses the Time Stone to manipulate reality? That&rsquo;s basically what Temporal does for your distributed systems, minus the glowing green special effects. But instead of reversing an apocalyptic event, you&rsquo;re handling things like &ldquo;Oops, the payment service is down&rdquo; or &ldquo;Help! The notification system is having an existential crisis.&rdquo;</p>
+<p>After implementing numerous workflow systems (and battling their quirks), I can tell you that Temporal is different. Here&rsquo;s why:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Traditional error handling - aka &#34;Hope for the best&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">traditionalApproach</span>() <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">processPayment</span>(); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// What if the system crashes here? 🙈
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#998;font-style:italic">// What if this retry loops forever? 🔄
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#998;font-style:italic">// What if we need to pick up where we left off? 😱
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#900;font-weight:bold">retryWithBackoff</span>(processPayment)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Temporal&#39;s approach - aka &#34;I got this&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">TemporalWorkflow</span>(ctx workflow.Context, input WorkflowInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Temporal remembers EVERYTHING
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    options <span style="color:#000;font-weight:bold">:=</span> workflow.ActivityOptions{
+</span></span><span style="display:flex;"><span>        StartToCloseTimeout: time.Hour <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">24</span>,
+</span></span><span style="display:flex;"><span>        RetryPolicy: <span style="color:#000;font-weight:bold">&amp;</span>temporal.RetryPolicy{
+</span></span><span style="display:flex;"><span>            InitialInterval:    time.Second <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>            MaximumInterval:    time.Minute <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>            BackoffCoefficient: <span style="color:#099">1.5</span>,
+</span></span><span style="display:flex;"><span>            MaximumAttempts:   <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ctx = workflow.<span style="color:#900;font-weight:bold">WithActivityOptions</span>(ctx, options)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Even if your entire data center catches fire, 
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#998;font-style:italic">// Temporal will resume right here when you&#39;re back
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, processPayment, input).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="the-magic-of-durable-execution">The Magic of Durable Execution</h2>
+<p>Let me tell you a story from my days building a capital structure management system. We had this complex workflow involving document analysis, payment processing, and multiple third-party integrations. Before Temporal, it was like trying to juggle while riding a unicycle on a tightrope. During a storm. At night.</p>
+<p>Here&rsquo;s what Temporal brought to the table:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">CapitalStructureWorkflow</span>(ctx workflow.Context, input StructureInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Define our workflow&#39;s &#34;memory&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> state WorkflowState
+</span></span><span style="display:flex;"><span>    err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">SetQueryHandler</span>(ctx, <span style="color:#d14">&#34;getState&#34;</span>, <span style="color:#000;font-weight:bold">func</span>() (WorkflowState, <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> state, <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Start our saga
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">NewSaga</span>()
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Document Analysis
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> analysisResult DocumentAnalysis
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, AnalyzeDocuments, input.Documents).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>analysisResult); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Temporal remembers we failed here and will resume from this point
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#900;font-weight:bold">handleError</span>(ctx, err, <span style="color:#d14">&#34;document_analysis&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    state.AnalysisComplete = <span style="color:#000;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Payment Processing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, ProcessPayment, input.PaymentDetails).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// If the system crashes here, Temporal will remember to compensate
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#998;font-style:italic">// for the document analysis when it recovers
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        saga.<span style="color:#900;font-weight:bold">CompensateWith</span>(ctx, ReverseAnalysis, analysisResult)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#900;font-weight:bold">handleError</span>(ctx, err, <span style="color:#d14">&#34;payment_processing&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    state.PaymentComplete = <span style="color:#000;font-weight:bold">true</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Even signals between workflows are durable
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    signalChan <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">GetSignalChannel</span>(ctx, <span style="color:#d14">&#34;approval_signal&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">var</span> approval ApprovalSignal
+</span></span><span style="display:flex;"><span>    signalChan.<span style="color:#900;font-weight:bold">Receive</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>approval)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="how-temporal-handles-failures-like-your-favorite-video-games-checkpoint-system">How Temporal Handles Failures (Like Your Favorite Video Game&rsquo;s Checkpoint System)</h3>
+<p>Remember playing games where you&rsquo;d hit a save point and think &ldquo;Thank goodness, if I die, I start from here&rdquo;? Temporal is that, but for your distributed systems. Here&rsquo;s a real example from my experience:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">ComplexWorkflow</span>(ctx workflow.Context, input WorkflowInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Temporal automatically tracks these options
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    options <span style="color:#000;font-weight:bold">:=</span> workflow.ActivityOptions{
+</span></span><span style="display:flex;"><span>        StartToCloseTimeout: time.Hour <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">24</span>,
+</span></span><span style="display:flex;"><span>        RetryPolicy: <span style="color:#000;font-weight:bold">&amp;</span>temporal.RetryPolicy{
+</span></span><span style="display:flex;"><span>            InitialInterval:    time.Second,
+</span></span><span style="display:flex;"><span>            MaximumInterval:    time.Minute <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">10</span>,
+</span></span><span style="display:flex;"><span>            BackoffCoefficient: <span style="color:#099">2.0</span>,
+</span></span><span style="display:flex;"><span>            MaximumAttempts:   <span style="color:#099">3</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ctx = workflow.<span style="color:#900;font-weight:bold">WithActivityOptions</span>(ctx, options)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Checkpoint 1: Start the workflow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    logger <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Starting workflow execution&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Checkpoint 2: Process the first activity
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> result1 ActivityResult
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, FirstActivity, input).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>result1); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// If we crash here, Temporal remembers everything about result1
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Checkpoint 3: Make a decision
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> result1.NeedsApproval {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Start a child workflow - also durable!
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        cwo <span style="color:#000;font-weight:bold">:=</span> workflow.ChildWorkflowOptions{
+</span></span><span style="display:flex;"><span>            WorkflowID: <span style="color:#d14">&#34;approval_&#34;</span> <span style="color:#000;font-weight:bold">+</span> workflow.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).WorkflowExecution.ID,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        ctx = workflow.<span style="color:#900;font-weight:bold">WithChildOptions</span>(ctx, cwo)
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">var</span> approvalResult ApprovalResult
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteChildWorkflow</span>(ctx, ApprovalWorkflow, result1).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>approvalResult); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// Even child workflow failures are handled gracefully
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>            <span style="color:#000;font-weight:bold">return</span> <span style="color:#900;font-weight:bold">handleApprovalError</span>(ctx, err)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Checkpoint 4: Final activity
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, FinalActivity, result1).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="advanced-features-that-make-life-better">Advanced Features That Make Life Better</h2>
+<h3 id="1-queryable-workflows">1. Queryable Workflows</h3>
+<p>Want to know what&rsquo;s happening in your workflow right now? Temporal&rsquo;s got you covered:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">WorkflowWithQueries</span>(ctx workflow.Context, input WorkflowInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Set up state tracking
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    state <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>WorkflowState{
+</span></span><span style="display:flex;"><span>        Status: <span style="color:#d14">&#34;STARTED&#34;</span>,
+</span></span><span style="display:flex;"><span>        Steps:  <span style="color:#0086b3">make</span>([]<span style="color:#458;font-weight:bold">string</span>, <span style="color:#099">0</span>),
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Register query handler
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">SetQueryHandler</span>(ctx, <span style="color:#d14">&#34;getState&#34;</span>, <span style="color:#000;font-weight:bold">func</span>() (<span style="color:#000;font-weight:bold">*</span>WorkflowState, <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> state, <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>    }); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Your workflow logic here, updating state as you go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    state.Status = <span style="color:#d14">&#34;IN_PROGRESS&#34;</span>
+</span></span><span style="display:flex;"><span>    state.Steps = <span style="color:#0086b3">append</span>(state.Steps, <span style="color:#d14">&#34;Started payment processing&#34;</span>)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// ... rest of the workflow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="2-signals-for-real-time-communication">2. Signals for Real-time Communication</h3>
+<p>Need to tell a running workflow something important? Signals to the rescue:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">WorkflowWithSignals</span>(ctx workflow.Context, input WorkflowInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Set up signal channel
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    cancelChan <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">GetSignalChannel</span>(ctx, <span style="color:#d14">&#34;cancelSignal&#34;</span>)
+</span></span><span style="display:flex;"><span>    updateChan <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">GetSignalChannel</span>(ctx, <span style="color:#d14">&#34;updateSignal&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create a selector to handle multiple signals
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    selector <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">NewSelector</span>(ctx)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    selector.<span style="color:#900;font-weight:bold">AddReceive</span>(cancelChan, <span style="color:#000;font-weight:bold">func</span>(c workflow.ReceiveChannel, more <span style="color:#458;font-weight:bold">bool</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">var</span> cancelReason <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>        c.<span style="color:#900;font-weight:bold">Receive</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>cancelReason)
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Handle cancellation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    selector.<span style="color:#900;font-weight:bold">AddReceive</span>(updateChan, <span style="color:#000;font-weight:bold">func</span>(c workflow.ReceiveChannel, more <span style="color:#458;font-weight:bold">bool</span>) {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">var</span> update UpdateInfo
+</span></span><span style="display:flex;"><span>        c.<span style="color:#900;font-weight:bold">Receive</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>update)
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Handle update
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Your workflow logic here
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="why-this-matters">Why This Matters</h2>
+<p>In my years of building distributed systems, I&rsquo;ve seen pretty much every way a system can fail (and invented a few new ones!). Temporal doesn&rsquo;t just handle the failures you expect—it handles the ones you don&rsquo;t even know to expect yet.</p>
+<p>It&rsquo;s like having a time-traveling backup dancer who:</p>
+<ul>
+<li>Remembers every step of the choreography</li>
+<li>Can pick up exactly where you left off if you trip</li>
+<li>Keeps track of what needs to be undone if something goes wrong</li>
+<li>Never gets tired or forgets what they&rsquo;re doing
+distributed systems dance like they&rsquo;re on &ldquo;Dancing with the Stars&rdquo;!*</li>
+</ul>
+<h2 id="lets-build-something-cool">Let&rsquo;s Build Something Cool</h2>
+<p>First things first—let&rsquo;s set up our development environment. It&rsquo;s like preparing your kitchen before cooking a gourmet meal, except instead of knives and pans, we&rsquo;re gathering Go packages and Docker containers.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Create our project</span>
+</span></span><span style="display:flex;"><span>mkdir temporal-saga-demo
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">cd</span> temporal-saga-demo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Initialize Go module</span>
+</span></span><span style="display:flex;"><span>go mod init github.com/yourusername/temporal-saga-demo
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># Get our dependencies</span>
+</span></span><span style="display:flex;"><span>go get go.temporal.io/sdk@latest
+</span></span><span style="display:flex;"><span>go get -u github.com/google/uuid
+</span></span><span style="display:flex;"><span>go get go.uber.org/zap
+</span></span></code></pre></div><h2 id="the-e-commerce-order-saga-a-real-world-example">The E-commerce Order Saga: A Real-World Example</h2>
+<p>Let&rsquo;s build something real: an e-commerce order processing system. Why? Because it&rsquo;s got everything we love in distributed systems:</p>
+<ul>
+<li>Multiple services that need to coordinate</li>
+<li>Money handling (always fun when things go wrong!)</li>
+<li>External service integrations</li>
+<li>Lots of things that can (and will) go wrong</li>
+</ul>
+<p>Here&rsquo;s our saga&rsquo;s steps:</p>
+<ol>
+<li>Verify inventory</li>
+<li>Reserve inventory</li>
+<li>Process payment</li>
+<li>Update inventory</li>
+<li>Create shipping label</li>
+<li>Send confirmation email</li>
+</ol>
+<h3 id="step-1-define-our-domain-models">Step 1: Define Our Domain Models</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// domain/models.go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">package</span> domain
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Order <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    ID          <span style="color:#458;font-weight:bold">string</span>    <span style="color:#d14">`json:&#34;id&#34;`</span>
+</span></span><span style="display:flex;"><span>    CustomerID  <span style="color:#458;font-weight:bold">string</span>    <span style="color:#d14">`json:&#34;customer_id&#34;`</span>
+</span></span><span style="display:flex;"><span>    Items       []Item    <span style="color:#d14">`json:&#34;items&#34;`</span>
+</span></span><span style="display:flex;"><span>    TotalAmount <span style="color:#458;font-weight:bold">float64</span>   <span style="color:#d14">`json:&#34;total_amount&#34;`</span>
+</span></span><span style="display:flex;"><span>    Status      <span style="color:#458;font-weight:bold">string</span>    <span style="color:#d14">`json:&#34;status&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Item <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    ProductID <span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`json:&#34;product_id&#34;`</span>
+</span></span><span style="display:flex;"><span>    Quantity  <span style="color:#458;font-weight:bold">int</span>     <span style="color:#d14">`json:&#34;quantity&#34;`</span>
+</span></span><span style="display:flex;"><span>    Price     <span style="color:#458;font-weight:bold">float64</span> <span style="color:#d14">`json:&#34;price&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> InventoryReservation <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    OrderID    <span style="color:#458;font-weight:bold">string</span>         <span style="color:#d14">`json:&#34;order_id&#34;`</span>
+</span></span><span style="display:flex;"><span>    Items      []ReservedItem <span style="color:#d14">`json:&#34;items&#34;`</span>
+</span></span><span style="display:flex;"><span>    ExpiresAt  time.Time      <span style="color:#d14">`json:&#34;expires_at&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> ReservedItem <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    ProductID <span style="color:#458;font-weight:bold">string</span> <span style="color:#d14">`json:&#34;product_id&#34;`</span>
+</span></span><span style="display:flex;"><span>    Quantity  <span style="color:#458;font-weight:bold">int</span>    <span style="color:#d14">`json:&#34;quantity&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> PaymentDetails <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    OrderID     <span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`json:&#34;order_id&#34;`</span>
+</span></span><span style="display:flex;"><span>    Amount      <span style="color:#458;font-weight:bold">float64</span> <span style="color:#d14">`json:&#34;amount&#34;`</span>
+</span></span><span style="display:flex;"><span>    PaymentID   <span style="color:#458;font-weight:bold">string</span>  <span style="color:#d14">`json:&#34;payment_id&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="step-2-implement-our-activity-definitions">Step 2: Implement Our Activity Definitions</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// activities/activities.go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">package</span> activities
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;context&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;github.com/yourusername/temporal-saga-demo/domain&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Activities <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    inventoryClient  <span style="color:#000;font-weight:bold">*</span>inventory.Client
+</span></span><span style="display:flex;"><span>    paymentClient    <span style="color:#000;font-weight:bold">*</span>payment.Client
+</span></span><span style="display:flex;"><span>    shippingClient   <span style="color:#000;font-weight:bold">*</span>shipping.Client
+</span></span><span style="display:flex;"><span>    emailClient      <span style="color:#000;font-weight:bold">*</span>email.Client
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>Activities) <span style="color:#900;font-weight:bold">VerifyInventory</span>(ctx context.Context, order domain.Order) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    logger <span style="color:#000;font-weight:bold">:=</span> activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Verifying inventory&#34;</span>, <span style="color:#d14">&#34;order_id&#34;</span>, order.ID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, item <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> order.Items {
+</span></span><span style="display:flex;"><span>        available, err <span style="color:#000;font-weight:bold">:=</span> a.inventoryClient.<span style="color:#900;font-weight:bold">CheckAvailability</span>(ctx, item.ProductID, item.Quantity)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to verify inventory: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> !available {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;insufficient inventory for product %s&#34;</span>, item.ProductID)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>Activities) <span style="color:#900;font-weight:bold">ReserveInventory</span>(ctx context.Context, order domain.Order) (<span style="color:#000;font-weight:bold">*</span>domain.InventoryReservation, <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>    logger <span style="color:#000;font-weight:bold">:=</span> activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Reserving inventory&#34;</span>, <span style="color:#d14">&#34;order_id&#34;</span>, order.ID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    reservation <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>domain.InventoryReservation{
+</span></span><span style="display:flex;"><span>        OrderID: order.ID,
+</span></span><span style="display:flex;"><span>        ExpiresAt: time.<span style="color:#900;font-weight:bold">Now</span>().<span style="color:#900;font-weight:bold">Add</span>(<span style="color:#099">15</span> <span style="color:#000;font-weight:bold">*</span> time.Minute),
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, item <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> order.Items {
+</span></span><span style="display:flex;"><span>        err <span style="color:#000;font-weight:bold">:=</span> a.inventoryClient.<span style="color:#900;font-weight:bold">Reserve</span>(ctx, item.ProductID, item.Quantity)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>, fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to reserve inventory: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        reservation.Items = <span style="color:#0086b3">append</span>(reservation.Items, domain.ReservedItem{
+</span></span><span style="display:flex;"><span>            ProductID: item.ProductID,
+</span></span><span style="display:flex;"><span>            Quantity: item.Quantity,
+</span></span><span style="display:flex;"><span>        })
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> reservation, <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>Activities) <span style="color:#900;font-weight:bold">ProcessPayment</span>(ctx context.Context, order domain.Order) (<span style="color:#000;font-weight:bold">*</span>domain.PaymentDetails, <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>    logger <span style="color:#000;font-weight:bold">:=</span> activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Processing payment&#34;</span>, <span style="color:#d14">&#34;order_id&#34;</span>, order.ID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    paymentID, err <span style="color:#000;font-weight:bold">:=</span> a.paymentClient.<span style="color:#900;font-weight:bold">Charge</span>(ctx, order.CustomerID, order.TotalAmount)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>, fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;payment failed: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>domain.PaymentDetails{
+</span></span><span style="display:flex;"><span>        OrderID: order.ID,
+</span></span><span style="display:flex;"><span>        Amount: order.TotalAmount,
+</span></span><span style="display:flex;"><span>        PaymentID: paymentID,
+</span></span><span style="display:flex;"><span>    }, <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Compensation Activities
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>Activities) <span style="color:#900;font-weight:bold">ReleaseInventory</span>(ctx context.Context, reservation domain.InventoryReservation) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    logger <span style="color:#000;font-weight:bold">:=</span> activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Releasing inventory reservation&#34;</span>, <span style="color:#d14">&#34;order_id&#34;</span>, reservation.OrderID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">for</span> _, item <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> reservation.Items {
+</span></span><span style="display:flex;"><span>        err <span style="color:#000;font-weight:bold">:=</span> a.inventoryClient.<span style="color:#900;font-weight:bold">Release</span>(ctx, item.ProductID, item.Quantity)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to release inventory: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>Activities) <span style="color:#900;font-weight:bold">RefundPayment</span>(ctx context.Context, payment domain.PaymentDetails) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    logger <span style="color:#000;font-weight:bold">:=</span> activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Processing refund&#34;</span>, <span style="color:#d14">&#34;order_id&#34;</span>, payment.OrderID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    err <span style="color:#000;font-weight:bold">:=</span> a.paymentClient.<span style="color:#900;font-weight:bold">Refund</span>(ctx, payment.PaymentID)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;refund failed: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="step-3-implement-the-workflow">Step 3: Implement The Workflow</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// workflows/order_workflow.go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">package</span> workflows
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;time&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;go.temporal.io/sdk/workflow&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;github.com/yourusername/temporal-saga-demo/domain&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> OrderWorkflow <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    activities <span style="color:#000;font-weight:bold">*</span>activities.Activities
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (w <span style="color:#000;font-weight:bold">*</span>OrderWorkflow) <span style="color:#900;font-weight:bold">Execute</span>(ctx workflow.Context, order domain.Order) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Set activity options
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    options <span style="color:#000;font-weight:bold">:=</span> workflow.ActivityOptions{
+</span></span><span style="display:flex;"><span>        StartToCloseTimeout: time.Minute <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">5</span>,
+</span></span><span style="display:flex;"><span>        RetryPolicy: <span style="color:#000;font-weight:bold">&amp;</span>temporal.RetryPolicy{
+</span></span><span style="display:flex;"><span>            InitialInterval:    time.Second,
+</span></span><span style="display:flex;"><span>            MaximumInterval:    time.Minute,
+</span></span><span style="display:flex;"><span>            BackoffCoefficient: <span style="color:#099">2.0</span>,
+</span></span><span style="display:flex;"><span>            MaximumAttempts:   <span style="color:#099">3</span>,
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    ctx = workflow.<span style="color:#900;font-weight:bold">WithActivityOptions</span>(ctx, options)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Initialize our saga
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">NewSaga</span>(workflow.SagaOptions{
+</span></span><span style="display:flex;"><span>        Continueonfailure: <span style="color:#000;font-weight:bold">false</span>,
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Step 1: Verify Inventory
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    logger <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx)
+</span></span><span style="display:flex;"><span>    logger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Starting order workflow&#34;</span>, <span style="color:#d14">&#34;order_id&#34;</span>, order.ID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.activities.VerifyInventory, order).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;inventory verification failed: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Step 2: Reserve Inventory
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> inventoryReservation domain.InventoryReservation
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.activities.ReserveInventory, order).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>inventoryReservation); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;inventory reservation failed: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Add compensation for inventory reservation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga.<span style="color:#900;font-weight:bold">AddCompensation</span>(<span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.activities.ReleaseInventory, inventoryReservation).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Step 3: Process Payment
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> paymentDetails domain.PaymentDetails
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.activities.ProcessPayment, order).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">&amp;</span>paymentDetails); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// This will automatically trigger the compensation for inventory reservation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">return</span> saga.<span style="color:#900;font-weight:bold">Compensate</span>(ctx)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Add compensation for payment
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    saga.<span style="color:#900;font-weight:bold">AddCompensation</span>(<span style="color:#000;font-weight:bold">func</span>(ctx workflow.Context) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> workflow.<span style="color:#900;font-weight:bold">ExecuteActivity</span>(ctx, w.activities.RefundPayment, paymentDetails).<span style="color:#900;font-weight:bold">Get</span>(ctx, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Continue with shipping label creation and email notification...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="step-4-set-up-the-worker">Step 4: Set Up the Worker</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// cmd/worker/main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">package</span> main
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;log&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;go.temporal.io/sdk/client&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;go.temporal.io/sdk/worker&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create Temporal client
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    c, err <span style="color:#000;font-weight:bold">:=</span> client.<span style="color:#900;font-weight:bold">NewClient</span>(client.Options{
+</span></span><span style="display:flex;"><span>        HostPort: client.DefaultHostPort,
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalln</span>(<span style="color:#d14">&#34;Unable to create client&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> c.<span style="color:#900;font-weight:bold">Close</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create worker
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    w <span style="color:#000;font-weight:bold">:=</span> worker.<span style="color:#900;font-weight:bold">New</span>(c, <span style="color:#d14">&#34;order-saga-taskqueue&#34;</span>, worker.Options{})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Register workflow and activities
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    w.<span style="color:#900;font-weight:bold">RegisterWorkflow</span>(workflows.OrderWorkflow{}.Execute)
+</span></span><span style="display:flex;"><span>    w.<span style="color:#900;font-weight:bold">RegisterActivity</span>(<span style="color:#000;font-weight:bold">&amp;</span>activities.Activities{})
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Start worker
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    err = w.<span style="color:#900;font-weight:bold">Run</span>(worker.<span style="color:#900;font-weight:bold">InterruptCh</span>())
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalln</span>(<span style="color:#d14">&#34;Unable to start worker&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="testing-our-saga">Testing Our Saga</h2>
+<p>Here&rsquo;s where it gets fun. Let&rsquo;s write some tests that verify our saga works correctly:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// workflows/order_workflow_test.go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">package</span> workflows
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;testing&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;go.temporal.io/sdk/testsuite&#34;</span>
+</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">TestOrderWorkflow</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>    testSuite <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>testsuite.WorkflowTestSuite{}
+</span></span><span style="display:flex;"><span>    env <span style="color:#000;font-weight:bold">:=</span> testSuite.<span style="color:#900;font-weight:bold">NewTestWorkflowEnvironment</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Mock activities
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.VerifyInventory, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.ReserveInventory, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">&amp;</span>domain.InventoryReservation{
+</span></span><span style="display:flex;"><span>        OrderID: <span style="color:#d14">&#34;test-order&#34;</span>,
+</span></span><span style="display:flex;"><span>        Items: []domain.ReservedItem{{
+</span></span><span style="display:flex;"><span>            ProductID: <span style="color:#d14">&#34;test-product&#34;</span>,
+</span></span><span style="display:flex;"><span>            Quantity:  <span style="color:#099">1</span>,
+</span></span><span style="display:flex;"><span>        }},
+</span></span><span style="display:flex;"><span>    }, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.ProcessPayment, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">&amp;</span>domain.PaymentDetails{
+</span></span><span style="display:flex;"><span>        OrderID:   <span style="color:#d14">&#34;test-order&#34;</span>,
+</span></span><span style="display:flex;"><span>        Amount:    <span style="color:#099">100.0</span>,
+</span></span><span style="display:flex;"><span>        PaymentID: <span style="color:#d14">&#34;test-payment&#34;</span>,
+</span></span><span style="display:flex;"><span>    }, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Execute workflow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    env.<span style="color:#900;font-weight:bold">ExecuteWorkflow</span>(OrderWorkflow{}.Execute, testOrder)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    require.<span style="color:#900;font-weight:bold">True</span>(t, env.<span style="color:#900;font-weight:bold">IsWorkflowCompleted</span>())
+</span></span><span style="display:flex;"><span>    require.<span style="color:#900;font-weight:bold">NoError</span>(t, env.<span style="color:#900;font-weight:bold">GetWorkflowError</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">TestOrderWorkflow_PaymentFailure</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>    testSuite <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>testsuite.WorkflowTestSuite{}
+</span></span><span style="display:flex;"><span>    env <span style="color:#000;font-weight:bold">:=</span> testSuite.<span style="color:#900;font-weight:bold">NewTestWorkflowEnvironment</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Mock successful inventory operations
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.VerifyInventory, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.ReserveInventory, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">&amp;</span>domain.InventoryReservation{
+</span></span><span style="display:flex;"><span>        OrderID: <span style="color:#d14">&#34;test-order&#34;</span>,
+</span></span><span style="display:flex;"><span>        Items: []domain.ReservedItem{{
+</span></span><span style="display:flex;"><span>            ProductID: <span style="color:#d14">&#34;test-product&#34;</span>,
+</span></span><span style="display:flex;"><span>            Quantity:  <span style="color:#099">1</span>,
+</span></span><span style="display:flex;"><span>        }},
+</span></span><span style="display:flex;"><span>    }, <span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Mock payment failure
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.ProcessPayment, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">nil</span>, errors.<span style="color:#900;font-weight:bold">New</span>(<span style="color:#d14">&#34;payment declined&#34;</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Expect compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    env.<span style="color:#900;font-weight:bold">OnActivity</span>(activities.ReleaseInventory, mock.Anything, mock.Anything).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Execute workflow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    env.<span style="color:#900;font-weight:bold">ExecuteWorkflow</span>(OrderWorkflow{}.Execute, testOrder)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    require.<span style="color:#900;font-weight:bold">True</span>(t, env.<span style="color:#900;font-weight:bold">IsWorkflowCompleted</span>())
+</span></span><span style="display:flex;"><span>    require.<span style="color:#900;font-weight:bold">Error</span>(t, env.<span style="color:#900;font-weight:bold">GetWorkflowError</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="running-our-system">Running Our System</h2>
+<p>To run this in development:</p>
+<ol>
+<li>Start Temporal Server (using Docker):</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>docker run --rm -p 7233:7233 temporalio/temporal-server:latest
+</span></span></code></pre></div><ol start="2">
+<li>Start our worker:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>go run cmd/worker/main.go
+</span></span></code></pre></div><ol start="3">
+<li>Start processing orders:</li>
+</ol>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// cmd/starter/main.go
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>    c, err <span style="color:#000;font-weight:bold">:=</span> client.<span style="color:#900;font-weight:bold">NewClient</span>(client.Options{})
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalln</span>(<span style="color:#d14">&#34;Unable to create client&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> c.<span style="color:#900;font-weight:bold">Close</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    orderID <span style="color:#000;font-weight:bold">:=</span> uuid.<span style="color:#900;font-weight:bold">New</span>().<span style="color:#900;font-weight:bold">String</span>()
+</span></span><span style="display:flex;"><span>    order <span style="color:#000;font-weight:bold">:=</span> domain.Order{
+</span></span><span style="display:flex;"><span>        ID:         orderID,
+</span></span><span style="display:flex;"><span>        CustomerID: <span style="color:#d14">&#34;customer-123&#34;</span>,
+</span></span><span style="display:flex;"><span>        Items: []domain.Item{
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                ProductID: <span style="color:#d14">&#34;GOLANG-BOOK&#34;</span>,
+</span></span><span style="display:flex;"><span>                Quantity:  <span style="color:#099">1</span>,
+</span></span><span style="display:flex;"><span>                Price:    <span style="color:#099">29.99</span>,
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>        TotalAmount: <span style="color:#099">29.99</span>,
+</span></span><span style="display:flex;"><span>        Status:     <span style="color:#d14">&#34;PENDING&#34;</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    workflowOptions <span style="color:#000;font-weight:bold">:=</span> client.StartWorkflowOptions{
+</span></span><span style="display:flex;"><span>        ID:        <span style="color:#d14">&#34;order-&#34;</span> <span style="color:#000;font-weight:bold">+</span> orderID,
+</span></span><span style="display:flex;"><span>        TaskQueue: <span style="color:#d14">&#34;order-saga-taskqueue&#34;</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    we, err <span style="color:#000;font-weight:bold">:=</span> c.<span style="color:#900;font-weight:bold">ExecuteWorkflow</span>(context.<span style="color:#900;font-weight:bold">Background</span>(), workflowOptions, workflows.OrderWorkflow{}.Execute, order)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Fatalln</span>(<span style="color:#d14">&#34;Unable to execute workflow&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Started workflow %s&#34;</span>, we.<span style="color:#900;font-weight:bold">GetID</span>())
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="what-weve-built">What We&rsquo;ve Built</h2>
+<p>We&rsquo;ve created a resilient order processing system that:</p>
+<ul>
+<li>Handles complex distributed transactions</li>
+<li>Properly compensates when things go wrong</li>
+<li>Is observable and debuggable</li>
+<li>Can survive system crashes and restarts</li>
+<li>Is testable and maintainable</li>
+</ul>
+<p>The best part? If something goes wrong, Temporal handles all the complex state management and compensation logic for us. It&rsquo;s like having a time machine for your transactions!</p>
+<h2 id="best-practices-and-common-pitfalls">Best Practices and Common Pitfalls</h2>
+<p>Remember in &ldquo;The Dark Knight&rdquo; when Bruce Wayne builds a system to track every phone in Gotham, but also builds in a self-destruct mechanism? That&rsquo;s what compensation actions are to your distributed transactions - they&rsquo;re your built-in self-destruct button when things go sideways. But like any powerful tool, they need to be designed with care and forethought.</p>
+<h3 id="the-philosophy-of-good-compensation">The Philosophy of Good Compensation</h3>
+<p>Compensation actions aren&rsquo;t just &ldquo;undo&rdquo; operations - they&rsquo;re more like &ldquo;restore balance to the universe&rdquo; operations. When designing compensation actions, consider these fundamental principles:</p>
+<ol>
+<li>
+<p><strong>The Isolation Principle</strong></p>
+<ul>
+<li>Each compensation action should be self-contained</li>
+<li>It should only rely on data that was available when the original action was performed</li>
+<li>Never assume the current state of the system matches what it was during the original action</li>
+</ul>
+</li>
+<li>
+<p><strong>The Time-Travel Paradox</strong></p>
+<ul>
+<li>Compensation actions might run minutes, hours, or even days after the original action</li>
+<li>The world might have changed dramatically in between</li>
+<li>Design compensations that acknowledge this temporal uncertainty</li>
+</ul>
+</li>
+<li>
+<p><strong>The Ripple Effect Awareness</strong></p>
+<ul>
+<li>Compensation actions might trigger cascading effects</li>
+<li>Consider the full impact on dependent systems</li>
+<li>Plan for the &ldquo;compensation of the compensation&rdquo; scenario</li>
+</ul>
+</li>
+</ol>
+<h3 id="compensation-patterns-in-the-real-world">Compensation Patterns in the Real World</h3>
+<p>During my time building capital structure management systems, we discovered several patterns that proved invaluable:</p>
+<ol>
+<li>
+<p><strong>The Snapshot Pattern</strong></p>
+<ul>
+<li>Capture all necessary data for compensation during the original action</li>
+<li>Store this data as part of the workflow state</li>
+<li>Use this snapshot for compensation rather than querying current state</li>
+</ul>
+</li>
+<li>
+<p><strong>The Audit Trail Pattern</strong></p>
+<ul>
+<li>Record every compensation attempt</li>
+<li>Include all relevant metadata (timing, reason, context)</li>
+<li>Make it easy to track the history of compensations</li>
+</ul>
+</li>
+<li>
+<p><strong>The Idempotency Shield</strong></p>
+<ul>
+<li>Design compensations to be safely retryable</li>
+<li>Use unique identifiers for each compensation action</li>
+<li>Maintain compensation attempt history</li>
+</ul>
+</li>
+</ol>
+<h2 id="the-art-of-timeout-management">The Art of Timeout Management</h2>
+<p>Timeouts in distributed systems are like speed limits on a highway - they&rsquo;re not just guidelines, they&rsquo;re survival mechanisms. But setting them requires careful consideration of various factors:</p>
+<h3 id="timeout-strategy-principles">Timeout Strategy Principles</h3>
+<ol>
+<li>
+<p><strong>The Context Principle</strong></p>
+<ul>
+<li>Different actions need different timeout windows</li>
+<li>Consider the nature of the operation</li>
+<li>Account for normal variation in response times</li>
+</ul>
+</li>
+<li>
+<p><strong>The Cascade Principle</strong></p>
+<ul>
+<li>Timeouts should be set in relation to each other</li>
+<li>Child operations should timeout before their parents</li>
+<li>Allow for retry attempts within the parent timeout</li>
+</ul>
+</li>
+<li>
+<p><strong>The Recovery Principle</strong></p>
+<ul>
+<li>Plan what happens when timeouts occur</li>
+<li>Define clear escalation paths</li>
+<li>Consider business impact of timeout vs. failure</li>
+</ul>
+</li>
+</ol>
+<h2 id="testing-philosophy-your-safety-net">Testing Philosophy: Your Safety Net</h2>
+<p>Testing distributed systems isn&rsquo;t just about finding bugs - it&rsquo;s about building confidence in your system&rsquo;s resilience. Let&rsquo;s break down the testing strategy from first principles:</p>
+<h3 id="why-test-first-in-saga-development">Why Test-First in Saga Development?</h3>
+<ol>
+<li>
+<p><strong>The Complexity Management Principle</strong></p>
+<ul>
+<li>Sagas are complex by nature</li>
+<li>Tests help document expected behavior</li>
+<li>They force you to think through edge cases early</li>
+</ul>
+</li>
+<li>
+<p><strong>The Feedback Loop Principle</strong></p>
+<ul>
+<li>Early testing shortens the feedback cycle</li>
+<li>Catches design issues before they&rsquo;re embedded</li>
+<li>Helps evolve the system architecture organically</li>
+</ul>
+</li>
+<li>
+<p><strong>The Confidence Building Principle</strong></p>
+<ul>
+<li>Tests provide a safety net for refactoring</li>
+<li>They document system behavior</li>
+<li>They serve as living documentation</li>
+</ul>
+</li>
+</ol>
+<h3 id="building-a-testing-strategy">Building a Testing Strategy</h3>
+<p>Start with these levels of testing:</p>
+<ol>
+<li>
+<p><strong>Unit Tests: The Foundation</strong></p>
+<ul>
+<li>Test individual activities in isolation</li>
+<li>Focus on business logic correctness</li>
+<li>Mock external dependencies</li>
+</ul>
+</li>
+<li>
+<p><strong>Integration Tests: The Reality Check</strong></p>
+<ul>
+<li>Test interaction between activities</li>
+<li>Verify compensation logic</li>
+<li>Test with real (or realistic) external services</li>
+</ul>
+</li>
+<li>
+<p><strong>Chaos Tests: The Stress Test</strong></p>
+<ul>
+<li>Deliberately introduce failures</li>
+<li>Test timeout handling</li>
+<li>Verify system resilience</li>
+</ul>
+</li>
+</ol>
+<h3 id="the-testing-maturity-model">The Testing Maturity Model</h3>
+<p>As your saga implementation matures, your testing should evolve through these stages:</p>
+<ol>
+<li>
+<p><strong>Basic Functionality Testing</strong></p>
+<ul>
+<li>Happy path scenarios</li>
+<li>Common error cases</li>
+<li>Basic compensation flows</li>
+</ul>
+</li>
+<li>
+<p><strong>Advanced Scenario Testing</strong></p>
+<ul>
+<li>Concurrent executions</li>
+<li>Partial failures</li>
+<li>Timeout scenarios</li>
+</ul>
+</li>
+<li>
+<p><strong>Production Simulation</strong></p>
+<ul>
+<li>Load testing</li>
+<li>Chaos engineering</li>
+<li>Long-running scenarios</li>
+</ul>
+</li>
+</ol>
+<h2 id="monitoring-and-observability-your-eyes-and-ears">Monitoring and Observability: Your Eyes and Ears</h2>
+<p>Monitoring distributed sagas is like being a detective - you need clues, evidence, and the ability to reconstruct what happened. Here&rsquo;s how to approach it:</p>
+<h3 id="the-three-pillars-of-observability">The Three Pillars of Observability</h3>
+<ol>
+<li>
+<p><strong>Logging Strategy</strong></p>
+<ul>
+<li>Use structured logging</li>
+<li>Include correlation IDs</li>
+<li>Log state transitions</li>
+</ul>
+</li>
+<li>
+<p><strong>Metrics Collection</strong></p>
+<ul>
+<li>Track activity durations</li>
+<li>Monitor compensation rates</li>
+<li>Measure end-to-end completion times</li>
+</ul>
+</li>
+<li>
+<p><strong>Tracing Implementation</strong></p>
+<ul>
+<li>Track saga progression</li>
+<li>Monitor activity relationships</li>
+<li>Visualize workflow paths</li>
+</ul>
+</li>
+</ol>
+<h3 id="key-monitoring-principles">Key Monitoring Principles</h3>
+<ol>
+<li>
+<p><strong>The Visibility Principle</strong></p>
+<ul>
+<li>Make system state obvious</li>
+<li>Track progress clearly</li>
+<li>Enable quick problem identification</li>
+</ul>
+</li>
+<li>
+<p><strong>The Debuggability Principle</strong></p>
+<ul>
+<li>Store enough context to debug issues</li>
+<li>Make it easy to trace failures</li>
+<li>Enable root cause analysis</li>
+</ul>
+</li>
+<li>
+<p><strong>The Business Impact Principle</strong></p>
+<ul>
+<li>Track business-relevant metrics</li>
+<li>Monitor SLA compliance</li>
+<li>Measure compensation frequency</li>
+</ul>
+</li>
+</ol>
+<h2 id="compensation-pattern-implementations">Compensation Pattern Implementations</h2>
+<h3 id="the-snapshot-pattern">The Snapshot Pattern</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// Implementing the snapshot pattern for compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">type</span> InvestmentActivity <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    investmentService <span style="color:#000;font-weight:bold">*</span>InvestmentService
+</span></span><span style="display:flex;"><span>    snapshotStore    <span style="color:#000;font-weight:bold">*</span>SnapshotStore
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> InvestmentSnapshot <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    ID              <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Amount          decimal.Decimal
+</span></span><span style="display:flex;"><span>    InvestorID      <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Timestamp       time.Time
+</span></span><span style="display:flex;"><span>    MarketPrice     decimal.Decimal
+</span></span><span style="display:flex;"><span>    OriginalRequest InvestmentRequest
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>InvestmentActivity) <span style="color:#900;font-weight:bold">ProcessInvestment</span>(ctx context.Context, req InvestmentRequest) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create snapshot before processing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    snapshot <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>InvestmentSnapshot{
+</span></span><span style="display:flex;"><span>        ID:              uuid.<span style="color:#900;font-weight:bold">New</span>().<span style="color:#900;font-weight:bold">String</span>(),
+</span></span><span style="display:flex;"><span>        Amount:          req.Amount,
+</span></span><span style="display:flex;"><span>        InvestorID:      req.InvestorID,
+</span></span><span style="display:flex;"><span>        Timestamp:       time.<span style="color:#900;font-weight:bold">Now</span>(),
+</span></span><span style="display:flex;"><span>        MarketPrice:     req.MarketPrice,
+</span></span><span style="display:flex;"><span>        OriginalRequest: req,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Store snapshot for potential compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> a.snapshotStore.<span style="color:#900;font-weight:bold">Save</span>(ctx, snapshot); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to save snapshot: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Proceed with investment processing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> a.investmentService.<span style="color:#900;font-weight:bold">Process</span>(ctx, req)
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>InvestmentActivity) <span style="color:#900;font-weight:bold">CompensateInvestment</span>(ctx context.Context, snapshotID <span style="color:#458;font-weight:bold">string</span>) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Retrieve the snapshot for compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    snapshot, err <span style="color:#000;font-weight:bold">:=</span> a.snapshotStore.<span style="color:#900;font-weight:bold">Get</span>(ctx, snapshotID)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to retrieve snapshot: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Use snapshot data for compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> a.investmentService.<span style="color:#900;font-weight:bold">Reverse</span>(ctx, ReversalRequest{
+</span></span><span style="display:flex;"><span>        OriginalID:    snapshot.ID,
+</span></span><span style="display:flex;"><span>        Amount:        snapshot.Amount,
+</span></span><span style="display:flex;"><span>        InvestorID:    snapshot.InvestorID,
+</span></span><span style="display:flex;"><span>        OriginalPrice: snapshot.MarketPrice,
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="the-audit-trail-pattern">The Audit Trail Pattern</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> CompensationAudit <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    ID            <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    SnapshotID    <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    ActivityType  <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Timestamp     time.Time
+</span></span><span style="display:flex;"><span>    Status        <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    ErrorMessage  <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    AttemptCount  <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>    CompletedAt   <span style="color:#000;font-weight:bold">*</span>time.Time
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> AuditedActivity <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    baseActivity    Activity
+</span></span><span style="display:flex;"><span>    auditStore     <span style="color:#000;font-weight:bold">*</span>AuditStore
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>AuditedActivity) <span style="color:#900;font-weight:bold">ExecuteWithAudit</span>(ctx context.Context, input ActivityInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    audit <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>CompensationAudit{
+</span></span><span style="display:flex;"><span>        ID:           uuid.<span style="color:#900;font-weight:bold">New</span>().<span style="color:#900;font-weight:bold">String</span>(),
+</span></span><span style="display:flex;"><span>        ActivityType: activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name,
+</span></span><span style="display:flex;"><span>        Timestamp:    time.<span style="color:#900;font-weight:bold">Now</span>(),
+</span></span><span style="display:flex;"><span>        Status:       <span style="color:#d14">&#34;STARTED&#34;</span>,
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Record start of compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> a.auditStore.<span style="color:#900;font-weight:bold">Create</span>(ctx, audit); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to create audit record: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Execute the actual compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    err <span style="color:#000;font-weight:bold">:=</span> a.baseActivity.<span style="color:#900;font-weight:bold">Execute</span>(ctx, input)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Update audit record
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    now <span style="color:#000;font-weight:bold">:=</span> time.<span style="color:#900;font-weight:bold">Now</span>()
+</span></span><span style="display:flex;"><span>    audit.CompletedAt = <span style="color:#000;font-weight:bold">&amp;</span>now
+</span></span><span style="display:flex;"><span>    audit.Status = <span style="color:#d14">&#34;COMPLETED&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        audit.Status = <span style="color:#d14">&#34;FAILED&#34;</span>
+</span></span><span style="display:flex;"><span>        audit.ErrorMessage = err.<span style="color:#900;font-weight:bold">Error</span>()
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> updateErr <span style="color:#000;font-weight:bold">:=</span> a.auditStore.<span style="color:#900;font-weight:bold">Update</span>(ctx, audit); updateErr <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx).<span style="color:#900;font-weight:bold">Error</span>(<span style="color:#d14">&#34;Failed to update audit record&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;error&#34;</span>, updateErr,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;audit_id&#34;</span>, audit.ID)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="the-idempotency-shield-pattern">The Idempotency Shield Pattern</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> IdempotentActivity <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    baseActivity     Activity
+</span></span><span style="display:flex;"><span>    idempotencyStore <span style="color:#000;font-weight:bold">*</span>IdempotencyStore
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> IdempotencyRecord <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    Key           <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    ActivityType  <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Status        <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    Result        <span style="color:#000;font-weight:bold">interface</span>{}
+</span></span><span style="display:flex;"><span>    FirstAttempt  time.Time
+</span></span><span style="display:flex;"><span>    LastAttempt   time.Time
+</span></span><span style="display:flex;"><span>    AttemptCount  <span style="color:#458;font-weight:bold">int</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>IdempotentActivity) <span style="color:#900;font-weight:bold">Execute</span>(ctx context.Context, input ActivityInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create idempotency key from input
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    key <span style="color:#000;font-weight:bold">:=</span> fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;%s:%s:%s&#34;</span>,
+</span></span><span style="display:flex;"><span>        activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name,
+</span></span><span style="display:flex;"><span>        input.OrderID,
+</span></span><span style="display:flex;"><span>        input.RequestID)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Check for existing execution
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    record, err <span style="color:#000;font-weight:bold">:=</span> a.idempotencyStore.<span style="color:#900;font-weight:bold">Get</span>(ctx, key)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">==</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Already executed
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">if</span> record.Status <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;COMPLETED&#34;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> record.Status <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;FAILED&#34;</span> {
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;previous attempt failed: %s&#34;</span>, record.Error)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create or update idempotency record
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    record = <span style="color:#000;font-weight:bold">&amp;</span>IdempotencyRecord{
+</span></span><span style="display:flex;"><span>        Key:          key,
+</span></span><span style="display:flex;"><span>        ActivityType: activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name,
+</span></span><span style="display:flex;"><span>        Status:       <span style="color:#d14">&#34;IN_PROGRESS&#34;</span>,
+</span></span><span style="display:flex;"><span>        FirstAttempt: time.<span style="color:#900;font-weight:bold">Now</span>(),
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> a.idempotencyStore.<span style="color:#900;font-weight:bold">Save</span>(ctx, record); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> fmt.<span style="color:#900;font-weight:bold">Errorf</span>(<span style="color:#d14">&#34;failed to save idempotency record: %w&#34;</span>, err)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Execute activity
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    err = a.baseActivity.<span style="color:#900;font-weight:bold">Execute</span>(ctx, input)
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Update record with result
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    record.LastAttempt = time.<span style="color:#900;font-weight:bold">Now</span>()
+</span></span><span style="display:flex;"><span>    record.AttemptCount<span style="color:#000;font-weight:bold">++</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        record.Status = <span style="color:#d14">&#34;FAILED&#34;</span>
+</span></span><span style="display:flex;"><span>        record.Error = err.<span style="color:#900;font-weight:bold">Error</span>()
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        record.Status = <span style="color:#d14">&#34;COMPLETED&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Save final status
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span> updateErr <span style="color:#000;font-weight:bold">:=</span> a.idempotencyStore.<span style="color:#900;font-weight:bold">Save</span>(ctx, record); updateErr <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        activity.<span style="color:#900;font-weight:bold">GetLogger</span>(ctx).<span style="color:#900;font-weight:bold">Error</span>(<span style="color:#d14">&#34;Failed to update idempotency record&#34;</span>,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;error&#34;</span>, updateErr,
+</span></span><span style="display:flex;"><span>            <span style="color:#d14">&#34;key&#34;</span>, key)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="testing-strategy-implementation">Testing Strategy Implementation</h2>
+<h3 id="unit-testing-with-principles">Unit Testing with Principles</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">TestInvestmentActivity</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Following the Testing Maturity Model
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Stage 1: Basic Functionality Testing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    t.<span style="color:#900;font-weight:bold">Run</span>(<span style="color:#d14">&#34;basic_functionality&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>        tests <span style="color:#000;font-weight:bold">:=</span> []<span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>            name    <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>            input   InvestmentRequest
+</span></span><span style="display:flex;"><span>            setup   <span style="color:#000;font-weight:bold">func</span>(<span style="color:#000;font-weight:bold">*</span>mockInvestmentService)
+</span></span><span style="display:flex;"><span>            verify  <span style="color:#000;font-weight:bold">func</span>(<span style="color:#000;font-weight:bold">*</span>testing.T, <span style="color:#458;font-weight:bold">error</span>)
+</span></span><span style="display:flex;"><span>            wantErr <span style="color:#458;font-weight:bold">bool</span>
+</span></span><span style="display:flex;"><span>        }{
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                name: <span style="color:#d14">&#34;successful investment&#34;</span>,
+</span></span><span style="display:flex;"><span>                input: InvestmentRequest{
+</span></span><span style="display:flex;"><span>                    Amount: decimal.<span style="color:#900;font-weight:bold">NewFromInt</span>(<span style="color:#099">1000</span>),
+</span></span><span style="display:flex;"><span>                    InvestorID: <span style="color:#d14">&#34;inv-123&#34;</span>,
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                setup: <span style="color:#000;font-weight:bold">func</span>(m <span style="color:#000;font-weight:bold">*</span>mockInvestmentService) {
+</span></span><span style="display:flex;"><span>                    m.<span style="color:#900;font-weight:bold">EXPECT</span>().<span style="color:#900;font-weight:bold">Process</span>(mock.<span style="color:#900;font-weight:bold">Any</span>(), mock.<span style="color:#900;font-weight:bold">Any</span>()).<span style="color:#900;font-weight:bold">Return</span>(<span style="color:#000;font-weight:bold">nil</span>)
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>                verify: <span style="color:#000;font-weight:bold">func</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T, err <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>                    assert.<span style="color:#900;font-weight:bold">NoError</span>(t, err)
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// Add more basic test cases...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Execute tests...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Stage 2: Advanced Scenario Testing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    t.<span style="color:#900;font-weight:bold">Run</span>(<span style="color:#d14">&#34;advanced_scenarios&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>        tests <span style="color:#000;font-weight:bold">:=</span> []<span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>            name    <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>            input   InvestmentRequest
+</span></span><span style="display:flex;"><span>            setup   <span style="color:#000;font-weight:bold">func</span>(<span style="color:#000;font-weight:bold">*</span>mockInvestmentService)
+</span></span><span style="display:flex;"><span>            verify  <span style="color:#000;font-weight:bold">func</span>(<span style="color:#000;font-weight:bold">*</span>testing.T, <span style="color:#458;font-weight:bold">error</span>)
+</span></span><span style="display:flex;"><span>        }{
+</span></span><span style="display:flex;"><span>            {
+</span></span><span style="display:flex;"><span>                name: <span style="color:#d14">&#34;concurrent investments&#34;</span>,
+</span></span><span style="display:flex;"><span>                input: InvestmentRequest{Amount: decimal.<span style="color:#900;font-weight:bold">NewFromInt</span>(<span style="color:#099">1000</span>)},
+</span></span><span style="display:flex;"><span>                setup: <span style="color:#000;font-weight:bold">func</span>(m <span style="color:#000;font-weight:bold">*</span>mockInvestmentService) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">// Setup concurrent scenario
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>                },
+</span></span><span style="display:flex;"><span>                verify: <span style="color:#000;font-weight:bold">func</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T, err <span style="color:#458;font-weight:bold">error</span>) {
+</span></span><span style="display:flex;"><span>                    <span style="color:#998;font-style:italic">// Verify concurrent execution
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>            <span style="color:#998;font-style:italic">// Add more advanced test cases...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        }
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Execute tests...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    })
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h3 id="integration-testing-with-real-dependencies">Integration Testing with Real Dependencies</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">TestInvestmentSaga_Integration</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> testing.<span style="color:#900;font-weight:bold">Short</span>() {
+</span></span><span style="display:flex;"><span>        t.<span style="color:#900;font-weight:bold">Skip</span>(<span style="color:#d14">&#34;skipping integration test&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Set up test environment
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    ctx <span style="color:#000;font-weight:bold">:=</span> context.<span style="color:#900;font-weight:bold">Background</span>()
+</span></span><span style="display:flex;"><span>    testEnv <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">newTestEnvironment</span>(t)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">defer</span> testEnv.<span style="color:#900;font-weight:bold">Cleanup</span>()
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Test complete saga flow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    t.<span style="color:#900;font-weight:bold">Run</span>(<span style="color:#d14">&#34;complete_investment_flow&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Arrange
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        saga <span style="color:#000;font-weight:bold">:=</span> testEnv.<span style="color:#900;font-weight:bold">NewInvestmentSaga</span>()
+</span></span><span style="display:flex;"><span>        input <span style="color:#000;font-weight:bold">:=</span> InvestmentInput{
+</span></span><span style="display:flex;"><span>            Amount:     decimal.<span style="color:#900;font-weight:bold">NewFromInt</span>(<span style="color:#099">1000</span>),
+</span></span><span style="display:flex;"><span>            InvestorID: <span style="color:#d14">&#34;test-investor&#34;</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Act
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        result, err <span style="color:#000;font-weight:bold">:=</span> saga.<span style="color:#900;font-weight:bold">Execute</span>(ctx, input)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Assert
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        assert.<span style="color:#900;font-weight:bold">NoError</span>(t, err)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">assertSagaCompletedSuccessfully</span>(t, result)
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Test compensation flow
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    t.<span style="color:#900;font-weight:bold">Run</span>(<span style="color:#d14">&#34;compensation_flow&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(t <span style="color:#000;font-weight:bold">*</span>testing.T) {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Arrange
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        saga <span style="color:#000;font-weight:bold">:=</span> testEnv.<span style="color:#900;font-weight:bold">NewInvestmentSaga</span>()
+</span></span><span style="display:flex;"><span>        input <span style="color:#000;font-weight:bold">:=</span> InvestmentInput{
+</span></span><span style="display:flex;"><span>            Amount:     decimal.<span style="color:#900;font-weight:bold">NewFromInt</span>(<span style="color:#099">1000</span>),
+</span></span><span style="display:flex;"><span>            InvestorID: <span style="color:#d14">&#34;test-investor&#34;</span>,
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Inject failure to trigger compensation
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        testEnv.<span style="color:#900;font-weight:bold">InjectFailure</span>(<span style="color:#d14">&#34;payment_processing&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Act
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        _, err <span style="color:#000;font-weight:bold">:=</span> saga.<span style="color:#900;font-weight:bold">Execute</span>(ctx, input)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Assert
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        assert.<span style="color:#900;font-weight:bold">Error</span>(t, err)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">assertCompensationExecutedCorrectly</span>(t, saga)
+</span></span><span style="display:flex;"><span>    })
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="monitoring-implementation">Monitoring Implementation</h2>
+<h3 id="structured-logging">Structured Logging</h3>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> MonitoredActivity <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    baseActivity Activity
+</span></span><span style="display:flex;"><span>    logger      <span style="color:#000;font-weight:bold">*</span>zap.Logger
+</span></span><span style="display:flex;"><span>    metrics     <span style="color:#000;font-weight:bold">*</span>MetricsClient
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (a <span style="color:#000;font-weight:bold">*</span>MonitoredActivity) <span style="color:#900;font-weight:bold">Execute</span>(ctx context.Context, input ActivityInput) <span style="color:#458;font-weight:bold">error</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Create activity-specific logger
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    activityLogger <span style="color:#000;font-weight:bold">:=</span> a.logger.<span style="color:#900;font-weight:bold">With</span>(
+</span></span><span style="display:flex;"><span>        zap.<span style="color:#900;font-weight:bold">String</span>(<span style="color:#d14">&#34;activity_id&#34;</span>, activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityID),
+</span></span><span style="display:flex;"><span>        zap.<span style="color:#900;font-weight:bold">String</span>(<span style="color:#d14">&#34;workflow_id&#34;</span>, activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).WorkflowExecution.ID),
+</span></span><span style="display:flex;"><span>        zap.<span style="color:#900;font-weight:bold">String</span>(<span style="color:#d14">&#34;activity_type&#34;</span>, activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name),
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Start timing
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    start <span style="color:#000;font-weight:bold">:=</span> time.<span style="color:#900;font-weight:bold">Now</span>()
+</span></span><span style="display:flex;"><span>    activityLogger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Starting activity execution&#34;</span>,
+</span></span><span style="display:flex;"><span>        zap.<span style="color:#900;font-weight:bold">Any</span>(<span style="color:#d14">&#34;input&#34;</span>, input),
+</span></span><span style="display:flex;"><span>        zap.<span style="color:#900;font-weight:bold">Int</span>(<span style="color:#d14">&#34;attempt&#34;</span>, activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).Attempt))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Execute activity
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    err <span style="color:#000;font-weight:bold">:=</span> a.baseActivity.<span style="color:#900;font-weight:bold">Execute</span>(ctx, input)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Record metrics and logs
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    duration <span style="color:#000;font-weight:bold">:=</span> time.<span style="color:#900;font-weight:bold">Since</span>(start)
+</span></span><span style="display:flex;"><span>    a.metrics.<span style="color:#900;font-weight:bold">RecordActivityDuration</span>(
+</span></span><span style="display:flex;"><span>        activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name,
+</span></span><span style="display:flex;"><span>        duration.<span style="color:#900;font-weight:bold">Seconds</span>(),
+</span></span><span style="display:flex;"><span>    )
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        activityLogger.<span style="color:#900;font-weight:bold">Error</span>(<span style="color:#d14">&#34;Activity execution failed&#34;</span>,
+</span></span><span style="display:flex;"><span>            zap.<span style="color:#900;font-weight:bold">Error</span>(err),
+</span></span><span style="display:flex;"><span>            zap.<span style="color:#900;font-weight:bold">Duration</span>(<span style="color:#d14">&#34;duration&#34;</span>, duration))
+</span></span><span style="display:flex;"><span>        a.metrics.<span style="color:#900;font-weight:bold">IncrementActivityFailure</span>(
+</span></span><span style="display:flex;"><span>            activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> err
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    activityLogger.<span style="color:#900;font-weight:bold">Info</span>(<span style="color:#d14">&#34;Activity completed successfully&#34;</span>,
+</span></span><span style="display:flex;"><span>        zap.<span style="color:#900;font-weight:bold">Duration</span>(<span style="color:#d14">&#34;duration&#34;</span>, duration))
+</span></span><span style="display:flex;"><span>    a.metrics.<span style="color:#900;font-weight:bold">IncrementActivitySuccess</span>(
+</span></span><span style="display:flex;"><span>        activity.<span style="color:#900;font-weight:bold">GetInfo</span>(ctx).ActivityType.Name)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">nil</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h2 id="the-journey-so-far">The Journey So Far</h2>
+<p>Remember when we started this journey, comparing distributed transactions to ordering that complex &ldquo;Distributed Mocha Supreme&rdquo; at a coffee shop? Well, now you&rsquo;re not just a customer - you&rsquo;re the master barista orchestrating the whole show. Through our exploration of Sagas and Temporal, we&rsquo;ve transformed what could be a chaotic juggling act into a well-choreographed performance.</p>
+<h2 id="when-to-use-and-when-not-to-use-the-saga-pattern">When to Use (and When Not to Use) the Saga Pattern</h2>
+<h3 id="perfect-use-cases-for-sagas">Perfect Use Cases for Sagas:</h3>
+<ol>
+<li>
+<p><strong>Complex Business Workflows</strong></p>
+<ul>
+<li>E-commerce order processing</li>
+<li>Financial transactions (like our capital structure management example)</li>
+<li>Travel booking systems</li>
+<li>Supply chain operations</li>
+</ul>
+</li>
+<li>
+<p><strong>Long-Running Processes</strong></p>
+<ul>
+<li>Document processing pipelines</li>
+<li>Multi-stage approval workflows</li>
+<li>Resource provisioning sequences</li>
+</ul>
+</li>
+<li>
+<p><strong>Cross-Service Transactions</strong></p>
+<ul>
+<li>Payment processing with inventory management</li>
+<li>User registration with multiple subsystems</li>
+<li>Data synchronization across platforms</li>
+</ul>
+</li>
+</ol>
+<h3 id="when-to-think-twice">When to Think Twice:</h3>
+<ol>
+<li>
+<p><strong>Simple CRUD Operations</strong></p>
+<ul>
+<li>Single-service data updates</li>
+<li>Read-only operations</li>
+<li>Stateless transactions</li>
+</ul>
+</li>
+<li>
+<p><strong>Strong Consistency Requirements</strong></p>
+<ul>
+<li>Real-time financial trading</li>
+<li>Database replication</li>
+<li>Immediate consistency needs</li>
+</ul>
+</li>
+<li>
+<p><strong>High-Performance, Low-Latency Requirements</strong></p>
+<ul>
+<li>Real-time gaming</li>
+<li>Live streaming</li>
+<li>High-frequency trading</li>
+</ul>
+</li>
+</ol>
+<h2 id="real-world-success-stories">Real-World Success Stories</h2>
+<p>During my time building complex systems, I&rsquo;ve seen Saga patterns transform seemingly impossible requirements into manageable solutions:</p>
+<ol>
+<li>
+<p><strong>The Capital Structure Management Victory</strong></p>
+<ul>
+<li>Challenge: Complex financial workflows with multiple third-party integrations</li>
+<li>Solution: Saga pattern with Temporal for orchestration</li>
+<li>Result: Reduced error rates by 90% and improved transaction visibility</li>
+</ul>
+</li>
+<li>
+<p><strong>The E-commerce Evolution</strong></p>
+<ul>
+<li>Challenge: Inconsistent order states during high-load periods</li>
+<li>Solution: Implemented compensating transactions with idempotency</li>
+<li>Result: Achieved 99.99% order consistency</li>
+</ul>
+</li>
+<li>
+<p><strong>The Document Processing Revolution</strong></p>
+<ul>
+<li>Challenge: Long-running workflows with frequent failures</li>
+<li>Solution: Temporal-based saga with robust compensation</li>
+<li>Result: Reduced manual intervention by 85%</li>
+</ul>
+</li>
+</ol>
+<p><em>&ldquo;The only way to make sense out of change is to plunge into it, move with it, and join the dance.&rdquo; - Alan Watts</em></p>
+<hr>
+<p>This journey doesn&rsquo;t end here. Keep exploring, keep building, and most importantly, keep learning. The distributed systems world is constantly evolving, and now you&rsquo;re equipped to evolve with it.</p>
+<p>Feel free to reach out  if you want to discuss more advanced patterns or share your own saga success stories. After all, the best distributed systems are built on shared knowledge and experience.</p>
+<p>Now, go make those microservices dance! 🚀</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2024 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

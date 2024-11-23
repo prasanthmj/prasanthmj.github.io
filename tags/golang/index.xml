@@ -7,7 +7,16 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 22 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/golang/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Implementing Saga Pattern with Temporal in Go Microservices: Journey Through Distributed Transactions</title>
+      <link>/microservices/saga-pattern-using-temporal-and-go/</link>
+      <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
+      
+      <guid>/microservices/saga-pattern-using-temporal-and-go/</guid>
+      <description>Picture this: You&amp;rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&amp;rsquo;s call it the &amp;ldquo;Distributed Mocha Supreme&amp;rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&amp;rsquo;s going great until—oops!—they&amp;rsquo;re out of whipped cream. Now what? Do they throw away everything they&amp;rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval?</description>
+    </item>
+    
     <item>
       <title>Building a simple query parser using PEG in Go</title>
       <link>/go/peg-parser-in-go/</link>

@@ -34,6 +34,7 @@
     
 </ul>
   
+<p><img src="../images/gphers-1.webp" alt="concurrent go out of control"></p>
 <p>Remember when you first dipped your toes into the world of concurrent programming? If you&rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&rsquo;s the thing: in today&rsquo;s tech landscape, mastering concurrency isn&rsquo;t just a cool party trick—it&rsquo;s becoming as essential as knowing how to loop.</p>
 <p>Enter Go (or Golang, if you&rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &ldquo;concurrency made easy!&rdquo; And you know what? For the most part, it delivered. Go&rsquo;s goroutines and channels made concurrent programming feel less like rocket science and more like, well, actual programming.</p>
 <p>But here&rsquo;s where it gets interesting. As we&rsquo;ve pushed Go into more complex, real-world scenarios, we&rsquo;ve started to see the limitations of its out-of-the-box concurrency tools. Don&rsquo;t get me wrong—goroutines and channels are fantastic. They&rsquo;re like the Swiss Army knife of concurrency. But sometimes, you need a whole toolbox.</p>
@@ -133,6 +134,7 @@
 </span></span></code></pre></div><p>Sure, this looks clean. It&rsquo;s concise. It&rsquo;s even kind of elegant. But it&rsquo;s also a ticking time bomb.</p>
 <p>Here&rsquo;s the deal: each of those goroutines is like a tiny worker. They&rsquo;re eager, they&rsquo;re ready to go, but they&rsquo;re also a bit&hellip; chaotic. They all start at once, fighting for CPU time and memory. It&rsquo;s like opening the doors on Black Friday — you might get trampled in the rush.</p>
 <p>What we need is a way to control the chaos. To say, &ldquo;Hey, let&rsquo;s process these pixels, but let&rsquo;s do it in a controlled, manageable way.&rdquo; That&rsquo;s where more advanced patterns come in.</p>
+<p><img src="../images/gphers-2.webp" alt=""></p>
 <h3 id="42-the-problem-of-unbounded-concurrency">4.2 The problem of unbounded concurrency</h3>
 <p>Now, let&rsquo;s talk about boundaries — or rather, the lack thereof. When you&rsquo;re creating goroutines willy-nilly, you&rsquo;re essentially writing a blank check for your system resources.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">processOrders</span>(orders []Order) {
@@ -378,6 +380,7 @@
 <p>But wait, there&rsquo;s more! In the next chapter, we&rsquo;ll explore how to evolve this basic worker pool to handle more complex scenarios. We&rsquo;ll add features like dynamic scaling, graceful shutdown, and more. It&rsquo;s going to be a wild ride, so buckle up!</p>
 <p>Remember, concurrency in Go is like a superpower. And with great power comes great responsibility&hellip; and really cool worker pools.</p>
 <h1 id="7-advanced-worker-pool-design">7. Advanced Worker Pool Design</h1>
+<p><img src="images/gopher-6.webp" alt=""></p>
 <p>Alright, code warriors, ready to take our worker pool to the next level? We&rsquo;ve got the basics down, but now it&rsquo;s time to soup up our concurrent code machine. We&rsquo;re talking dynamic scaling, graceful shutdowns, and error handling that&rsquo;ll make your fellow devs weep with joy. Buckle up!</p>
 <h2 id="71-dynamic-scaling-of-worker-count">7.1 Dynamic Scaling of Worker Count</h2>
 <p>Remember how we hardcoded the number of workers in our basic pool? Well, that&rsquo;s like buying shoes that never grow - it works for a while, but eventually, you&rsquo;re gonna get some painful pinching. Let&rsquo;s make our worker pool more flexible:</p>

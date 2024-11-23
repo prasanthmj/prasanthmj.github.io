@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Concurrency on Prasanth Janardhanan</title>
-    <link>/tags/concurrency/</link>
-    <description>Recent content in Concurrency on Prasanth Janardhanan</description>
+    <title>saga pattern on Prasanth Janardhanan</title>
+    <link>/tags/saga-pattern/</link>
+    <description>Recent content in saga pattern on Prasanth Janardhanan</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Fri, 22 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/concurrency/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 22 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/saga-pattern/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Implementing Saga Pattern with Temporal in Go Microservices: Journey Through Distributed Transactions</title>
       <link>/microservices/saga-pattern-using-temporal-and-go/</link>
@@ -15,16 +15,6 @@
       
       <guid>/microservices/saga-pattern-using-temporal-and-go/</guid>
       <description>Picture this: You&amp;rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&amp;rsquo;s call it the &amp;ldquo;Distributed Mocha Supreme&amp;rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&amp;rsquo;s going great until—oops!—they&amp;rsquo;re out of whipped cream. Now what? Do they throw away everything they&amp;rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval?</description>
-    </item>
-    
-    <item>
-      <title>The Evolution of Concurrency Patterns in Go: From Goroutines to Advanced Worker Pools</title>
-      <link>/go/concurrency-and-worker-pools/</link>
-      <pubDate>Wed, 10 Jul 2024 00:00:00 +0000</pubDate>
-      
-      <guid>/go/concurrency-and-worker-pools/</guid>
-      <description>Remember when you first dipped your toes into the world of concurrent programming? If you&amp;rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&amp;rsquo;s the thing: in today&amp;rsquo;s tech landscape, mastering concurrency isn&amp;rsquo;t just a cool party trick—it&amp;rsquo;s becoming as essential as knowing how to loop.
-Enter Go (or Golang, if you&amp;rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &amp;ldquo;concurrency made easy!</description>
     </item>
     
   </channel>
