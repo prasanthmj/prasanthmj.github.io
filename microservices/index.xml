@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Mon, 25 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/microservices/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 28 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/microservices/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building a Reliable ETL System with Go and Temporal: When Data Needs to Move Like a Marvel Superhero 🦸‍♂️</title>
+      <link>/microservices/etl-go-temporal/</link>
+      <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
+      
+      <guid>/microservices/etl-go-temporal/</guid>
+      <description>Ever tried moving your entire apartment through a drinking straw? That&amp;rsquo;s basically what building ETL (Extract, Transform, Load) systems feels like sometimes. You&amp;rsquo;ve got terabytes of data that need to go from Point A to Point B, transform from one shape to another along the way, and arrive without losing a single byte. Oh, and it needs to happen yesterday.
+As a backend engineer who&amp;rsquo;s battled these challenges at scale, I&amp;rsquo;ve learned that building reliable ETL systems is less about writing perfect code (though that helps) and more about preparing for everything that could possibly go wrong.</description>
+    </item>
+    
     <item>
       <title>Your Legacy System is Trying to Tell You Something (And It&#39;s Not &#39;Please Reboot&#39;)</title>
       <link>/microservices/legacy-systems-to-microservices/</link>
