@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SystemModernization on Prasanth Janardhanan</title>
+    <link>/tags/systemmodernization/</link>
+    <description>Recent content in SystemModernization on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Mon, 25 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/systemmodernization/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Your Legacy System is Trying to Tell You Something (And It&#39;s Not &#39;Please Reboot&#39;)</title>
+      <link>/microservices/legacy-systems-to-microservices/</link>
+      <pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
+      
+      <guid>/microservices/legacy-systems-to-microservices/</guid>
+      <description>You know that uneasy feeling when your car makes a noise it&amp;rsquo;s definitely not supposed to make? That moment when you turn down the radio, tilt your head, and think, &amp;ldquo;Maybe if I ignore it, it&amp;rsquo;ll go away&amp;rdquo;? Well, your legacy system is making those noises right now, and trust me – it won&amp;rsquo;t go away by itself.
+I&amp;rsquo;ve spent the last 15 years listening to legacy systems whisper (and sometimes scream) their stories.</description>
+    </item>
+    
+  </channel>
+</rss>
