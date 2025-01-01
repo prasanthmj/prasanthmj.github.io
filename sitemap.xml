@@ -2,6 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>/ai/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/tags/chatgpt/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/tags/claude/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/tags/mcp/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/tags/model-context-protocol/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/ai/mcp/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
+    <loc>/tags/</loc>
+    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+  </url><url>
     <loc>/microservices/etl-go-temporal/</loc>
     <lastmod>2024-11-28T00:00:00+00:00</lastmod>
   </url><url>
@@ -17,13 +41,7 @@
     <loc>/microservices/</loc>
     <lastmod>2024-11-28T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>/</loc>
-    <lastmod>2024-11-28T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>/tags/softwarearchitecture/</loc>
-    <lastmod>2024-11-28T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/</loc>
     <lastmod>2024-11-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/temporal/</loc>
@@ -65,9 +83,6 @@
     <loc>/tags/worker-pools/</loc>
     <lastmod>2024-07-10T00:00:00+00:00</lastmod>
   </url><url>
-    <loc>/ai/</loc>
-    <lastmod>2024-05-07T00:00:00+00:00</lastmod>
-  </url><url>
     <loc>/tags/chatgpt-4o/</loc>
     <lastmod>2024-05-07T00:00:00+00:00</lastmod>
   </url><url>
@@ -108,9 +123,6 @@
     <lastmod>2024-05-06T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/chain-of-thought/</loc>
-    <lastmod>2024-03-25T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/chatgpt/</loc>
     <lastmod>2024-03-25T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/ai/chain-of-thought/</loc>

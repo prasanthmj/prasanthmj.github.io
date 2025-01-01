@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Model Context Protocol on Prasanth Janardhanan</title>
+    <link>/tags/model-context-protocol/</link>
+    <description>Recent content in Model Context Protocol on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Sat, 28 Dec 2024 10:42:12 +0000</lastBuildDate><atom:link href="/tags/model-context-protocol/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Model Context Protocol (MCP): Building Bridges Between AI and Your World</title>
+      <link>/ai/mcp/</link>
+      <pubDate>Sat, 28 Dec 2024 10:42:12 +0000</pubDate>
+      
+      <guid>/ai/mcp/</guid>
+      <description>Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.
+Enter the Model Context Protocol (MCP) - think of it as giving your AI assistant a complete office setup instead of just a mailbox.</description>
+    </item>
+    
+  </channel>
+</rss>
