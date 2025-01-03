@@ -3,39 +3,42 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>/ai/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/chatgpt/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/claude/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
+  </url><url>
+    <loc>/tags/go/</loc>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
+  </url><url>
+    <loc>/tags/golang/</loc>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/mcp/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/model-context-protocol/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
-    <loc>/ai/mcp/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <loc>/ai/mcp-go/</loc>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/</loc>
-    <lastmod>2024-12-28T10:42:12+00:00</lastmod>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/</loc>
+    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
+  </url><url>
+    <loc>/ai/mcp/</loc>
     <lastmod>2024-12-28T10:42:12+00:00</lastmod>
   </url><url>
     <loc>/microservices/etl-go-temporal/</loc>
     <lastmod>2024-11-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/etl/</loc>
-    <lastmod>2024-11-28T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/go/</loc>
-    <lastmod>2024-11-28T00:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/golang/</loc>
     <lastmod>2024-11-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>/microservices/</loc>

@@ -7,7 +7,17 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Sat, 28 Dec 2024 10:42:12 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 02 Jan 2025 09:55:45 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Model Context Protocol (MCP): Lets Implement an MCP server in Go</title>
+      <link>/ai/mcp-go/</link>
+      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
+      
+      <guid>/ai/mcp-go/</guid>
+      <description>Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.
+While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks.</description>
+    </item>
+    
     <item>
       <title>Model Context Protocol (MCP): Building Bridges Between AI and Your World</title>
       <link>/ai/mcp/</link>

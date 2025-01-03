@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Model Context Protocol (MCP): Lets Implement an MCP server in Go </title><meta name="keywords" content="claude, chatgpt, mcp, Model Context Protocol, go, golang" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Model Context Protocol (MCP): Lets Implement an MCP server in Go</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/claude" class="text-gray-600">claude</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/chatgpt" class="text-gray-600">chatgpt</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/mcp" class="text-gray-600">mcp</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/model-context-protocol" class="text-gray-600">Model Context Protocol</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/go" class="text-gray-600">go</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+</ul>
+  
+<p>Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&rsquo;re witnessing fast-paced development in MCP tools and components.</p>
+<p>While a detailed introduction to MCP was covered in our previous post, here&rsquo;s a quick refresher: MCP  servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks. The protocol standardizes how these components communicate, making it easy to build interoperable AI-powered applications.</p>
+<p>Let&rsquo;s embark on creating an MCP server in Go. Why Go? There are several compelling reasons:</p>
+<ul>
+<li>Most existing MCP frameworks are built in Node.js and Python</li>
+<li>Taking the &ldquo;MCP server the hard way&rdquo; approach helps us understand the raw protocol better</li>
+<li>Go&rsquo;s ability to compile to a single binary makes distribution much easier compared to Node.js or Python solutions that require managing dependencies</li>
+<li>Go&rsquo;s strong type system and excellent concurrency support make it ideal for building robust servers</li>
+</ul>
+<p>Lets build an image generation server that connects to Stable Diffusion APIs.</p>
+<p>Once ready, this is what we can do with this MCP server + Claude Desktop:</p>
+<p><img src="../images/generate-garden.png" alt="generate a garden image prompt"></p>
+<p>Result:
+<img src="../images/A-serene-and-beautiful.webp" alt="garden image generated"></p>
+<h4 id="source-repository">Source Repository:</h4>
+<p><a href="https://github.com/prasanthmj/primitive-go-mcp-server">primitive-go-mcp-server</a></p>
+<h2 id="get-started">Get Started</h2>
+<p>Before diving into the implementation, let&rsquo;s understand the networking aspects. MCP currently supports multiple transport protocols, but we&rsquo;ll focus on stdio since it&rsquo;s currently supported by Claude Desktop. The protocol uses JSON-RPC 2.0 for message exchange, providing a standardized way to handle requests, responses, and notifications.</p>
+<p>JSON-RPC 2.0 in MCP context provides:</p>
+<ul>
+<li>Structured message format for requests and responses</li>
+<li>Support for asynchronous communication</li>
+<li>Error handling capabilities</li>
+</ul>
+<p>Let&rsquo;s create an image generator that takes a prompt and uses Stable Diffusion APIs to generate images. The first step is handling the initialization request that establishes the connection between the client and server.</p>
+<h3 id="the-initialization-request">The initialization request</h3>
+<p>When a client connects to our MCP server, the first interaction is an initialization request. This request establishes the protocol version and capabilities. Here&rsquo;s how we implement it in Go:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>	decoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewDecoder</span>(os.Stdin)
+</span></span><span style="display:flex;"><span>	encoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewEncoder</span>(os.Stdout)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> req <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> decoder.<span style="color:#900;font-weight:bold">Decode</span>(<span style="color:#000;font-weight:bold">&amp;</span>req); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error decoding request: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received request: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(req))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	method, hasMethod <span style="color:#000;font-weight:bold">:=</span> req[<span style="color:#d14">&#34;method&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>)
+</span></span><span style="display:flex;"><span>	id, hasId <span style="color:#000;font-weight:bold">:=</span> req[<span style="color:#d14">&#34;id&#34;</span>]
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> response <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> hasMethod <span style="color:#000;font-weight:bold">&amp;&amp;</span> hasId {
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">switch</span> method {
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;initialize&#34;</span>:
+</span></span><span style="display:flex;"><span>			response = <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
+</span></span><span style="display:flex;"><span>				<span style="color:#d14">&#34;jsonrpc&#34;</span>: <span style="color:#d14">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>				<span style="color:#d14">&#34;id&#34;</span>:      id,
+</span></span><span style="display:flex;"><span>				<span style="color:#d14">&#34;result&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
+</span></span><span style="display:flex;"><span>					<span style="color:#d14">&#34;protocolVersion&#34;</span>: <span style="color:#d14">&#34;2024-11-05&#34;</span>,
+</span></span><span style="display:flex;"><span>					<span style="color:#d14">&#34;serverInfo&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
+</span></span><span style="display:flex;"><span>						<span style="color:#d14">&#34;name&#34;</span>:    <span style="color:#d14">&#34;imagegen-go&#34;</span>,
+</span></span><span style="display:flex;"><span>						<span style="color:#d14">&#34;version&#34;</span>: <span style="color:#d14">&#34;1.0.0&#34;</span>,
+</span></span><span style="display:flex;"><span>					},
+</span></span><span style="display:flex;"><span>					<span style="color:#d14">&#34;capabilities&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
+</span></span><span style="display:flex;"><span>						<span style="color:#d14">&#34;tools&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{},
+</span></span><span style="display:flex;"><span>					},
+</span></span><span style="display:flex;"><span>				},
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> response <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>		log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Sending response: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(response))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		err <span style="color:#000;font-weight:bold">:=</span> encoder.<span style="color:#900;font-weight:bold">Encode</span>(response)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error encoding response: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Let&rsquo;s break down this initialization code:</p>
+<h4 id="stream-setup">Stream Setup</h4>
+<ul>
+<li>We create decoders and encoders for stdin/stdout</li>
+<li>This handles the JSON-RPC communication channel with the client</li>
+</ul>
+<h4 id="request-handling">Request Handling</h4>
+<ul>
+<li>The code reads JSON requests from stdin</li>
+<li>It parses them into a generic map structure</li>
+<li>Logs are written to help with debugging</li>
+</ul>
+<h4 id="method-dispatch">Method Dispatch**</h4>
+<ul>
+<li>Checks for the &ldquo;initialize&rdquo; method</li>
+<li>Validates that the request has both method and ID fields</li>
+<li>Uses a switch statement for extensibility</li>
+</ul>
+<h4 id="response-structure">Response Structure</h4>
+<ul>
+<li>Returns protocol version (2024-11-05)</li>
+<li>Includes server identification information</li>
+<li>Declares supported capabilities (in this case, tools)</li>
+</ul>
+<p>The PrettyJSON helper function (not shown above) helps with logging formatted JSON for debugging:</p>
+<h3 id="building-and-configuring-the-server">Building and Configuring the Server</h3>
+<h4 id="build-the-binary">Build the Binary</h4>
+<p>First, let&rsquo;s compile our Go server into a binary.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>go build -o ./bin/imagegen-go ./main
+</span></span></code></pre></div><h4 id="configure-claude-desktop">Configure Claude Desktop</h4>
+<p>Since Claude Desktop is currently the main client available for testing MCP servers, we&rsquo;ll need to set it up:</p>
+<h4 id="install-claude-desktop">Install Claude Desktop</h4>
+<ul>
+<li>Download Claude Desktop</li>
+<li>Follow the installation instructions for your platform</li>
+<li>Launch Claude Desktop to ensure it&rsquo;s working correctly</li>
+</ul>
+<h4 id="update-configuration">Update Configuration</h4>
+<p>The Claude Desktop configuration. For mac the file is located at:</p>
+<pre tabindex="0"><code>~/Library/Application Support/Claude/claude_desktop_config.json
+</code></pre><p>If this file doesn&rsquo;t exist, you&rsquo;ll need to create it. Edit the file to point to your MCP server:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;mcpServers&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;imagegen-go&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;command&#34;</span>: <span style="color:#d14">&#34;/absolute/path/to/your/binary/bin/imagegen-go&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Replace <code>/absolute/path/to/your/binary</code> with the actual path to your compiled binary. For example:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;mcpServers&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;imagegen-go&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;command&#34;</span>: <span style="color:#d14">&#34;/Users/username/Projects/mcp/myservers/imagegen-go/bin/imagegen-go&#34;</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="restart-claude-desktop">Restart Claude Desktop</h4>
+<ul>
+<li>Completely quit Claude Desktop</li>
+<li>Restart the application</li>
+</ul>
+<p>At this point, you might see an error about the imagegen-go MCP server - this is expected since we haven&rsquo;t implemented all the required functionality yet. The important thing is that we can still see the server logs to verify the initialization request is being received.</p>
+<h3 id="check-the-log-file">Check the Log File</h3>
+<p>Since we&rsquo;ve added logging to our server, we can inspect the protocol messages. When you start Claude desktop with this configuration, you should see something like this in the logs:</p>
+<pre tabindex="0"><code>2025/01/02 05:11:34 Received request: {
+    &#34;id&#34;: 0,
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;method&#34;: &#34;initialize&#34;,
+    &#34;params&#34;: {
+        &#34;capabilities&#34;: {},
+        &#34;clientInfo&#34;: {
+            &#34;name&#34;: &#34;claude-ai&#34;,
+            &#34;version&#34;: &#34;0.1.0&#34;
+        },
+        &#34;protocolVersion&#34;: &#34;2024-11-05&#34;
+    }
+}
+2025/01/02 05:11:34 Sending response: {
+    &#34;id&#34;: 0,
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;result&#34;: {
+        &#34;capabilities&#34;: {
+            &#34;tools&#34;: {}
+        },
+        &#34;protocolVersion&#34;: &#34;2024-11-05&#34;,
+        &#34;serverInfo&#34;: {
+            &#34;name&#34;: &#34;imagegen-go&#34;,
+            &#34;version&#34;: &#34;1.0.0&#34;
+        }
+    }
+}
+</code></pre><p>In the response, this part is particularly important:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#d14">&#34;capabilities&#34;</span><span style="color:#a61717;background-color:#e3d2d2">:</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;tools&#34;</span>: {}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This tells the client (Claude Desktop) that our server implements the &ldquo;tools&rdquo; capability. In MCP, servers can declare three main capabilities:</p>
+<ul>
+<li>&ldquo;tools&rdquo;: Functions that can be executed</li>
+<li>&ldquo;resources&rdquo;: Data or files that can be accessed</li>
+<li>&ldquo;prompts&rdquo;: Predefined templates for specific tasks</li>
+</ul>
+<p>By including &ldquo;tools&rdquo; in our capabilities, we&rsquo;re indicating that our server will provide executable functions - in this case, for image generation.</p>
+<h2 id="initialization-updates">Initialization updates.</h2>
+<p>Now that we know we are getting the initialization request right, lets reorganize a bit. Use complete structs to parse (rather than generic map[string])
+Then we have to process the requests in a loop.</p>
+<p>First added struct definitions:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// JSON-RPC 2.0 base types
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">type</span> JSONRPCRequest <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>	JSONRPC <span style="color:#458;font-weight:bold">string</span>      <span style="color:#d14">`json:&#34;jsonrpc&#34;`</span>
+</span></span><span style="display:flex;"><span>	ID      <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#d14">`json:&#34;id&#34;`</span>
+</span></span><span style="display:flex;"><span>	Method  <span style="color:#458;font-weight:bold">string</span>      <span style="color:#d14">`json:&#34;method&#34;`</span>
+</span></span><span style="display:flex;"><span>	Params  <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#d14">`json:&#34;params,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> JSONRPCResponse <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>	JSONRPC <span style="color:#458;font-weight:bold">string</span>        <span style="color:#d14">`json:&#34;jsonrpc&#34;`</span>
+</span></span><span style="display:flex;"><span>	ID      <span style="color:#000;font-weight:bold">interface</span>{}   <span style="color:#d14">`json:&#34;id&#34;`</span>
+</span></span><span style="display:flex;"><span>	Result  <span style="color:#000;font-weight:bold">interface</span>{}   <span style="color:#d14">`json:&#34;result,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>	Error   <span style="color:#000;font-weight:bold">*</span>JSONRPCError <span style="color:#d14">`json:&#34;error,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> JSONRPCError <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>	Code    <span style="color:#458;font-weight:bold">int</span>         <span style="color:#d14">`json:&#34;code&#34;`</span>
+</span></span><span style="display:flex;"><span>	Message <span style="color:#458;font-weight:bold">string</span>      <span style="color:#d14">`json:&#34;message&#34;`</span>
+</span></span><span style="display:flex;"><span>	Data    <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#d14">`json:&#34;data,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// MCP specific types for initialize
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">type</span> InitializeResult <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>	ProtocolVersion <span style="color:#458;font-weight:bold">string</span>       <span style="color:#d14">`json:&#34;protocolVersion&#34;`</span>
+</span></span><span style="display:flex;"><span>	ServerInfo      ServerInfo   <span style="color:#d14">`json:&#34;serverInfo&#34;`</span>
+</span></span><span style="display:flex;"><span>	Capabilities    Capabilities <span style="color:#d14">`json:&#34;capabilities&#34;`</span>
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Then updated the main function:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
+</span></span><span style="display:flex;"><span>	decoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewDecoder</span>(os.Stdin)
+</span></span><span style="display:flex;"><span>	encoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewEncoder</span>(os.Stdout)
+</span></span><span style="display:flex;"><span>	<span style="color:#998;font-style:italic">// Set up logging to stderr
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>	log.<span style="color:#900;font-weight:bold">SetOutput</span>(os.Stderr)
+</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">SetFlags</span>(log.LstdFlags | log.Lmicroseconds)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Starting imagegen-go MCP server ...&#34;</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> {
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> request JSONRPCRequest
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> decoder.<span style="color:#900;font-weight:bold">Decode</span>(<span style="color:#000;font-weight:bold">&amp;</span>request); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error decoding request: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendError</span>(encoder, <span style="color:#000;font-weight:bold">nil</span>, ParseError, <span style="color:#d14">&#34;Failed to parse JSON&#34;</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">break</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received request: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(request))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> request.JSONRPC <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;2.0&#34;</span> {
+</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidRequest, <span style="color:#d14">&#34;Only JSON-RPC 2.0 is supported&#34;</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> response <span style="color:#000;font-weight:bold">interface</span>{}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">switch</span> request.Method {
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;initialize&#34;</span>:
+</span></span><span style="display:flex;"><span>			response = JSONRPCResponse{
+</span></span><span style="display:flex;"><span>				JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>				ID:      request.ID,
+</span></span><span style="display:flex;"><span>				Result: InitializeResult{
+</span></span><span style="display:flex;"><span>					ProtocolVersion: <span style="color:#d14">&#34;2024-11-05&#34;</span>,
+</span></span><span style="display:flex;"><span>					ServerInfo: ServerInfo{
+</span></span><span style="display:flex;"><span>						Name:    <span style="color:#d14">&#34;imagegen-go&#34;</span>,
+</span></span><span style="display:flex;"><span>						Version: <span style="color:#d14">&#34;1.0.0&#34;</span>,
+</span></span><span style="display:flex;"><span>					},
+</span></span><span style="display:flex;"><span>					Capabilities: Capabilities{
+</span></span><span style="display:flex;"><span>						Tools: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{},
+</span></span><span style="display:flex;"><span>					},
+</span></span><span style="display:flex;"><span>				},
+</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;notifications/initialized&#34;</span>, <span style="color:#d14">&#34;initialized&#34;</span>:
+</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Server initialized successfully&#34;</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">continue</span> <span style="color:#998;font-style:italic">// Skip sending response for notifications
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>		
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">default</span>:
+</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, MethodNotFound, <span style="color:#d14">&#34;Method not implemented&#34;</span>)
+</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> response <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Sending response: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(response))
+</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendResponse</span>(encoder, response)
+</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;imagegen-go MCP server out of loop...&#34;</span>)
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><h4 id="persistent-connection">Persistent Connection</h4>
+<ul>
+<li>The <code>for</code> loop keeps the server running and ready to handle multiple requests</li>
+<li>Each <code>decoder.Decode()</code> blocks until a new request arrives on stdin</li>
+<li>This creates a persistent connection between the client and server</li>
+</ul>
+<h4 id="protocol-handshake">Protocol Handshake</h4>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">switch</span> request.Method {
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;initialize&#34;</span>:
+</span></span><span style="display:flex;"><span>    response = JSONRPCResponse{
+</span></span><span style="display:flex;"><span>        JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>        ID:      request.ID,
+</span></span><span style="display:flex;"><span>        Result: InitializeResult{<span style="color:#000;font-weight:bold">...</span>},
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;notifications/initialized&#34;</span>, <span style="color:#d14">&#34;initialized&#34;</span>:
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Server initialized successfully&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">continue</span>  <span style="color:#998;font-style:italic">// Skip sending response for notifications
+</span></span></span></code></pre></div><ul>
+<li>The MCP protocol has a two-step handshake:
+<ol>
+<li>Client sends <code>initialize</code> request -&gt; Server responds with capabilities</li>
+<li>Client sends <code>initialized</code> notification -&gt; Server acknowledges internally</li>
+</ol>
+</li>
+<li>The loop allows us to handle both steps naturally</li>
+<li>Using <code>continue</code> for notifications is important because notifications don&rsquo;t expect responses</li>
+</ul>
+<h4 id="connection-lifecycle">Connection Lifecycle</h4>
+<p>The loop allows the server to:</p>
+<ol>
+<li>Complete the initialization handshake</li>
+<li>Stay alive to handle subsequent  calls</li>
+<li>Maintain state across multiple requests</li>
+<li>Properly handle disconnection through the <code>break</code> statement</li>
+</ol>
+<h2 id="list-the-tools">List the tools</h2>
+<p>Now, let&rsquo;s handle tools/list request from the client.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;tools/list&#34;</span>:
+</span></span><span style="display:flex;"><span>    toolSchema <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">RawMessage</span>(<span style="color:#d14">`{
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">        &#34;type&#34;: &#34;object&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">        &#34;properties&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;prompt&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;string&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Description of the image to generate&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            },
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;width&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;number&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Width of the image in pixels&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;default&#34;: 512
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            },
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;height&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;number&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Height of the image in pixels&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;default&#34;: 512
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            },
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;destination&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;string&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Path where the generated image should be saved&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">            }
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">        },
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">        &#34;required&#34;: [&#34;prompt&#34;, &#34;destination&#34;]
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">    }`</span>)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    response = JSONRPCResponse{
+</span></span><span style="display:flex;"><span>        JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>        ID:      request.ID,
+</span></span><span style="display:flex;"><span>        Result: ListToolsResult{
+</span></span><span style="display:flex;"><span>            Tools: []Tool{
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    Name:        <span style="color:#d14">&#34;generate-image&#34;</span>,
+</span></span><span style="display:flex;"><span>                    Description: <span style="color:#d14">&#34;Generate an image using Stable Diffusion based on a text prompt&#34;</span>,
+</span></span><span style="display:flex;"><span>                    InputSchema: toolSchema,
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span></code></pre></div><p>Let&rsquo;s break down how this works:</p>
+<h4 id="tool-definition">Tool Definition</h4>
+<p>Each tool needs three key pieces of information:
+- <code>Name</code>: The identifier for the tool (&ldquo;generate-image&rdquo;)
+- <code>Description</code>: Human-readable explanation of what the tool does
+- <code>InputSchema</code>: JSON Schema defining the expected input parameters</p>
+<h4 id="input-schema">Input Schema</h4>
+<ul>
+<li>The schema defines four parameters for image generation:
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;prompt&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">string</span>      <span style="color:#998;font-style:italic">// Required: The description of the image to generate
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#d14">&#34;width&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">number</span>      <span style="color:#998;font-style:italic">// Optional: Defaults to 512
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#d14">&#34;height&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">number</span>     <span style="color:#998;font-style:italic">// Optional: Defaults to 512
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#d14">&#34;destination&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">string</span> <span style="color:#998;font-style:italic">// Required: Where to save the image
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></div></li>
+<li>Note the <code>required</code> field specifies which parameters are mandatory</li>
+<li>The <code>default</code> fields provide fallback values for optional parameters</li>
+</ul>
+<h4 id="response-structure-1">Response Structure</h4>
+<ul>
+<li>The response follows the JSON-RPC 2.0 format</li>
+<li>The <code>Result</code> field contains a <code>ListToolsResult</code> with an array of available tools</li>
+<li>Each tool in the array provides its interface definition to the client</li>
+</ul>
+<p>When a client like Claude receives this response, it understands:</p>
+<ul>
+<li>There&rsquo;s a tool named &ldquo;generate-image&rdquo; available</li>
+<li>It needs at least a prompt and destination path to work</li>
+<li>It can optionally specify image dimensions</li>
+<li>The tool&rsquo;s purpose is to generate images using Stable Diffusion</li>
+</ul>
+<p>This enables Claude to:</p>
+<ol>
+<li>Know when to use this tool (when the user wants to generate images)</li>
+<li>Validate inputs before making the call (ensuring required fields are present)</li>
+<li>Provide meaningful feedback to users about what information is needed</li>
+</ol>
+<p>For &ldquo;resources/list&rdquo; and &ldquo;prompts/list&rdquo; we just return empty arrays since we are not implementing it at the moment.</p>
+<p>Lets now restart Claude Desktop and check the log.</p>
+<h2 id="log-after-adding-toolslist">Log After adding tools/list</h2>
+<pre tabindex="0"><code>2025/01/02 11:47:30.511413 Starting imagegen-go MCP server ...
+2025/01/02 11:47:30.512904 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 0,
+    &#34;method&#34;: &#34;initialize&#34;,
+    &#34;params&#34;: {
+        &#34;capabilities&#34;: {},
+        &#34;clientInfo&#34;: {
+            &#34;name&#34;: &#34;claude-ai&#34;,
+            &#34;version&#34;: &#34;0.1.0&#34;
+        },
+        &#34;protocolVersion&#34;: &#34;2024-11-05&#34;
+    }
+}
+2025/01/02 11:47:30.512932 Sending response: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 0,
+    &#34;result&#34;: {
+        &#34;protocolVersion&#34;: &#34;2024-11-05&#34;,
+        &#34;serverInfo&#34;: {
+            &#34;name&#34;: &#34;imagegen-go&#34;,
+            &#34;version&#34;: &#34;1.0.0&#34;
+        },
+        &#34;capabilities&#34;: {
+            &#34;tools&#34;: {}
+        }
+    }
+}
+2025/01/02 11:47:30.514176 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: null,
+    &#34;method&#34;: &#34;notifications/initialized&#34;
+}
+2025/01/02 11:47:30.514185 Server initialized successfully
+2025/01/02 11:47:30.515453 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 1,
+    &#34;method&#34;: &#34;tools/list&#34;,
+    &#34;params&#34;: {}
+}
+2025/01/02 11:47:30.515554 Sending response: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 1,
+    &#34;result&#34;: {
+        &#34;tools&#34;: [
+            {
+                &#34;name&#34;: &#34;generate-image&#34;,
+                &#34;description&#34;: &#34;Generate an image using Stable Diffusion based on a text prompt&#34;,
+                &#34;inputSchema&#34;: {
+                    &#34;type&#34;: &#34;object&#34;,
+                    &#34;properties&#34;: {
+                        &#34;prompt&#34;: {
+                            &#34;type&#34;: &#34;string&#34;,
+                            &#34;description&#34;: &#34;Description of the image to generate&#34;
+                        },
+                        &#34;width&#34;: {
+                            &#34;type&#34;: &#34;number&#34;,
+                            &#34;description&#34;: &#34;Width of the image in pixels&#34;,
+                            &#34;default&#34;: 512
+                        },
+                        &#34;height&#34;: {
+                            &#34;type&#34;: &#34;number&#34;,
+                            &#34;description&#34;: &#34;Height of the image in pixels&#34;,
+                            &#34;default&#34;: 512
+                        },
+                        &#34;destination&#34;: {
+                            &#34;type&#34;: &#34;string&#34;,
+                            &#34;description&#34;: &#34;Path where the generated image should be saved&#34;
+                        }
+                    },
+                    &#34;required&#34;: [
+                        &#34;prompt&#34;,
+                        &#34;destination&#34;
+                    ]
+                }
+            }
+        ]
+    }
+}
+2025/01/02 11:47:31.680344 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 2,
+    &#34;method&#34;: &#34;resources/list&#34;,
+    &#34;params&#34;: {}
+}
+2025/01/02 11:47:31.680520 Sending response: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 2,
+    &#34;result&#34;: {
+        &#34;resources&#34;: []
+    }
+}
+2025/01/02 11:47:31.709596 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 3,
+    &#34;method&#34;: &#34;prompts/list&#34;,
+    &#34;params&#34;: {}
+}
+2025/01/02 11:47:31.709670 Sending response: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 3,
+    &#34;result&#34;: {
+        &#34;prompts&#34;: []
+    }
+}
+2025/01/02 11:47:32.050237 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 4,
+    &#34;method&#34;: &#34;resources/list&#34;,
+    &#34;params&#34;: {}
+}
+2025/01/02 11:47:32.050267 Sending response: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 4,
+    &#34;result&#34;: {
+        &#34;resources&#34;: []
+    }
+}
+2025/01/02 11:47:32.050830 Received request: {
+    &#34;jsonrpc&#34;: &#34;2.0&#34;,
+    &#34;id&#34;: 5,
+    &#34;method&#34;: &#34;tools/list&#34;,
+    &#34;params&#34;: {}
+}
+</code></pre><p>After the initialization sequence, it sends the tools/list request and we respond with our tool and parameter details.</p>
+<p>However, the client is sending &ldquo;prompts/list&rdquo; and &ldquo;resources/list&rdquo; again and again although we already said we don&rsquo;t have any.</p>
+<h2 id="the-toolscall-implementation">The &ldquo;tools/call&rdquo; Implementation</h2>
+<p>Now let&rsquo;s implement the core functionality of our server: image generation. The implementation follows a straightforward flow - collect parameters from the request, call the OpenAI API to generate the image, and save it to a specified location.</p>
+<p>Here&rsquo;s our implementation of the <code>tools/call</code> handler:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;tools/call&#34;</span>:
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Handling tools/call request&#34;</span>)
+</span></span><span style="display:flex;"><span>    params, ok <span style="color:#000;font-weight:bold">:=</span> request.Params.(<span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{})
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Invalid parameters type: %T&#34;</span>, request.Params)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Invalid parameters&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    toolName, ok <span style="color:#000;font-weight:bold">:=</span> params[<span style="color:#d14">&#34;name&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Tool name not found or invalid type: %T&#34;</span>, params[<span style="color:#d14">&#34;name&#34;</span>])
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Invalid tool name&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Tool requested: %s&#34;</span>, toolName)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> toolName <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;generate-image&#34;</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Unknown tool requested: %s&#34;</span>, toolName)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, MethodNotFound, <span style="color:#d14">&#34;Unknown tool&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    args, ok <span style="color:#000;font-weight:bold">:=</span> params[<span style="color:#d14">&#34;arguments&#34;</span>].(<span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{})
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Invalid arguments type: %T&#34;</span>, params[<span style="color:#d14">&#34;arguments&#34;</span>])
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Invalid arguments&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received arguments: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(args))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    prompt, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;prompt&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok <span style="color:#000;font-weight:bold">||</span> prompt <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;&#34;</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Invalid or empty prompt: %v&#34;</span>, args[<span style="color:#d14">&#34;prompt&#34;</span>])
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Prompt is required&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Processing prompt: %s&#34;</span>, prompt)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Get destination path or use filename from sanitized prompt
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> destPath <span style="color:#458;font-weight:bold">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> dest, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;destination&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>); ok <span style="color:#000;font-weight:bold">&amp;&amp;</span> dest <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;&#34;</span> {
+</span></span><span style="display:flex;"><span>        destPath = dest
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using provided destination path: %s&#34;</span>, destPath)
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Create filename from sanitized prompt
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        sanitized <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">sanitizeFilename</span>(prompt)
+</span></span><span style="display:flex;"><span>        defaultPath <span style="color:#000;font-weight:bold">:=</span> os.<span style="color:#900;font-weight:bold">Getenv</span>(<span style="color:#d14">&#34;DEFAULT_DOWNLOAD_PATH&#34;</span>)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> defaultPath <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;&#34;</span> {
+</span></span><span style="display:flex;"><span>            homeDir, err <span style="color:#000;font-weight:bold">:=</span> os.<span style="color:#900;font-weight:bold">UserHomeDir</span>()
+</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>                log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error getting user home directory: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>                <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, <span style="color:#d14">&#34;Could not determine default path&#34;</span>)
+</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>            }
+</span></span><span style="display:flex;"><span>            defaultPath = filepath.<span style="color:#900;font-weight:bold">Join</span>(homeDir, <span style="color:#d14">&#34;Downloads&#34;</span>)
+</span></span><span style="display:flex;"><span>        }
+</span></span><span style="display:flex;"><span>        destPath = filepath.<span style="color:#900;font-weight:bold">Join</span>(defaultPath, sanitized<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#34;.webp&#34;</span>)
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using generated destination path: %s&#34;</span>, destPath)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Generate unique filename with error handling
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    fullPath, err <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">generateUniqueFilename</span>(destPath, prompt)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error generating unique filename: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Error generating filename: %v&#34;</span>, err))
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Generated unique filename: %s&#34;</span>, fullPath)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Get dimensions with more detailed logging
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    width <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">1920</span>
+</span></span><span style="display:flex;"><span>    height <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">1080</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> w, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;width&#34;</span>].(<span style="color:#458;font-weight:bold">float64</span>); ok {
+</span></span><span style="display:flex;"><span>        width = <span style="color:#0086b3">int</span>(w)
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using provided width: %d&#34;</span>, width)
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using default width: %d&#34;</span>, width)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> h, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;height&#34;</span>].(<span style="color:#458;font-weight:bold">float64</span>); ok {
+</span></span><span style="display:flex;"><span>        height = <span style="color:#0086b3">int</span>(h)
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using provided height: %d&#34;</span>, height)
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using default height: %d&#34;</span>, height)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Generate image
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Starting image generation with OpenAI...&#34;</span>)
+</span></span><span style="display:flex;"><span>    imageURL, err <span style="color:#000;font-weight:bold">:=</span> openai.<span style="color:#900;font-weight:bold">GenerateImage</span>(prompt, width, height)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error generating image: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Error generating image: %v&#34;</span>, err))
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Successfully generated image URL: %s&#34;</span>, imageURL)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Download image
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Starting image download...&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> openai.<span style="color:#900;font-weight:bold">DownloadImage</span>(imageURL, fullPath); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error downloading image: %v&#34;</span>, err)
+</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Error saving image: %v&#34;</span>, err))
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Successfully downloaded image to: %s&#34;</span>, fullPath)
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    response = JSONRPCResponse{
+</span></span><span style="display:flex;"><span>        JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
+</span></span><span style="display:flex;"><span>        ID:      request.ID,
+</span></span><span style="display:flex;"><span>        Result: CallToolResult{
+</span></span><span style="display:flex;"><span>            Content: []ToolContent{
+</span></span><span style="display:flex;"><span>                {
+</span></span><span style="display:flex;"><span>                    Type: <span style="color:#d14">&#34;text&#34;</span>,
+</span></span><span style="display:flex;"><span>                    Text: fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Image generated and saved to: %s&#34;</span>, fullPath),
+</span></span><span style="display:flex;"><span>                },
+</span></span><span style="display:flex;"><span>            },
+</span></span><span style="display:flex;"><span>        },
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Sending successful response for image generation&#34;</span>)
+</span></span></code></pre></div><p>Let&rsquo;s understand what&rsquo;s happening in this implementation:</p>
+<h4 id="parameter-validation">Parameter Validation</h4>
+<ul>
+<li>Checks for valid tool name (&ldquo;generate-image&rdquo;)</li>
+<li>Validates the required prompt parameter</li>
+<li>Handles optional parameters like width, height, and destination path</li>
+</ul>
+<h4 id="path-management">Path Management</h4>
+<ul>
+<li>Uses provided destination path or generates one from the prompt</li>
+<li>Creates unique filenames to avoid overwrites</li>
+<li>Falls back to user&rsquo;s Downloads directory if no default path is specified</li>
+</ul>
+<h4 id="image-generation">Image Generation</h4>
+<ul>
+<li>Uses default dimensions (1920x1080) unless otherwise specified</li>
+<li>Calls OpenAI&rsquo;s API to generate the image</li>
+<li>Downloads the generated image to the specified location</li>
+</ul>
+<h3 id="configuration-updates">Configuration Updates</h3>
+<p>To use this functionality, we need to update our Claude Desktop configuration with the required environment variables. Modify your <code>claude_desktop_config.json</code> to include:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#000080">&#34;mcpServers&#34;</span>: {
+</span></span><span style="display:flex;"><span>   <span style="color:#000080">&#34;imagegen-go&#34;</span>: {
+</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;command&#34;</span>: <span style="color:#d14">&#34;/Users/user/imagegen-go/bin/imagegen-go&#34;</span>,
+</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;env&#34;</span>: {
+</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;OPENAI_API_KEY&#34;</span>: <span style="color:#d14">&#34;xxxx&#34;</span>,
+</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;DEFAULT_DOWNLOAD_PATH&#34;</span>:<span style="color:#d14">&#34;/Users/user/Downloads&#34;</span>
+</span></span><span style="display:flex;"><span>      }
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>This configuration provides two essential environment variables:</p>
+<ul>
+<li><code>OPENAI_API_KEY</code>: Your OpenAI API key for image generation</li>
+<li><code>DEFAULT_DOWNLOAD_PATH</code>: The default directory for saving generated images</li>
+</ul>
+<p>The server will use these settings to authenticate with OpenAI and determine where to save generated images when no specific destination is provided in the request.</p>
+<h3 id="interesting-observations">Interesting observations</h3>
+<p>The image dimensions are optional. However when the prompt does not include the dimensions, claude seem to insert the dimensions on its own</p>
+<p><img src="../images/generating-image-dimensions.png" alt="Generate image with simple prompt"></p>
+<p>Then I updated the descriptions of the parameters and mentioned that the parameter is optional. May be it would have worked?
+The next call didn&rsquo;t have dimension parameters:</p>
+<p><img src="../images/simple-prompt-no-dimentions.png" alt="No dimention parameters"></p>
+<p>I had a talk with claude itself about the behaviour:</p>
+<p><img src="../images/dimention-discussion.png" alt="Dimension discussion"></p>
+<h2 id="timeout-and-cancelled-notifications">Timeout and cancelled notifications</h2>
+<p>The API call to generate the image and the image download takes some time. This can cause the client to have timeout and sends a &ldquo;cancelled&rdquo; notification. Initially, this call was not handled and resulted in responding with error.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;cancelled&#34;</span>:
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> params, ok <span style="color:#000;font-weight:bold">:=</span> request.Params.(<span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}); ok {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received cancellation notification for request ID: %v, reason: %v&#34;</span>,
+</span></span><span style="display:flex;"><span>            params[<span style="color:#d14">&#34;requestId&#34;</span>], params[<span style="color:#d14">&#34;reason&#34;</span>])
+</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
+</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received cancellation notification with invalid params&#34;</span>)
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">continue</span> <span style="color:#998;font-style:italic">// Skip sending response for notifications
+</span></span></span></code></pre></div><p>The real fix would be to keep being responsive by handling the long running request in another goroutine.</p>
+<h2 id="surprises">Surprises</h2>
+<p>I discovered something fascinating about Claude&rsquo;s image generation capabilities - it&rsquo;s quite the artist when it comes to enhancing prompts! Even when I toss a basic description its way, Claude knows exactly how to jazz it up for better results.</p>
+<p>Here&rsquo;s a perfect example. I gave Claude this simple prompt:</p>
+<pre tabindex="0"><code>Can you generate an image of a riverside home in cinematic style?
+</code></pre><p>And look at how Claude transformed it when talking to DALL-E:</p>
+<pre tabindex="0"><code>{
+  `prompt`: `A cinematic shot of a beautiful riverside home, golden hour lighting, reflections in the calm water, architectural photography style, high end real estate photography, high detail, photorealistic, artful composition, dramatic lighting`
+}
+</code></pre><p>The result? Judge for yourself:
+<img src="../images/A-cinematic-shot-of.webp" alt="improved prompt"></p>
+<p>This opens up some really cool possibilities - you could feed Claude an entire story and have it generate images for each scene, adding all those professional photography touches automatically!</p>
+<h3 id="claude-understands-openais-content-filters">Claude understands OpenAI&rsquo;s content filters!</h3>
+<p>Here&rsquo;s something that really made me laugh - Claude actually understands OpenAI&rsquo;s content filters! In one attempt, OpenAI&rsquo;s filter blocked Claude&rsquo;s first prompt because it contained the word &ldquo;whip&rdquo;. Without missing a beat, Claude figured out what triggered the filter, rewrote the prompt, and got the image generated successfully.</p>
+<p><img src="../images/auto-corrects-prompt.png" alt="Auto-corrects"></p>
+<p>Through this article, we&rsquo;ve built a complete MCP server in Go that leverages OpenAI&rsquo;s image generation capabilities. But more importantly, we&rsquo;ve uncovered some fascinating insights about how MCP enables natural interaction between LLMs and external tools.</p>
+<p>What makes this implementation particularly interesting is how it demonstrates the evolving relationship between different AI components:</p>
+<p>The server implementation shows how to handle various edge cases gracefully, from timeouts to content filter issues. Claude&rsquo;s ability to automatically work around content filters shows how LLMs can adapt to system constraints.</p>
+<p>While our implementation focused on stdio transport and basic image generation, it demonstrates the core principles of MCP: standardized communication between AI models and tools.</p>
+<p>Looking ahead, there are several ways this server could be enhanced:</p>
+<ul>
+<li>Handling long-running requests with goroutines</li>
+<li>Adding support for multiple image generation models</li>
+<li>Implementing image manipulation tools</li>
+<li>Adding resource capabilities to manage generated images</li>
+</ul>
+<p>The source code for this implementation is available on <a href="https://github.com/prasanthmj/primitive-go-mcp-server">GitHub</a>, and I encourage you to experiment with it.</p>
+<p>MCP is opening up new possibilities for how we interact with AI systems, and I&rsquo;m excited to see what the community builds next!</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/ai/mcp/" class="pr-4">&larr; Model Context Protocol (MCP): Building Bridges Between AI and Your World</a>
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2025 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+
