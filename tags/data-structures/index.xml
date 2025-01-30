@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>data structures on Prasanth Janardhanan</title>
+    <link>/tags/data-structures/</link>
+    <description>Recent content in data structures on Prasanth Janardhanan</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Wed, 15 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/data-structures/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Lock-Free Data Structures and Wait-Free Algorithms in Go: From Theory to Practice</title>
+      <link>/go/lock-free-data-structures/</link>
+      <pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate>
+      
+      <guid>/go/lock-free-data-structures/</guid>
+      <description>Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&amp;rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!
+The Concurrent Programming Challenge Let&amp;rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&amp;rsquo;s memory), and you&amp;rsquo;re both trying to make sandwiches (execute operations) at the same time.</description>
+    </item>
+    
+  </channel>
+</rss>
