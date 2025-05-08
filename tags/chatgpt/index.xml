@@ -1,41 +1,34 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>chatgpt on Prasanth Janardhanan</title>
+    <title>Chatgpt on Prasanth Janardhanan</title>
     <link>/tags/chatgpt/</link>
-    <description>Recent content in chatgpt on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Chatgpt on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Thu, 02 Jan 2025 09:55:45 +0000</lastBuildDate><atom:link href="/tags/chatgpt/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 02 Jan 2025 09:55:45 +0000</lastBuildDate>
+    <atom:link href="/tags/chatgpt/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Model Context Protocol (MCP): Lets Implement an MCP server in Go</title>
       <link>/ai/mcp-go/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/ai/mcp-go/</guid>
-      <description>Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.
-While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks.</description>
+      <description>&lt;p&gt;Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.&lt;/p&gt;&#xA;&lt;p&gt;While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP  servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks. The protocol standardizes how these components communicate, making it easy to build interoperable AI-powered applications.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Model Context Protocol (MCP): Building Bridges Between AI and Your World</title>
       <link>/ai/mcp/</link>
-      <pubDate>Sat, 28 Dec 2024 10:42:12 +0000</pubDate>
-      
+      <pubDate>Sat, 28 Dec 2024 00:00:00 +0000</pubDate>
       <guid>/ai/mcp/</guid>
-      <description>Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.
-Enter the Model Context Protocol (MCP) - think of it as giving your AI assistant a complete office setup instead of just a mailbox.</description>
+      <description>&lt;p&gt;Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;../images/mcp-intro-v2.webp&#34; alt=&#34;Need for Model Context Protocol&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Exploring Chain-of-Thought: Enhancing Problem-Solving in Large Language Models</title>
       <link>/ai/chain-of-thought/</link>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/chain-of-thought/</guid>
-      <description>LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.</description>
+      <description>&lt;p&gt;LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

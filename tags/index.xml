@@ -4,432 +4,353 @@
     <title>Tags on Prasanth Janardhanan</title>
     <link>/tags/</link>
     <description>Recent content in Tags on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Wed, 15 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 May 2025 09:55:45 +0000</lastBuildDate>
+    <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>data structures</title>
+      <title>Rag</title>
+      <link>/tags/rag/</link>
+      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <guid>/tags/rag/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Search Privacy</title>
+      <link>/tags/search-privacy/</link>
+      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <guid>/tags/search-privacy/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Data Structures</title>
       <link>/tags/data-structures/</link>
       <pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate>
-      
       <guid>/tags/data-structures/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>go</title>
+      <title>Go</title>
       <link>/tags/go/</link>
       <pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate>
-      
       <guid>/tags/go/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>chatgpt</title>
+      <title>Chatgpt</title>
       <link>/tags/chatgpt/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/tags/chatgpt/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>claude</title>
+      <title>Claude</title>
       <link>/tags/claude/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/tags/claude/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>golang</title>
+      <title>Golang</title>
       <link>/tags/golang/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/tags/golang/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>mcp</title>
+      <title>Mcp</title>
       <link>/tags/mcp/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/tags/mcp/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Model Context Protocol</title>
       <link>/tags/model-context-protocol/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/tags/model-context-protocol/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>ETL</title>
       <link>/tags/etl/</link>
       <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/etl/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>SoftwareArchitecture</title>
       <link>/tags/softwarearchitecture/</link>
       <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/softwarearchitecture/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Temporal</title>
       <link>/tags/temporal/</link>
       <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/temporal/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>CodeRefactoring</title>
       <link>/tags/coderefactoring/</link>
       <pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/coderefactoring/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>LegacyCode</title>
       <link>/tags/legacycode/</link>
       <pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/legacycode/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>SystemModernization</title>
       <link>/tags/systemmodernization/</link>
       <pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/systemmodernization/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>TechnicalDebt</title>
       <link>/tags/technicaldebt/</link>
       <pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/technicaldebt/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Concurrency</title>
       <link>/tags/concurrency/</link>
       <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/concurrency/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>microservices</title>
+      <title>Microservices</title>
       <link>/tags/microservices/</link>
       <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/microservices/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>saga pattern</title>
+      <title>Saga Pattern</title>
       <link>/tags/saga-pattern/</link>
       <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/saga-pattern/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Worker Pools</title>
       <link>/tags/worker-pools/</link>
       <pubDate>Wed, 10 Jul 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/worker-pools/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>chatgpt 4o</title>
+      <title>Chatgpt 4o</title>
       <link>/tags/chatgpt-4o/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/chatgpt-4o/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>human computer interaction</title>
+      <title>Human Computer Interaction</title>
       <link>/tags/human-computer-interaction/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/human-computer-interaction/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Large Language Models</title>
       <link>/tags/large-language-models/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/large-language-models/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>LLMs</title>
       <link>/tags/llms/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/llms/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ui</title>
+      <title>Ui</title>
       <link>/tags/ui/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/ui/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ai</title>
+      <title>Ai</title>
       <link>/tags/ai/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/ai/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>deepmind</title>
+      <title>Deepmind</title>
       <link>/tags/deepmind/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/deepmind/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>gaming</title>
+      <title>Gaming</title>
       <link>/tags/gaming/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/gaming/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>innovation</title>
+      <title>Innovation</title>
       <link>/tags/innovation/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/innovation/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>medicine</title>
+      <title>Medicine</title>
       <link>/tags/medicine/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/medicine/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>proteins</title>
+      <title>Proteins</title>
       <link>/tags/proteins/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/proteins/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>chain of thought</title>
+      <title>Chain of Thought</title>
       <link>/tags/chain-of-thought/</link>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/chain-of-thought/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>llm</title>
+      <title>Llm</title>
       <link>/tags/llm/</link>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
-      
       <guid>/tags/llm/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>compiler</title>
+      <title>Compiler</title>
       <link>/tags/compiler/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/tags/compiler/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>parser</title>
+      <title>Parser</title>
       <link>/tags/parser/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/tags/parser/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>peg</title>
+      <title>Peg</title>
       <link>/tags/peg/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/tags/peg/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>javascript</title>
+      <title>Javascript</title>
       <link>/tags/javascript/</link>
       <pubDate>Wed, 06 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/tags/javascript/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>JSON file to JavaScript object</title>
+      <title>JSON File to JavaScript Object</title>
       <link>/tags/json-file-to-javascript-object/</link>
       <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/json-file-to-javascript-object/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>serialization</title>
+      <title>Serialization</title>
       <link>/tags/serialization/</link>
       <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/serialization/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>typescript</title>
+      <title>Typescript</title>
       <link>/tags/typescript/</link>
       <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/typescript/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>ansible</title>
+      <title>Ansible</title>
       <link>/tags/ansible/</link>
       <pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/ansible/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>hetzner</title>
+      <title>Hetzner</title>
       <link>/tags/hetzner/</link>
       <pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/hetzner/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>terraform</title>
+      <title>Terraform</title>
       <link>/tags/terraform/</link>
       <pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/terraform/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>badgerdb</title>
+      <title>Badgerdb</title>
       <link>/tags/badgerdb/</link>
       <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/badgerdb/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>task queue</title>
+      <title>Task Queue</title>
       <link>/tags/task-queue/</link>
       <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/task-queue/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>key-value store</title>
+      <title>Key-Value Store</title>
       <link>/tags/key-value-store/</link>
       <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/key-value-store/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>build a static website</title>
+      <title>Build a Static Website</title>
       <link>/tags/build-a-static-website/</link>
       <pubDate>Fri, 12 Jun 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/build-a-static-website/</guid>
       <description></description>
     </item>
-    
     <item>
       <title>Hugo</title>
       <link>/tags/hugo/</link>
       <pubDate>Fri, 12 Jun 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/hugo/</guid>
       <description></description>
     </item>
-    
     <item>
-      <title>static website</title>
+      <title>Static Website</title>
       <link>/tags/static-website/</link>
       <pubDate>Fri, 12 Jun 2020 00:00:00 +0000</pubDate>
-      
       <guid>/tags/static-website/</guid>
       <description></description>
     </item>
-    
   </channel>
 </rss>

@@ -69,54 +69,54 @@
 <p>Let&rsquo;s create an image generator that takes a prompt and uses Stable Diffusion APIs to generate images. The first step is handling the initialization request that establishes the connection between the client and server.</p>
 <h3 id="the-initialization-request">The initialization request</h3>
 <p>When a client connects to our MCP server, the first interaction is an initialization request. This request establishes the protocol version and capabilities. Here&rsquo;s how we implement it in Go:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
-</span></span><span style="display:flex;"><span>	decoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewDecoder</span>(os.Stdin)
-</span></span><span style="display:flex;"><span>	encoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewEncoder</span>(os.Stdout)
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">main</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">decoder</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">json</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewDecoder</span><span style="color:#1f2328">(</span><span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Stdin</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">encoder</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">json</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewEncoder</span><span style="color:#1f2328">(</span><span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Stdout</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> req <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> decoder.<span style="color:#900;font-weight:bold">Decode</span>(<span style="color:#000;font-weight:bold">&amp;</span>req); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error decoding request: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">var</span> <span style="color:#1f2328">req</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">decoder</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Decode</span><span style="color:#1f2328">(</span><span style="color:#0550ae">&amp;</span><span style="color:#1f2328">req</span><span style="color:#1f2328">);</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error decoding request: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received request: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(req))
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Received request: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">PrettyJSON</span><span style="color:#1f2328">(</span><span style="color:#1f2328">req</span><span style="color:#1f2328">))</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	method, hasMethod <span style="color:#000;font-weight:bold">:=</span> req[<span style="color:#d14">&#34;method&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>)
-</span></span><span style="display:flex;"><span>	id, hasId <span style="color:#000;font-weight:bold">:=</span> req[<span style="color:#d14">&#34;id&#34;</span>]
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> response <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">method</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">hasMethod</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">req</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;method&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">id</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">hasId</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">req</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;id&#34;</span><span style="color:#1f2328">]</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">var</span> <span style="color:#1f2328">response</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> hasMethod <span style="color:#000;font-weight:bold">&amp;&amp;</span> hasId {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">switch</span> method {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;initialize&#34;</span>:
-</span></span><span style="display:flex;"><span>			response = <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
-</span></span><span style="display:flex;"><span>				<span style="color:#d14">&#34;jsonrpc&#34;</span>: <span style="color:#d14">&#34;2.0&#34;</span>,
-</span></span><span style="display:flex;"><span>				<span style="color:#d14">&#34;id&#34;</span>:      id,
-</span></span><span style="display:flex;"><span>				<span style="color:#d14">&#34;result&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
-</span></span><span style="display:flex;"><span>					<span style="color:#d14">&#34;protocolVersion&#34;</span>: <span style="color:#d14">&#34;2024-11-05&#34;</span>,
-</span></span><span style="display:flex;"><span>					<span style="color:#d14">&#34;serverInfo&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
-</span></span><span style="display:flex;"><span>						<span style="color:#d14">&#34;name&#34;</span>:    <span style="color:#d14">&#34;imagegen-go&#34;</span>,
-</span></span><span style="display:flex;"><span>						<span style="color:#d14">&#34;version&#34;</span>: <span style="color:#d14">&#34;1.0.0&#34;</span>,
-</span></span><span style="display:flex;"><span>					},
-</span></span><span style="display:flex;"><span>					<span style="color:#d14">&#34;capabilities&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{
-</span></span><span style="display:flex;"><span>						<span style="color:#d14">&#34;tools&#34;</span>: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{},
-</span></span><span style="display:flex;"><span>					},
-</span></span><span style="display:flex;"><span>				},
-</span></span><span style="display:flex;"><span>			}
-</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">hasMethod</span> <span style="color:#0550ae">&amp;&amp;</span> <span style="color:#1f2328">hasId</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">switch</span> <span style="color:#1f2328">method</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;initialize&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">response</span> <span style="color:#1f2328">=</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}{</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#0a3069">&#34;jsonrpc&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#0a3069">&#34;id&#34;</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">id</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#0a3069">&#34;result&#34;</span><span style="color:#1f2328">:</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}{</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#0a3069">&#34;protocolVersion&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2024-11-05&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#0a3069">&#34;serverInfo&#34;</span><span style="color:#1f2328">:</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}{</span>
+</span></span><span style="display:flex;"><span>						<span style="color:#0a3069">&#34;name&#34;</span><span style="color:#1f2328">:</span>    <span style="color:#0a3069">&#34;imagegen-go&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>						<span style="color:#0a3069">&#34;version&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;1.0.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#0a3069">&#34;capabilities&#34;</span><span style="color:#1f2328">:</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}{</span>
+</span></span><span style="display:flex;"><span>						<span style="color:#0a3069">&#34;tools&#34;</span><span style="color:#1f2328">:</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}{},</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> response <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Sending response: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(response))
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">response</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Sending response: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">PrettyJSON</span><span style="color:#1f2328">(</span><span style="color:#1f2328">response</span><span style="color:#1f2328">))</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		err <span style="color:#000;font-weight:bold">:=</span> encoder.<span style="color:#900;font-weight:bold">Encode</span>(response)
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">encoder</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Encode</span><span style="color:#1f2328">(</span><span style="color:#1f2328">response</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error encoding response: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error encoding response: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Let&rsquo;s break down this initialization code:</p>
 <h4 id="stream-setup">Stream Setup</h4>
 <ul>
@@ -158,21 +158,21 @@
 <p>The Claude Desktop configuration. For mac the file is located at:</p>
 <pre tabindex="0"><code>~/Library/Application Support/Claude/claude_desktop_config.json
 </code></pre><p>If this file doesn&rsquo;t exist, you&rsquo;ll need to create it. Edit the file to point to your MCP server:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;mcpServers&#34;</span>: {
-</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;imagegen-go&#34;</span>: {
-</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;command&#34;</span>: <span style="color:#d14">&#34;/absolute/path/to/your/binary/bin/imagegen-go&#34;</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0550ae">&#34;mcpServers&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0550ae">&#34;imagegen-go&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0550ae">&#34;command&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;/absolute/path/to/your/binary/bin/imagegen-go&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Replace <code>/absolute/path/to/your/binary</code> with the actual path to your compiled binary. For example:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;mcpServers&#34;</span>: {
-</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;imagegen-go&#34;</span>: {
-</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;command&#34;</span>: <span style="color:#d14">&#34;/Users/username/Projects/mcp/myservers/imagegen-go/bin/imagegen-go&#34;</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0550ae">&#34;mcpServers&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0550ae">&#34;imagegen-go&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0550ae">&#34;command&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;/Users/username/Projects/mcp/myservers/imagegen-go/bin/imagegen-go&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><h4 id="restart-claude-desktop">Restart Claude Desktop</h4>
 <ul>
 <li>Completely quit Claude Desktop</li>
@@ -209,9 +209,9 @@
     }
 }
 </code></pre><p>In the response, this part is particularly important:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#d14">&#34;capabilities&#34;</span><span style="color:#a61717;background-color:#e3d2d2">:</span> {
-</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;tools&#34;</span>: {}
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#0a3069">&#34;capabilities&#34;</span><span style="color:#f6f8fa;background-color:#82071e">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0550ae">&#34;tools&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>This tells the client (Claude Desktop) that our server implements the &ldquo;tools&rdquo; capability. In MCP, servers can declare three main capabilities:</p>
 <ul>
 <li>&ldquo;tools&rdquo;: Functions that can be executed</li>
@@ -223,95 +223,95 @@
 <p>Now that we know we are getting the initialization request right, lets reorganize a bit. Use complete structs to parse (rather than generic map[string])
 Then we have to process the requests in a loop.</p>
 <p>First added struct definitions:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// JSON-RPC 2.0 base types
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">type</span> JSONRPCRequest <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	JSONRPC <span style="color:#458;font-weight:bold">string</span>      <span style="color:#d14">`json:&#34;jsonrpc&#34;`</span>
-</span></span><span style="display:flex;"><span>	ID      <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#d14">`json:&#34;id&#34;`</span>
-</span></span><span style="display:flex;"><span>	Method  <span style="color:#458;font-weight:bold">string</span>      <span style="color:#d14">`json:&#34;method&#34;`</span>
-</span></span><span style="display:flex;"><span>	Params  <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#d14">`json:&#34;params,omitempty&#34;`</span>
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#57606a">// JSON-RPC 2.0 base types</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">JSONRPCRequest</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">JSONRPC</span> <span style="color:#cf222e">string</span>      <span style="color:#0a3069">`json:&#34;jsonrpc&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">ID</span>      <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span> <span style="color:#0a3069">`json:&#34;id&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Method</span>  <span style="color:#cf222e">string</span>      <span style="color:#0a3069">`json:&#34;method&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Params</span>  <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span> <span style="color:#0a3069">`json:&#34;params,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> JSONRPCResponse <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	JSONRPC <span style="color:#458;font-weight:bold">string</span>        <span style="color:#d14">`json:&#34;jsonrpc&#34;`</span>
-</span></span><span style="display:flex;"><span>	ID      <span style="color:#000;font-weight:bold">interface</span>{}   <span style="color:#d14">`json:&#34;id&#34;`</span>
-</span></span><span style="display:flex;"><span>	Result  <span style="color:#000;font-weight:bold">interface</span>{}   <span style="color:#d14">`json:&#34;result,omitempty&#34;`</span>
-</span></span><span style="display:flex;"><span>	Error   <span style="color:#000;font-weight:bold">*</span>JSONRPCError <span style="color:#d14">`json:&#34;error,omitempty&#34;`</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">JSONRPCResponse</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">JSONRPC</span> <span style="color:#cf222e">string</span>        <span style="color:#0a3069">`json:&#34;jsonrpc&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">ID</span>      <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span>   <span style="color:#0a3069">`json:&#34;id&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Result</span>  <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span>   <span style="color:#0a3069">`json:&#34;result,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Error</span>   <span style="color:#0550ae">*</span><span style="color:#1f2328">JSONRPCError</span> <span style="color:#0a3069">`json:&#34;error,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> JSONRPCError <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Code    <span style="color:#458;font-weight:bold">int</span>         <span style="color:#d14">`json:&#34;code&#34;`</span>
-</span></span><span style="display:flex;"><span>	Message <span style="color:#458;font-weight:bold">string</span>      <span style="color:#d14">`json:&#34;message&#34;`</span>
-</span></span><span style="display:flex;"><span>	Data    <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#d14">`json:&#34;data,omitempty&#34;`</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">JSONRPCError</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Code</span>    <span style="color:#cf222e">int</span>         <span style="color:#0a3069">`json:&#34;code&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Message</span> <span style="color:#cf222e">string</span>      <span style="color:#0a3069">`json:&#34;message&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Data</span>    <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span> <span style="color:#0a3069">`json:&#34;data,omitempty&#34;`</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// MCP specific types for initialize
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">type</span> InitializeResult <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	ProtocolVersion <span style="color:#458;font-weight:bold">string</span>       <span style="color:#d14">`json:&#34;protocolVersion&#34;`</span>
-</span></span><span style="display:flex;"><span>	ServerInfo      ServerInfo   <span style="color:#d14">`json:&#34;serverInfo&#34;`</span>
-</span></span><span style="display:flex;"><span>	Capabilities    Capabilities <span style="color:#d14">`json:&#34;capabilities&#34;`</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#57606a">// MCP specific types for initialize</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">InitializeResult</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">ProtocolVersion</span> <span style="color:#cf222e">string</span>       <span style="color:#0a3069">`json:&#34;protocolVersion&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">ServerInfo</span>      <span style="color:#1f2328">ServerInfo</span>   <span style="color:#0a3069">`json:&#34;serverInfo&#34;`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Capabilities</span>    <span style="color:#1f2328">Capabilities</span> <span style="color:#0a3069">`json:&#34;capabilities&#34;`</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Then updated the main function:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
-</span></span><span style="display:flex;"><span>	decoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewDecoder</span>(os.Stdin)
-</span></span><span style="display:flex;"><span>	encoder <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">NewEncoder</span>(os.Stdout)
-</span></span><span style="display:flex;"><span>	<span style="color:#998;font-style:italic">// Set up logging to stderr
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>	log.<span style="color:#900;font-weight:bold">SetOutput</span>(os.Stderr)
-</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">SetFlags</span>(log.LstdFlags | log.Lmicroseconds)
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">main</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">decoder</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">json</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewDecoder</span><span style="color:#1f2328">(</span><span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Stdin</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">encoder</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">json</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewEncoder</span><span style="color:#1f2328">(</span><span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Stdout</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#57606a">// Set up logging to stderr</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">SetOutput</span><span style="color:#1f2328">(</span><span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Stderr</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">SetFlags</span><span style="color:#1f2328">(</span><span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#1f2328">LstdFlags</span> <span style="color:#1f2328">|</span> <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Lmicroseconds</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Starting imagegen-go MCP server ...&#34;</span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Starting imagegen-go MCP server ...&#34;</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> request JSONRPCRequest
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> decoder.<span style="color:#900;font-weight:bold">Decode</span>(<span style="color:#000;font-weight:bold">&amp;</span>request); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error decoding request: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendError</span>(encoder, <span style="color:#000;font-weight:bold">nil</span>, ParseError, <span style="color:#d14">&#34;Failed to parse JSON&#34;</span>)
-</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">break</span>
-</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">for</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">var</span> <span style="color:#1f2328">request</span> <span style="color:#1f2328">JSONRPCRequest</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">decoder</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Decode</span><span style="color:#1f2328">(</span><span style="color:#0550ae">&amp;</span><span style="color:#1f2328">request</span><span style="color:#1f2328">);</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error decoding request: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">nil</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ParseError</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Failed to parse JSON&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#cf222e">break</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received request: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(request))
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Received request: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">PrettyJSON</span><span style="color:#1f2328">(</span><span style="color:#1f2328">request</span><span style="color:#1f2328">))</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> request.JSONRPC <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;2.0&#34;</span> {
-</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidRequest, <span style="color:#d14">&#34;Only JSON-RPC 2.0 is supported&#34;</span>)
-</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">if</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">JSONRPC</span> <span style="color:#0550ae">!=</span> <span style="color:#0a3069">&#34;2.0&#34;</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InvalidRequest</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Only JSON-RPC 2.0 is supported&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> response <span style="color:#000;font-weight:bold">interface</span>{}
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">var</span> <span style="color:#1f2328">response</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">switch</span> request.Method {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;initialize&#34;</span>:
-</span></span><span style="display:flex;"><span>			response = JSONRPCResponse{
-</span></span><span style="display:flex;"><span>				JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
-</span></span><span style="display:flex;"><span>				ID:      request.ID,
-</span></span><span style="display:flex;"><span>				Result: InitializeResult{
-</span></span><span style="display:flex;"><span>					ProtocolVersion: <span style="color:#d14">&#34;2024-11-05&#34;</span>,
-</span></span><span style="display:flex;"><span>					ServerInfo: ServerInfo{
-</span></span><span style="display:flex;"><span>						Name:    <span style="color:#d14">&#34;imagegen-go&#34;</span>,
-</span></span><span style="display:flex;"><span>						Version: <span style="color:#d14">&#34;1.0.0&#34;</span>,
-</span></span><span style="display:flex;"><span>					},
-</span></span><span style="display:flex;"><span>					Capabilities: Capabilities{
-</span></span><span style="display:flex;"><span>						Tools: <span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}{},
-</span></span><span style="display:flex;"><span>					},
-</span></span><span style="display:flex;"><span>				},
-</span></span><span style="display:flex;"><span>			}
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">switch</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Method</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;initialize&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">response</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">JSONRPCResponse</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#1f2328">JSONRPC</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#1f2328">ID</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#1f2328">Result</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">InitializeResult</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">ProtocolVersion</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2024-11-05&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">ServerInfo</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">ServerInfo</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>						<span style="color:#1f2328">Name</span><span style="color:#1f2328">:</span>    <span style="color:#0a3069">&#34;imagegen-go&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>						<span style="color:#1f2328">Version</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;1.0.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">Capabilities</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">Capabilities</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>						<span style="color:#1f2328">Tools</span><span style="color:#1f2328">:</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{}{},</span>
+</span></span><span style="display:flex;"><span>					<span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>				<span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;notifications/initialized&#34;</span>, <span style="color:#d14">&#34;initialized&#34;</span>:
-</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Server initialized successfully&#34;</span>)
-</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">continue</span> <span style="color:#998;font-style:italic">// Skip sending response for notifications
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;notifications/initialized&#34;</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;initialized&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Server initialized successfully&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#cf222e">continue</span> <span style="color:#57606a">// Skip sending response for notifications</span>
+</span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>		
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">default</span>:
-</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, MethodNotFound, <span style="color:#d14">&#34;Method not implemented&#34;</span>)
-</span></span><span style="display:flex;"><span>			<span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">default</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">MethodNotFound</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Method not implemented&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">if</span> response <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>			log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Sending response: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(response))
-</span></span><span style="display:flex;"><span>			<span style="color:#900;font-weight:bold">sendResponse</span>(encoder, response)
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">if</span> <span style="color:#1f2328">response</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Sending response: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">PrettyJSON</span><span style="color:#1f2328">(</span><span style="color:#1f2328">response</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#6639ba">sendResponse</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">response</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;imagegen-go MCP server out of loop...&#34;</span>)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;imagegen-go MCP server out of loop...&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><h4 id="persistent-connection">Persistent Connection</h4>
 <ul>
 <li>The <code>for</code> loop keeps the server running and ready to handle multiple requests</li>
@@ -319,17 +319,17 @@ Then we have to process the requests in a loop.</p>
 <li>This creates a persistent connection between the client and server</li>
 </ul>
 <h4 id="protocol-handshake">Protocol Handshake</h4>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">switch</span> request.Method {
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;initialize&#34;</span>:
-</span></span><span style="display:flex;"><span>    response = JSONRPCResponse{
-</span></span><span style="display:flex;"><span>        JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
-</span></span><span style="display:flex;"><span>        ID:      request.ID,
-</span></span><span style="display:flex;"><span>        Result: InitializeResult{<span style="color:#000;font-weight:bold">...</span>},
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;notifications/initialized&#34;</span>, <span style="color:#d14">&#34;initialized&#34;</span>:
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Server initialized successfully&#34;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">continue</span>  <span style="color:#998;font-style:italic">// Skip sending response for notifications
-</span></span></span></code></pre></div><ul>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">switch</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Method</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;initialize&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">response</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">JSONRPCResponse</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">JSONRPC</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">ID</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">Result</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">InitializeResult</span><span style="color:#1f2328">{</span><span style="color:#0550ae">...</span><span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;notifications/initialized&#34;</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;initialized&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Server initialized successfully&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">continue</span>  <span style="color:#57606a">// Skip sending response for notifications</span>
+</span></span></code></pre></div><ul>
 <li>The MCP protocol has a two-step handshake:
 <ol>
 <li>Client sends <code>initialize</code> request -&gt; Server responds with capabilities</li>
@@ -349,45 +349,45 @@ Then we have to process the requests in a loop.</p>
 </ol>
 <h2 id="list-the-tools">List the tools</h2>
 <p>Now, let&rsquo;s handle tools/list request from the client.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;tools/list&#34;</span>:
-</span></span><span style="display:flex;"><span>    toolSchema <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">RawMessage</span>(<span style="color:#d14">`{
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">        &#34;type&#34;: &#34;object&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">        &#34;properties&#34;: {
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;prompt&#34;: {
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;string&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Description of the image to generate&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            },
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;width&#34;: {
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;number&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Width of the image in pixels&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;default&#34;: 512
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            },
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;height&#34;: {
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;number&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Height of the image in pixels&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;default&#34;: 512
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            },
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            &#34;destination&#34;: {
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;type&#34;: &#34;string&#34;,
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">                &#34;description&#34;: &#34;Path where the generated image should be saved&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">            }
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">        },
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">        &#34;required&#34;: [&#34;prompt&#34;, &#34;destination&#34;]
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">    }`</span>)
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;tools/list&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">toolSchema</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">json</span><span style="color:#1f2328">.</span><span style="color:#6639ba">RawMessage</span><span style="color:#1f2328">(</span><span style="color:#0a3069">`{
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">        &#34;type&#34;: &#34;object&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">        &#34;properties&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            &#34;prompt&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;type&#34;: &#34;string&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;description&#34;: &#34;Description of the image to generate&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            },
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            &#34;width&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;type&#34;: &#34;number&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;description&#34;: &#34;Width of the image in pixels&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;default&#34;: 512
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            },
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            &#34;height&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;type&#34;: &#34;number&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;description&#34;: &#34;Height of the image in pixels&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;default&#34;: 512
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            },
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            &#34;destination&#34;: {
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;type&#34;: &#34;string&#34;,
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">                &#34;description&#34;: &#34;Path where the generated image should be saved&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">            }
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">        },
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">        &#34;required&#34;: [&#34;prompt&#34;, &#34;destination&#34;]
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">    }`</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    response = JSONRPCResponse{
-</span></span><span style="display:flex;"><span>        JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
-</span></span><span style="display:flex;"><span>        ID:      request.ID,
-</span></span><span style="display:flex;"><span>        Result: ListToolsResult{
-</span></span><span style="display:flex;"><span>            Tools: []Tool{
-</span></span><span style="display:flex;"><span>                {
-</span></span><span style="display:flex;"><span>                    Name:        <span style="color:#d14">&#34;generate-image&#34;</span>,
-</span></span><span style="display:flex;"><span>                    Description: <span style="color:#d14">&#34;Generate an image using Stable Diffusion based on a text prompt&#34;</span>,
-</span></span><span style="display:flex;"><span>                    InputSchema: toolSchema,
-</span></span><span style="display:flex;"><span>                },
-</span></span><span style="display:flex;"><span>            },
-</span></span><span style="display:flex;"><span>        },
-</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">response</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">JSONRPCResponse</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">JSONRPC</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">ID</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">Result</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">ListToolsResult</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Tools</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">[]</span><span style="color:#1f2328">Tool</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#1f2328">Name</span><span style="color:#1f2328">:</span>        <span style="color:#0a3069">&#34;generate-image&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#1f2328">Description</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;Generate an image using Stable Diffusion based on a text prompt&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#1f2328">InputSchema</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">toolSchema</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Let&rsquo;s break down how this works:</p>
 <h4 id="tool-definition">Tool Definition</h4>
 <p>Each tool needs three key pieces of information:
@@ -397,12 +397,12 @@ Then we have to process the requests in a loop.</p>
 <h4 id="input-schema">Input Schema</h4>
 <ul>
 <li>The schema defines four parameters for image generation:
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#000080">&#34;prompt&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">string</span>      <span style="color:#998;font-style:italic">// Required: The description of the image to generate
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#d14">&#34;width&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">number</span>      <span style="color:#998;font-style:italic">// Optional: Defaults to 512
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#d14">&#34;height&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">number</span>     <span style="color:#998;font-style:italic">// Optional: Defaults to 512
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#d14">&#34;destination&#34;</span>: <span style="color:#a61717;background-color:#e3d2d2">string</span> <span style="color:#998;font-style:italic">// Required: Where to save the image
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0550ae">&#34;prompt&#34;</span><span style="color:#1f2328">:</span> <span style="color:#f6f8fa;background-color:#82071e">string</span>      <span style="color:#57606a">// Required: The description of the image to generate
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a"></span>    <span style="color:#0a3069">&#34;width&#34;</span><span style="color:#1f2328">:</span> <span style="color:#f6f8fa;background-color:#82071e">number</span>      <span style="color:#57606a">// Optional: Defaults to 512
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a"></span>    <span style="color:#0a3069">&#34;height&#34;</span><span style="color:#1f2328">:</span> <span style="color:#f6f8fa;background-color:#82071e">number</span>     <span style="color:#57606a">// Optional: Defaults to 512
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a"></span>    <span style="color:#0a3069">&#34;destination&#34;</span><span style="color:#1f2328">:</span> <span style="color:#f6f8fa;background-color:#82071e">string</span> <span style="color:#57606a">// Required: Where to save the image
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a"></span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div></li>
 <li>Note the <code>required</code> field specifies which parameters are mandatory</li>
 <li>The <code>default</code> fields provide fallback values for optional parameters</li>
@@ -558,124 +558,124 @@ Then we have to process the requests in a loop.</p>
 <h2 id="the-toolscall-implementation">The &ldquo;tools/call&rdquo; Implementation</h2>
 <p>Now let&rsquo;s implement the core functionality of our server: image generation. The implementation follows a straightforward flow - collect parameters from the request, call the OpenAI API to generate the image, and save it to a specified location.</p>
 <p>Here&rsquo;s our implementation of the <code>tools/call</code> handler:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;tools/call&#34;</span>:
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Handling tools/call request&#34;</span>)
-</span></span><span style="display:flex;"><span>    params, ok <span style="color:#000;font-weight:bold">:=</span> request.Params.(<span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{})
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Invalid parameters type: %T&#34;</span>, request.Params)
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Invalid parameters&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;tools/call&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Handling tools/call request&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">params</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Params</span><span style="color:#1f2328">.(</span><span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">!</span><span style="color:#1f2328">ok</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error: Invalid parameters type: %T&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Params</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InvalidParams</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Invalid parameters&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    toolName, ok <span style="color:#000;font-weight:bold">:=</span> params[<span style="color:#d14">&#34;name&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Tool name not found or invalid type: %T&#34;</span>, params[<span style="color:#d14">&#34;name&#34;</span>])
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Invalid tool name&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Tool requested: %s&#34;</span>, toolName)
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">toolName</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">params</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;name&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">!</span><span style="color:#1f2328">ok</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error: Tool name not found or invalid type: %T&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">params</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;name&#34;</span><span style="color:#1f2328">])</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InvalidParams</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Invalid tool name&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Tool requested: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">toolName</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> toolName <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;generate-image&#34;</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Unknown tool requested: %s&#34;</span>, toolName)
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, MethodNotFound, <span style="color:#d14">&#34;Unknown tool&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">toolName</span> <span style="color:#0550ae">!=</span> <span style="color:#0a3069">&#34;generate-image&#34;</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error: Unknown tool requested: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">toolName</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">MethodNotFound</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Unknown tool&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    args, ok <span style="color:#000;font-weight:bold">:=</span> params[<span style="color:#d14">&#34;arguments&#34;</span>].(<span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{})
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Invalid arguments type: %T&#34;</span>, params[<span style="color:#d14">&#34;arguments&#34;</span>])
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Invalid arguments&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received arguments: %v&#34;</span>, <span style="color:#900;font-weight:bold">PrettyJSON</span>(args))
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">args</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">params</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;arguments&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">!</span><span style="color:#1f2328">ok</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error: Invalid arguments type: %T&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">params</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;arguments&#34;</span><span style="color:#1f2328">])</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InvalidParams</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Invalid arguments&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Received arguments: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">PrettyJSON</span><span style="color:#1f2328">(</span><span style="color:#1f2328">args</span><span style="color:#1f2328">))</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    prompt, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;prompt&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> !ok <span style="color:#000;font-weight:bold">||</span> prompt <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;&#34;</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error: Invalid or empty prompt: %v&#34;</span>, args[<span style="color:#d14">&#34;prompt&#34;</span>])
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InvalidParams, <span style="color:#d14">&#34;Prompt is required&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Processing prompt: %s&#34;</span>, prompt)
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">prompt</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">args</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;prompt&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">!</span><span style="color:#1f2328">ok</span> <span style="color:#0550ae">||</span> <span style="color:#1f2328">prompt</span> <span style="color:#0550ae">==</span> <span style="color:#0a3069">&#34;&#34;</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error: Invalid or empty prompt: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">args</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;prompt&#34;</span><span style="color:#1f2328">])</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InvalidParams</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Prompt is required&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Processing prompt: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">prompt</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Get destination path or use filename from sanitized prompt
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">var</span> destPath <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> dest, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;destination&#34;</span>].(<span style="color:#458;font-weight:bold">string</span>); ok <span style="color:#000;font-weight:bold">&amp;&amp;</span> dest <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#34;&#34;</span> {
-</span></span><span style="display:flex;"><span>        destPath = dest
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using provided destination path: %s&#34;</span>, destPath)
-</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>        <span style="color:#998;font-style:italic">// Create filename from sanitized prompt
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        sanitized <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">sanitizeFilename</span>(prompt)
-</span></span><span style="display:flex;"><span>        defaultPath <span style="color:#000;font-weight:bold">:=</span> os.<span style="color:#900;font-weight:bold">Getenv</span>(<span style="color:#d14">&#34;DEFAULT_DOWNLOAD_PATH&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">if</span> defaultPath <span style="color:#000;font-weight:bold">==</span> <span style="color:#d14">&#34;&#34;</span> {
-</span></span><span style="display:flex;"><span>            homeDir, err <span style="color:#000;font-weight:bold">:=</span> os.<span style="color:#900;font-weight:bold">UserHomeDir</span>()
-</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>                log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error getting user home directory: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>                <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, <span style="color:#d14">&#34;Could not determine default path&#34;</span>)
-</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>            defaultPath = filepath.<span style="color:#900;font-weight:bold">Join</span>(homeDir, <span style="color:#d14">&#34;Downloads&#34;</span>)
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>        destPath = filepath.<span style="color:#900;font-weight:bold">Join</span>(defaultPath, sanitized<span style="color:#000;font-weight:bold">+</span><span style="color:#d14">&#34;.webp&#34;</span>)
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using generated destination path: %s&#34;</span>, destPath)
-</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Get destination path or use filename from sanitized prompt</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">var</span> <span style="color:#1f2328">destPath</span> <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">dest</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">args</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;destination&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">);</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">&amp;&amp;</span> <span style="color:#1f2328">dest</span> <span style="color:#0550ae">!=</span> <span style="color:#0a3069">&#34;&#34;</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">destPath</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">dest</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Using provided destination path: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">destPath</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span> <span style="color:#cf222e">else</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#57606a">// Create filename from sanitized prompt</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">sanitized</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">sanitizeFilename</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prompt</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">defaultPath</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Getenv</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;DEFAULT_DOWNLOAD_PATH&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">if</span> <span style="color:#1f2328">defaultPath</span> <span style="color:#0550ae">==</span> <span style="color:#0a3069">&#34;&#34;</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">homeDir</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">os</span><span style="color:#1f2328">.</span><span style="color:#6639ba">UserHomeDir</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error getting user home directory: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InternalError</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Could not determine default path&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">defaultPath</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">filepath</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Join</span><span style="color:#1f2328">(</span><span style="color:#1f2328">homeDir</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;Downloads&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">destPath</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">filepath</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Join</span><span style="color:#1f2328">(</span><span style="color:#1f2328">defaultPath</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sanitized</span><span style="color:#0550ae">+</span><span style="color:#0a3069">&#34;.webp&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Using generated destination path: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">destPath</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Generate unique filename with error handling
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    fullPath, err <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">generateUniqueFilename</span>(destPath, prompt)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error generating unique filename: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Error generating filename: %v&#34;</span>, err))
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Generated unique filename: %s&#34;</span>, fullPath)
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Generate unique filename with error handling</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">fullPath</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">generateUniqueFilename</span><span style="color:#1f2328">(</span><span style="color:#1f2328">destPath</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">prompt</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error generating unique filename: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InternalError</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Sprintf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error generating filename: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Generated unique filename: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fullPath</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Get dimensions with more detailed logging
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    width <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">1920</span>
-</span></span><span style="display:flex;"><span>    height <span style="color:#000;font-weight:bold">:=</span> <span style="color:#099">1080</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> w, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;width&#34;</span>].(<span style="color:#458;font-weight:bold">float64</span>); ok {
-</span></span><span style="display:flex;"><span>        width = <span style="color:#0086b3">int</span>(w)
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using provided width: %d&#34;</span>, width)
-</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using default width: %d&#34;</span>, width)
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> h, ok <span style="color:#000;font-weight:bold">:=</span> args[<span style="color:#d14">&#34;height&#34;</span>].(<span style="color:#458;font-weight:bold">float64</span>); ok {
-</span></span><span style="display:flex;"><span>        height = <span style="color:#0086b3">int</span>(h)
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using provided height: %d&#34;</span>, height)
-</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Using default height: %d&#34;</span>, height)
-</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Get dimensions with more detailed logging</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">width</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">1920</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">height</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">1080</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">w</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">args</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;width&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">float64</span><span style="color:#1f2328">);</span> <span style="color:#1f2328">ok</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">width</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">int</span><span style="color:#1f2328">(</span><span style="color:#1f2328">w</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Using provided width: %d&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">width</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span> <span style="color:#cf222e">else</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Using default width: %d&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">width</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">h</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">args</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;height&#34;</span><span style="color:#1f2328">].(</span><span style="color:#cf222e">float64</span><span style="color:#1f2328">);</span> <span style="color:#1f2328">ok</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">height</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">int</span><span style="color:#1f2328">(</span><span style="color:#1f2328">h</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Using provided height: %d&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">height</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span> <span style="color:#cf222e">else</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Using default height: %d&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">height</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Generate image
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Starting image generation with OpenAI...&#34;</span>)
-</span></span><span style="display:flex;"><span>    imageURL, err <span style="color:#000;font-weight:bold">:=</span> openai.<span style="color:#900;font-weight:bold">GenerateImage</span>(prompt, width, height)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error generating image: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Error generating image: %v&#34;</span>, err))
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Successfully generated image URL: %s&#34;</span>, imageURL)
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Generate image</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Starting image generation with OpenAI...&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">imageURL</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">openai</span><span style="color:#1f2328">.</span><span style="color:#6639ba">GenerateImage</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prompt</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">width</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">height</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error generating image: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InternalError</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Sprintf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error generating image: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Successfully generated image URL: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">imageURL</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Download image
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Starting image download...&#34;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">:=</span> openai.<span style="color:#900;font-weight:bold">DownloadImage</span>(imageURL, fullPath); err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error downloading image: %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>        <span style="color:#900;font-weight:bold">sendError</span>(encoder, request.ID, InternalError, fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Error saving image: %v&#34;</span>, err))
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">continue</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Successfully downloaded image to: %s&#34;</span>, fullPath)
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Download image</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Starting image download...&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">openai</span><span style="color:#1f2328">.</span><span style="color:#6639ba">DownloadImage</span><span style="color:#1f2328">(</span><span style="color:#1f2328">imageURL</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fullPath</span><span style="color:#1f2328">);</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error downloading image: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#6639ba">sendError</span><span style="color:#1f2328">(</span><span style="color:#1f2328">encoder</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">InternalError</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Sprintf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error saving image: %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">continue</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Successfully downloaded image to: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fullPath</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>    response = JSONRPCResponse{
-</span></span><span style="display:flex;"><span>        JSONRPC: <span style="color:#d14">&#34;2.0&#34;</span>,
-</span></span><span style="display:flex;"><span>        ID:      request.ID,
-</span></span><span style="display:flex;"><span>        Result: CallToolResult{
-</span></span><span style="display:flex;"><span>            Content: []ToolContent{
-</span></span><span style="display:flex;"><span>                {
-</span></span><span style="display:flex;"><span>                    Type: <span style="color:#d14">&#34;text&#34;</span>,
-</span></span><span style="display:flex;"><span>                    Text: fmt.<span style="color:#900;font-weight:bold">Sprintf</span>(<span style="color:#d14">&#34;Image generated and saved to: %s&#34;</span>, fullPath),
-</span></span><span style="display:flex;"><span>                },
-</span></span><span style="display:flex;"><span>            },
-</span></span><span style="display:flex;"><span>        },
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Sending successful response for image generation&#34;</span>)
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">response</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">JSONRPCResponse</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">JSONRPC</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;2.0&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">ID</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">ID</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">Result</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">CallToolResult</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Content</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">[]</span><span style="color:#1f2328">ToolContent</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#1f2328">Type</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;text&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>                    <span style="color:#1f2328">Text</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Sprintf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Image generated and saved to: %s&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fullPath</span><span style="color:#1f2328">),</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Sending successful response for image generation&#34;</span><span style="color:#1f2328">)</span>
 </span></span></code></pre></div><p>Let&rsquo;s understand what&rsquo;s happening in this implementation:</p>
 <h4 id="parameter-validation">Parameter Validation</h4>
 <ul>
@@ -697,17 +697,17 @@ Then we have to process the requests in a loop.</p>
 </ul>
 <h3 id="configuration-updates">Configuration Updates</h3>
 <p>To use this functionality, we need to update our Claude Desktop configuration with the required environment variables. Modify your <code>claude_desktop_config.json</code> to include:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  <span style="color:#000080">&#34;mcpServers&#34;</span>: {
-</span></span><span style="display:flex;"><span>   <span style="color:#000080">&#34;imagegen-go&#34;</span>: {
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;command&#34;</span>: <span style="color:#d14">&#34;/Users/user/imagegen-go/bin/imagegen-go&#34;</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;env&#34;</span>: {
-</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;OPENAI_API_KEY&#34;</span>: <span style="color:#d14">&#34;xxxx&#34;</span>,
-</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;DEFAULT_DOWNLOAD_PATH&#34;</span>:<span style="color:#d14">&#34;/Users/user/Downloads&#34;</span>
-</span></span><span style="display:flex;"><span>      }
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  }
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#0550ae">&#34;mcpServers&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#0550ae">&#34;imagegen-go&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;command&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;/Users/user/imagegen-go/bin/imagegen-go&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;env&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0550ae">&#34;OPENAI_API_KEY&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;xxxx&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0550ae">&#34;DEFAULT_DOWNLOAD_PATH&#34;</span><span style="color:#1f2328">:</span><span style="color:#0a3069">&#34;/Users/user/Downloads&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>This configuration provides two essential environment variables:</p>
 <ul>
 <li><code>OPENAI_API_KEY</code>: Your OpenAI API key for image generation</li>
@@ -724,15 +724,15 @@ The next call didn&rsquo;t have dimension parameters:</p>
 <p><img src="../images/dimention-discussion.png" alt="Dimension discussion"></p>
 <h2 id="timeout-and-cancelled-notifications">Timeout and cancelled notifications</h2>
 <p>The API call to generate the image and the image download takes some time. This can cause the client to have timeout and sends a &ldquo;cancelled&rdquo; notification. Initially, this call was not handled and resulted in responding with error.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;cancelled&#34;</span>:
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span> params, ok <span style="color:#000;font-weight:bold">:=</span> request.Params.(<span style="color:#000;font-weight:bold">map</span>[<span style="color:#458;font-weight:bold">string</span>]<span style="color:#000;font-weight:bold">interface</span>{}); ok {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received cancellation notification for request ID: %v, reason: %v&#34;</span>,
-</span></span><span style="display:flex;"><span>            params[<span style="color:#d14">&#34;requestId&#34;</span>], params[<span style="color:#d14">&#34;reason&#34;</span>])
-</span></span><span style="display:flex;"><span>    } <span style="color:#000;font-weight:bold">else</span> {
-</span></span><span style="display:flex;"><span>        log.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Received cancellation notification with invalid params&#34;</span>)
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">continue</span> <span style="color:#998;font-style:italic">// Skip sending response for notifications
-</span></span></span></code></pre></div><p>The real fix would be to keep being responsive by handling the long running request in another goroutine.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;cancelled&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">params</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ok</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">request</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Params</span><span style="color:#1f2328">.(</span><span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{});</span> <span style="color:#1f2328">ok</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Received cancellation notification for request ID: %v, reason: %v&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">params</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;requestId&#34;</span><span style="color:#1f2328">],</span> <span style="color:#1f2328">params</span><span style="color:#1f2328">[</span><span style="color:#0a3069">&#34;reason&#34;</span><span style="color:#1f2328">])</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span> <span style="color:#cf222e">else</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">log</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Received cancellation notification with invalid params&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">continue</span> <span style="color:#57606a">// Skip sending response for notifications</span>
+</span></span></code></pre></div><p>The real fix would be to keep being responsive by handling the long running request in another goroutine.</p>
 <h2 id="surprises">Surprises</h2>
 <p>I discovered something fascinating about Claude&rsquo;s image generation capabilities - it&rsquo;s quite the artist when it comes to enhancing prompts! Even when I toss a basic description its way, Claude knows exactly how to jazz it up for better results.</p>
 <p>Here&rsquo;s a perfect example. I gave Claude this simple prompt:</p>
@@ -766,6 +766,8 @@ The next call didn&rsquo;t have dimension parameters:</p>
     
     <a href="/ai/mcp/" class="pr-4">&larr; Model Context Protocol (MCP): Building Bridges Between AI and Your World</a>
     
+    
+    <a href="/ai/self-hosted-rag-for-privacy/" class="pl-4">Self-Hosted RAG Architecture for Privacy-Sensitive Document Search with Golang &rarr;</a>
         
 </div>
 

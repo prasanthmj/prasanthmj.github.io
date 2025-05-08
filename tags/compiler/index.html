@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>compiler </title><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Compiler </title><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body class="antialiased text-grey-900">
@@ -31,8 +31,10 @@
         
             <h2><a href="/go/peg-parser-in-go/">Building a simple query parser using PEG in Go</a></h2>
             <p>
-                In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
-The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.
+                <p>In another post, <a href="../simple-query-parser/">Simple Query Parser</a> we had built a simple query parser using <a href="https://github.com/alecthomas/participle">Participle</a> - a parser builder for go lang.
+<a href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">Parsing expression grammar (PEG)</a> is a type of grammar. The advantage of PEG is that it doesn&rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.</p>
+<p>The go language port of PEG is <a href="https://pkg.go.dev/github.com/mna/pigeon">pigeon</a>
+The popular Javascript port of PEG is <a href="https://pegjs.org/documentation">pegjs</a>. A good introduction to PEG grammar can be found in the <a href="https://pegjs.org/documentation">pegjs documentation</a> and also <a href="https://github.com/PhilippeSigaud/Pegged/wiki/PEG-Basics">here</a>.</p>
             </p> 
             <p>
                 <a href="/go/peg-parser-in-go/" class="btn-continue">Continue Reading &rarr;</a>
@@ -42,8 +44,8 @@ The go language port of PEG is pigeon The popular Javascript port of PEG is pegj
         
             <h2><a href="/go/simple-query-parser/">Let&#39;s build a search query parser in Go</a></h2>
             <p>
-                Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &ldquo;some phrase&rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
-Imagine we are building an online store that allows searching for products using a simple but structured query language.
+                <p>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &ldquo;some phrase&rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.</p>
+<p>Imagine we are building an online store that allows searching for products using a simple but structured query language. You can search for a laptop with more than 8GB RAM and more than 512GB SSD using this query:</p>
             </p> 
             <p>
                 <a href="/go/simple-query-parser/" class="btn-continue">Continue Reading &rarr;</a>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Rag on Prasanth Janardhanan</title>
+    <link>/tags/rag/</link>
+    <description>Recent content in Rag on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Wed, 07 May 2025 09:55:45 +0000</lastBuildDate>
+    <atom:link href="/tags/rag/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Self-Hosted RAG Architecture for Privacy-Sensitive Document Search with Golang</title>
+      <link>/ai/self-hosted-rag-for-privacy/</link>
+      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <guid>/ai/self-hosted-rag-for-privacy/</guid>
+      <description>&lt;p&gt;Remember the days of boolean search operators? The frustrating experience of trying to find that one document by guessing the exact keywords it might contain? For decades, our ability to search through documents has been limited by keyword matching—a primitive approach that fails to capture the richness of human language and intent.&lt;/p&gt;&#xA;&lt;p&gt;Traditional search technology has evolved through several stages: from basic keyword matching to more sophisticated approaches involving stemming, lemmatization, and eventually, statistical methods like TF-IDF (Term Frequency-Inverse Document Frequency). Each iteration brought incremental improvements, but they all shared a fundamental limitation—they didn&amp;rsquo;t truly understand the meaning behind our queries.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>microservices on Prasanth Janardhanan</title>
+    <title>Microservices on Prasanth Janardhanan</title>
     <link>/tags/microservices/</link>
-    <description>Recent content in microservices on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Microservices on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Fri, 22 Nov 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/microservices/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 22 Nov 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/microservices/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Implementing Saga Pattern with Temporal in Go Microservices: Journey Through Distributed Transactions</title>
       <link>/microservices/saga-pattern-using-temporal-and-go/</link>
       <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/microservices/saga-pattern-using-temporal-and-go/</guid>
-      <description>Picture this: You&amp;rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&amp;rsquo;s call it the &amp;ldquo;Distributed Mocha Supreme&amp;rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&amp;rsquo;s going great until—oops!—they&amp;rsquo;re out of whipped cream. Now what? Do they throw away everything they&amp;rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval?</description>
+      <description>&lt;p&gt;&lt;img src=&#34;../images/coffee-spill-barista.webp&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Picture this: You&amp;rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&amp;rsquo;s call it the &amp;ldquo;Distributed Mocha Supreme&amp;rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&amp;rsquo;s going great until—oops!—they&amp;rsquo;re out of whipped cream. Now what? Do they throw away everything they&amp;rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval? Welcome to the world of distributed transactions in microservices!&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

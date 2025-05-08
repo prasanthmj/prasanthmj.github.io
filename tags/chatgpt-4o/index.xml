@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>chatgpt 4o on Prasanth Janardhanan</title>
+    <title>Chatgpt 4o on Prasanth Janardhanan</title>
     <link>/tags/chatgpt-4o/</link>
-    <description>Recent content in chatgpt 4o on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Chatgpt 4o on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Tue, 07 May 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/chatgpt-4o/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 07 May 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/chatgpt-4o/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>ChatGpt 4o, the Rise of Conversational Interfaces and the Shifting Landscape of Human-Computer Interaction</title>
       <link>/ai/llms-to-transform-ui/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/llms-to-transform-ui/</guid>
-      <description>Picture this: You&amp;rsquo;re a sales manager trying to stay on top of your team&amp;rsquo;s performance. Instead of navigating through complex menus and dashboards, you simply turn to your computer and say, &amp;ldquo;Get me the list of all new leads for the last month.&amp;rdquo; Instantly, your screen displays a neatly organized list of every new lead your team has generated, complete with contact information, lead source, and potential revenue.
-Or imagine this: You&amp;rsquo;re a business analyst tasked with identifying trends and opportunities in your company&amp;rsquo;s sales data.</description>
+      <description>&lt;p&gt;Picture this: You&amp;rsquo;re a sales manager trying to stay on top of your team&amp;rsquo;s performance. Instead of navigating through complex menus and dashboards, you simply turn to your computer and say, &amp;ldquo;Get me the list of all new leads for the last month.&amp;rdquo; Instantly, your screen displays a neatly organized list of every new lead your team has generated, complete with contact information, lead source, and potential revenue.&lt;/p&gt;&#xA;&lt;p&gt;Or imagine this: You&amp;rsquo;re a business analyst tasked with identifying trends and opportunities in your company&amp;rsquo;s sales data. Rather than writing complex queries and creating visualizations from scratch, you simply ask your computer, &amp;ldquo;Get me the sales report for the last month for California for blue widgets.&amp;rdquo; Moments later, you&amp;rsquo;re presented with a comprehensive report that breaks down sales by region, product, and customer segment, highlighting key insights and areas for growth.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

@@ -1,32 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>terraform on Prasanth Janardhanan</title>
+    <title>Terraform on Prasanth Janardhanan</title>
     <link>/tags/terraform/</link>
-    <description>Recent content in terraform on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Terraform on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 22 Nov 2020 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/terraform/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Creating an isolated cluster - provisioning a cluster and a Bastion host using Ansible</title>
       <link>/terraform/ansible-cloud-setup/</link>
       <pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/terraform/ansible-cloud-setup/</guid>
-      <description>This is the second part of the series on setting up a cluster using Terraform and Ansible. In the first part, we had set up the bare cluster Virtual Machines. The set up included a virtual private network, a bastion server, and a separately configurable cluster of nodes.
-The nodes are ready but not software or configuration is done so far. In the next step, we will provision all the nodes in our cloud</description>
+      <description>&lt;p&gt;This is the second part of the series on setting up a cluster using Terraform and Ansible. In the &lt;a href=&#34;../terraform-hetzner-cloud-setup-example/&#34;&gt;first part&lt;/a&gt;, we had set up the bare cluster Virtual Machines.&#xA;The set up included a virtual private network, a bastion server, and a separately configurable cluster of nodes.&lt;/p&gt;&#xA;&lt;p&gt;The nodes are ready but not software or configuration is done so far. In the next step, we will provision all the nodes in our cloud&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Setting up a Bastion host and a three-node cluster on Hetzner cloud using Terraform and Ansible</title>
       <link>/terraform/terraform-hetzner-cloud-setup-example/</link>
       <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/terraform/terraform-hetzner-cloud-setup-example/</guid>
-      <description>Infrastructure as code has a great benefit - you can make a cluster available in a few minutes. Then, switch the configuration with a few updates to the configuration. If you ever had long hours staring at blinking LEDs while it installed from a stack of CDs, you will know what a relief this is.
-Terraform makes it possible to declaratively create the cloud infrastructure, supports all major cloud providers, and is easy to learn if you can spare an afternoon.</description>
+      <description>&lt;p&gt;Infrastructure as code has a great benefit - you can make a cluster available in a few minutes. Then, switch the configuration with a few updates to the configuration. If you ever had long hours staring at blinking LEDs while it installed from a stack of CDs, you will know what a relief this is.&lt;/p&gt;&#xA;&lt;p&gt;Terraform makes it possible to declaratively create the cloud infrastructure, supports all major cloud providers, and is easy to learn if you can spare an afternoon.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

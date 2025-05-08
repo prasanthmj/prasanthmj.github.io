@@ -1,32 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>compiler on Prasanth Janardhanan</title>
+    <title>Compiler on Prasanth Janardhanan</title>
     <link>/tags/compiler/</link>
-    <description>Recent content in compiler on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Compiler on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate><atom:link href="/tags/compiler/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Fri, 15 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/compiler/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Building a simple query parser using PEG in Go</title>
       <link>/go/peg-parser-in-go/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/go/peg-parser-in-go/</guid>
-      <description>In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
-The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.</description>
+      <description>&lt;p&gt;In another post, &lt;a href=&#34;../simple-query-parser/&#34;&gt;Simple Query Parser&lt;/a&gt; we had built a simple query parser using &lt;a href=&#34;https://github.com/alecthomas/participle&#34;&gt;Participle&lt;/a&gt; - a parser builder for go lang.&#xA;&lt;a href=&#34;https://en.wikipedia.org/wiki/Parsing_expression_grammar&#34;&gt;Parsing expression grammar (PEG)&lt;/a&gt; is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.&lt;/p&gt;&#xA;&lt;p&gt;The go language port of PEG is &lt;a href=&#34;https://pkg.go.dev/github.com/mna/pigeon&#34;&gt;pigeon&lt;/a&gt;&#xA;The popular Javascript port of PEG is &lt;a href=&#34;https://pegjs.org/documentation&#34;&gt;pegjs&lt;/a&gt;. A good introduction to PEG grammar can be found in the &lt;a href=&#34;https://pegjs.org/documentation&#34;&gt;pegjs documentation&lt;/a&gt; and also &lt;a href=&#34;https://github.com/PhilippeSigaud/Pegged/wiki/PEG-Basics&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Let&#39;s build a search query parser in Go</title>
       <link>/go/simple-query-parser/</link>
       <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/simple-query-parser/</guid>
-      <description>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
-Imagine we are building an online store that allows searching for products using a simple but structured query language.</description>
+      <description>&lt;p&gt;Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.&lt;/p&gt;&#xA;&lt;p&gt;Imagine we are building an online store that allows searching for products using a simple but structured query language. You can search for a laptop with more than 8GB RAM and more than 512GB SSD using this query:&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

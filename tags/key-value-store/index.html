@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>key-value store </title><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Key-Value Store </title><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body class="antialiased text-grey-900">
@@ -31,9 +31,16 @@
         
             <h2><a href="/go/badgerdb-wrapper/">A Simple Wrapper to BadgerDB Key-Value store in Go</a></h2>
             <p>
-                BadgerDB is an embeddable key-value store written in Go. It is a persistent store.
-In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &ldquo;virtual tables&rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.
-Usage import( &#34;github.com/prasanthmj/sett&#34; ) s := sett.
+                <p><a href="https://github.com/dgraph-io/badger">BadgerDB</a> is an embeddable key-value store written in Go. It is a persistent store.</p>
+<p>In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &ldquo;virtual tables&rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.</p>
+<h2 id="usage">Usage</h2>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">import</span><span style="color:#1f2328">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#0a3069">&#34;github.com/prasanthmj/sett&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">s</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">sett</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Open</span><span style="color:#1f2328">(</span><span style="color:#1f2328">sett</span><span style="color:#1f2328">.</span><span style="color:#6639ba">DefaultOptions</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;./data/mydb&#34;</span><span style="color:#1f2328">))</span>
+</span></span></code></pre></div><p>To set a string key-value pair, call <code>s.SetStr(k, v)</code>
+and to get it back, call <code>s.GetStr(k)</code>.</p>
             </p> 
             <p>
                 <a href="/go/badgerdb-wrapper/" class="btn-continue">Continue Reading &rarr;</a>

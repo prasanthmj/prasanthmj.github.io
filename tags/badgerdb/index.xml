@@ -1,32 +1,27 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>badgerdb on Prasanth Janardhanan</title>
+    <title>Badgerdb on Prasanth Janardhanan</title>
     <link>/tags/badgerdb/</link>
-    <description>Recent content in badgerdb on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Badgerdb on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Thu, 10 Sep 2020 00:00:00 +0000</lastBuildDate><atom:link href="/tags/badgerdb/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 10 Sep 2020 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/badgerdb/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Background task processor in Go with persistence support using BadgerDB</title>
       <link>/go/go-task-queue-with-badgerdb-backend/</link>
       <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/go-task-queue-with-badgerdb-backend/</guid>
-      <description>Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks. For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress. A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.</description>
+      <description>&lt;p&gt;Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks.&#xA;For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress.&#xA;A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.&#xA;qUP (called queue up) is a background task manager. It persists the task status and tracking information to the disc so that restarting the process does not lose the tasks that were in progress. BadgerDB is used for persistence.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>A Simple Wrapper to BadgerDB Key-Value store in Go</title>
       <link>/go/badgerdb-wrapper/</link>
       <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/badgerdb-wrapper/</guid>
-      <description>BadgerDB is an embeddable key-value store written in Go. It is a persistent store.
-In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.
-Usage import( &amp;#34;github.com/prasanthmj/sett&amp;#34; ) s := sett.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/dgraph-io/badger&#34;&gt;BadgerDB&lt;/a&gt; is an embeddable key-value store written in Go. It is a persistent store.&lt;/p&gt;&#xA;&lt;p&gt;In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.&lt;/p&gt;&#xA;&lt;h2 id=&#34;usage&#34;&gt;Usage&lt;/h2&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#cf222e&#34;&gt;import&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#0a3069&#34;&gt;&amp;#34;github.com/prasanthmj/sett&amp;#34;&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color:#0550ae&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;sett&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#6639ba&#34;&gt;Open&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;sett&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#6639ba&#34;&gt;DefaultOptions&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0a3069&#34;&gt;&amp;#34;./data/mydb&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;))&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;To set a string key-value pair, call &lt;code&gt;s.SetStr(k, v)&lt;/code&gt;&#xA;and to get it back, call &lt;code&gt;s.GetStr(k)&lt;/code&gt;.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

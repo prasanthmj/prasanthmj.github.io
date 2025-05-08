@@ -4,233 +4,171 @@
     <title>Prasanth Janardhanan</title>
     <link>/</link>
     <description>Recent content on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Wed, 15 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 May 2025 09:55:45 +0000</lastBuildDate>
+    <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Self-Hosted RAG Architecture for Privacy-Sensitive Document Search with Golang</title>
+      <link>/ai/self-hosted-rag-for-privacy/</link>
+      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <guid>/ai/self-hosted-rag-for-privacy/</guid>
+      <description>&lt;p&gt;Remember the days of boolean search operators? The frustrating experience of trying to find that one document by guessing the exact keywords it might contain? For decades, our ability to search through documents has been limited by keyword matching—a primitive approach that fails to capture the richness of human language and intent.&lt;/p&gt;&#xA;&lt;p&gt;Traditional search technology has evolved through several stages: from basic keyword matching to more sophisticated approaches involving stemming, lemmatization, and eventually, statistical methods like TF-IDF (Term Frequency-Inverse Document Frequency). Each iteration brought incremental improvements, but they all shared a fundamental limitation—they didn&amp;rsquo;t truly understand the meaning behind our queries.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Lock-Free Data Structures and Wait-Free Algorithms in Go: From Theory to Practice</title>
       <link>/go/lock-free-data-structures/</link>
       <pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate>
-      
       <guid>/go/lock-free-data-structures/</guid>
-      <description>Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&amp;rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!
-The Concurrent Programming Challenge Let&amp;rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&amp;rsquo;s memory), and you&amp;rsquo;re both trying to make sandwiches (execute operations) at the same time.</description>
+      <description>&lt;p&gt;Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&amp;rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!&lt;/p&gt;&#xA;&lt;h2 id=&#34;the-concurrent-programming-challenge&#34;&gt;The Concurrent Programming Challenge&lt;/h2&gt;&#xA;&lt;p&gt;Let&amp;rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&amp;rsquo;s memory), and you&amp;rsquo;re both trying to make sandwiches (execute operations) at the same time. In traditional programming, we&amp;rsquo;d put a lock on the kitchen – &amp;ldquo;Hey, I&amp;rsquo;m using the kitchen, wait your turn!&amp;rdquo; But what if your roommate just needs to grab a glass of water? Should they really have to wait for your entire sandwich-making process to finish?&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Model Context Protocol (MCP): Lets Implement an MCP server in Go</title>
       <link>/ai/mcp-go/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/ai/mcp-go/</guid>
-      <description>Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.
-While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks.</description>
+      <description>&lt;p&gt;Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.&lt;/p&gt;&#xA;&lt;p&gt;While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP  servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks. The protocol standardizes how these components communicate, making it easy to build interoperable AI-powered applications.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Model Context Protocol (MCP): Building Bridges Between AI and Your World</title>
       <link>/ai/mcp/</link>
-      <pubDate>Sat, 28 Dec 2024 10:42:12 +0000</pubDate>
-      
+      <pubDate>Sat, 28 Dec 2024 00:00:00 +0000</pubDate>
       <guid>/ai/mcp/</guid>
-      <description>Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.
-Enter the Model Context Protocol (MCP) - think of it as giving your AI assistant a complete office setup instead of just a mailbox.</description>
+      <description>&lt;p&gt;Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;../images/mcp-intro-v2.webp&#34; alt=&#34;Need for Model Context Protocol&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Building a Reliable ETL System with Go and Temporal: When Data Needs to Move Like a Marvel Superhero 🦸‍♂️</title>
       <link>/microservices/etl-go-temporal/</link>
       <pubDate>Thu, 28 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/microservices/etl-go-temporal/</guid>
-      <description>Ever tried moving your entire apartment through a drinking straw? That&amp;rsquo;s basically what building ETL (Extract, Transform, Load) systems feels like sometimes. You&amp;rsquo;ve got terabytes of data that need to go from Point A to Point B, transform from one shape to another along the way, and arrive without losing a single byte. Oh, and it needs to happen yesterday.
-As a backend engineer who&amp;rsquo;s battled these challenges at scale, I&amp;rsquo;ve learned that building reliable ETL systems is less about writing perfect code (though that helps) and more about preparing for everything that could possibly go wrong.</description>
+      <description>&lt;p&gt;Ever tried moving your entire apartment through a drinking straw? That&amp;rsquo;s basically what building ETL (Extract, Transform, Load) systems feels like sometimes. You&amp;rsquo;ve got terabytes of data that need to go from Point A to Point B, transform from one shape to another along the way, and arrive without losing a single byte. Oh, and it needs to happen yesterday.&lt;/p&gt;&#xA;&lt;p&gt;As a backend engineer who&amp;rsquo;s battled these challenges at scale, I&amp;rsquo;ve learned that building reliable ETL systems is less about writing perfect code (though that helps) and more about preparing for everything that could possibly go wrong. Because trust me, Murphy&amp;rsquo;s Law isn&amp;rsquo;t just a suggestion when it comes to data pipelines – it&amp;rsquo;s more like a promise.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Your Legacy System is Trying to Tell You Something (And It&#39;s Not &#39;Please Reboot&#39;)</title>
       <link>/microservices/legacy-systems-to-microservices/</link>
       <pubDate>Mon, 25 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/microservices/legacy-systems-to-microservices/</guid>
-      <description>You know that uneasy feeling when your car makes a noise it&amp;rsquo;s definitely not supposed to make? That moment when you turn down the radio, tilt your head, and think, &amp;ldquo;Maybe if I ignore it, it&amp;rsquo;ll go away&amp;rdquo;? Well, your legacy system is making those noises right now, and trust me – it won&amp;rsquo;t go away by itself.
-I&amp;rsquo;ve spent the last 15 years listening to legacy systems whisper (and sometimes scream) their stories.</description>
+      <description>&lt;p&gt;You know that uneasy feeling when your car makes a noise it&amp;rsquo;s definitely not supposed to make? That moment when you turn down the radio, tilt your head, and think, &amp;ldquo;Maybe if I ignore it, it&amp;rsquo;ll go away&amp;rdquo;? Well, your legacy system is making those noises right now, and trust me – it won&amp;rsquo;t go away by itself.&lt;/p&gt;&#xA;&lt;p&gt;I&amp;rsquo;ve spent the last 15 years listening to legacy systems whisper (and sometimes scream) their stories. Like that time at a  startup when their core transaction system started hiccuping every Tuesday at 3 PM. Nobody knew why Tuesdays – the system had apparently developed a case of mid-week existential crisis. Turns out, it was trying to tell us something important: &amp;ldquo;Your transaction log is full, and I&amp;rsquo;ve been tap dancing on the edge of disaster for the past three months.&amp;rdquo;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Implementing Saga Pattern with Temporal in Go Microservices: Journey Through Distributed Transactions</title>
       <link>/microservices/saga-pattern-using-temporal-and-go/</link>
       <pubDate>Fri, 22 Nov 2024 00:00:00 +0000</pubDate>
-      
       <guid>/microservices/saga-pattern-using-temporal-and-go/</guid>
-      <description>Picture this: You&amp;rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&amp;rsquo;s call it the &amp;ldquo;Distributed Mocha Supreme&amp;rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&amp;rsquo;s going great until—oops!—they&amp;rsquo;re out of whipped cream. Now what? Do they throw away everything they&amp;rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval?</description>
+      <description>&lt;p&gt;&lt;img src=&#34;../images/coffee-spill-barista.webp&#34; alt=&#34;alt text&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Picture this: You&amp;rsquo;re standing in line at your favorite coffee shop. You order a complex drink (let&amp;rsquo;s call it the &amp;ldquo;Distributed Mocha Supreme&amp;rdquo;), and the barista starts a carefully choreographed dance between the espresso machine, milk steamer, and various syrup stations. Everything&amp;rsquo;s going great until—oops!—they&amp;rsquo;re out of whipped cream. Now what? Do they throw away everything they&amp;rsquo;ve made so far? Ask you to pay for a half-finished drink? Call over three managers for approval? Welcome to the world of distributed transactions in microservices!&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>The Evolution of Concurrency Patterns in Go: From Goroutines to Advanced Worker Pools</title>
       <link>/go/concurrency-and-worker-pools/</link>
       <pubDate>Wed, 10 Jul 2024 00:00:00 +0000</pubDate>
-      
       <guid>/go/concurrency-and-worker-pools/</guid>
-      <description>Remember when you first dipped your toes into the world of concurrent programming? If you&amp;rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&amp;rsquo;s the thing: in today&amp;rsquo;s tech landscape, mastering concurrency isn&amp;rsquo;t just a cool party trick—it&amp;rsquo;s becoming as essential as knowing how to loop.
-Enter Go (or Golang, if you&amp;rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &amp;ldquo;concurrency made easy!</description>
+      <description>&lt;p&gt;&lt;img src=&#34;../images/gphers-1.webp&#34; alt=&#34;concurrent go out of control&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Remember when you first dipped your toes into the world of concurrent programming? If you&amp;rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&amp;rsquo;s the thing: in today&amp;rsquo;s tech landscape, mastering concurrency isn&amp;rsquo;t just a cool party trick—it&amp;rsquo;s becoming as essential as knowing how to loop.&lt;/p&gt;&#xA;&lt;p&gt;Enter Go (or Golang, if you&amp;rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &amp;ldquo;concurrency made easy!&amp;rdquo; And you know what? For the most part, it delivered. Go&amp;rsquo;s goroutines and channels made concurrent programming feel less like rocket science and more like, well, actual programming.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>ChatGpt 4o, the Rise of Conversational Interfaces and the Shifting Landscape of Human-Computer Interaction</title>
       <link>/ai/llms-to-transform-ui/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/llms-to-transform-ui/</guid>
-      <description>Picture this: You&amp;rsquo;re a sales manager trying to stay on top of your team&amp;rsquo;s performance. Instead of navigating through complex menus and dashboards, you simply turn to your computer and say, &amp;ldquo;Get me the list of all new leads for the last month.&amp;rdquo; Instantly, your screen displays a neatly organized list of every new lead your team has generated, complete with contact information, lead source, and potential revenue.
-Or imagine this: You&amp;rsquo;re a business analyst tasked with identifying trends and opportunities in your company&amp;rsquo;s sales data.</description>
+      <description>&lt;p&gt;Picture this: You&amp;rsquo;re a sales manager trying to stay on top of your team&amp;rsquo;s performance. Instead of navigating through complex menus and dashboards, you simply turn to your computer and say, &amp;ldquo;Get me the list of all new leads for the last month.&amp;rdquo; Instantly, your screen displays a neatly organized list of every new lead your team has generated, complete with contact information, lead source, and potential revenue.&lt;/p&gt;&#xA;&lt;p&gt;Or imagine this: You&amp;rsquo;re a business analyst tasked with identifying trends and opportunities in your company&amp;rsquo;s sales data. Rather than writing complex queries and creating visualizations from scratch, you simply ask your computer, &amp;ldquo;Get me the sales report for the last month for California for blue widgets.&amp;rdquo; Moments later, you&amp;rsquo;re presented with a comprehensive report that breaks down sales by region, product, and customer segment, highlighting key insights and areas for growth.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>The Art of the Algorithm: How AI&#39;s Gaming Strategies are Shaping the Future of Innovation</title>
       <link>/ai/gaming-and-ai/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/gaming-and-ai/</guid>
-      <description>Demis Hassabis is a name you might not have heard before, but trust me, you will. This guy is the real deal when it comes to artificial intelligence (AI). He&amp;rsquo;s the mastermind behind DeepMind, a company that&amp;rsquo;s been making waves in the AI world for years now. And recently, he gave a talk that blew my mind.
-Now, I&amp;rsquo;ve been around the block a few times when it comes to technology.</description>
+      <description>&lt;p&gt;Demis Hassabis is a name you might not have heard before, but trust me, you will. This guy is the real deal when it comes to artificial intelligence (AI). He&amp;rsquo;s the mastermind behind DeepMind, a company that&amp;rsquo;s been making waves in the AI world for years now. And recently, he gave a talk that blew my mind.&lt;/p&gt;&#xA;&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;&#xA;      &lt;iframe allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; allowfullscreen=&#34;allowfullscreen&#34; loading=&#34;eager&#34; referrerpolicy=&#34;strict-origin-when-cross-origin&#34; src=&#34;https://www.youtube.com/embed/0_M_syPuFos?autoplay=0&amp;amp;controls=1&amp;amp;end=0&amp;amp;loop=0&amp;amp;mute=0&amp;amp;start=0&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; title=&#34;YouTube video&#34;&gt;&lt;/iframe&gt;&#xA;    &lt;/div&gt;&#xA;&#xA;&lt;p&gt;Now, I&amp;rsquo;ve been around the block a few times when it comes to technology. I&amp;rsquo;ve seen my fair share of overhyped vaporware and empty promises. But Hassabis is different. This guy has a vision for AI that&amp;rsquo;s both thrilling and terrifying at the same time.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Exploring Chain-of-Thought: Enhancing Problem-Solving in Large Language Models</title>
       <link>/ai/chain-of-thought/</link>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/chain-of-thought/</guid>
-      <description>LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.</description>
+      <description>&lt;p&gt;LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Building a simple query parser using PEG in Go</title>
       <link>/go/peg-parser-in-go/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/go/peg-parser-in-go/</guid>
-      <description>In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
-The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.</description>
+      <description>&lt;p&gt;In another post, &lt;a href=&#34;../simple-query-parser/&#34;&gt;Simple Query Parser&lt;/a&gt; we had built a simple query parser using &lt;a href=&#34;https://github.com/alecthomas/participle&#34;&gt;Participle&lt;/a&gt; - a parser builder for go lang.&#xA;&lt;a href=&#34;https://en.wikipedia.org/wiki/Parsing_expression_grammar&#34;&gt;Parsing expression grammar (PEG)&lt;/a&gt; is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.&lt;/p&gt;&#xA;&lt;p&gt;The go language port of PEG is &lt;a href=&#34;https://pkg.go.dev/github.com/mna/pigeon&#34;&gt;pigeon&lt;/a&gt;&#xA;The popular Javascript port of PEG is &lt;a href=&#34;https://pegjs.org/documentation&#34;&gt;pegjs&lt;/a&gt;. A good introduction to PEG grammar can be found in the &lt;a href=&#34;https://pegjs.org/documentation&#34;&gt;pegjs documentation&lt;/a&gt; and also &lt;a href=&#34;https://github.com/PhilippeSigaud/Pegged/wiki/PEG-Basics&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>How to support custom Javascript scripting in Go Applications</title>
       <link>/go/javascript-parser-in-go/</link>
       <pubDate>Wed, 06 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/go/javascript-parser-in-go/</guid>
-      <description>Why will someone need a Javascript Parser, written natively in Go? Isn&amp;rsquo;t it a crazy, Architecture Astronauts solution that is looking for a problem? Not necessarily.
-There was a time when applications allowed some kind of scripting to extend them and to make them fit into any workflow. For example VBScript for Microsoft office products. However, very few Web applications have the infrastructure to allow custom scripts inside them. There are a few that does support; one example is Google Apps Script.</description>
+      <description>&lt;p&gt;Why will someone need a Javascript Parser, written natively in Go? Isn&amp;rsquo;t it a crazy, &lt;a href=&#34;https://www.joelonsoftware.com/2001/04/21/dont-let-architecture-astronauts-scare-you/&#34;&gt;Architecture Astronauts&lt;/a&gt; solution that is looking for a problem? Not necessarily.&lt;/p&gt;&#xA;&lt;p&gt;There was a time when applications allowed some kind of scripting to extend them and to make them fit into any workflow. For example VBScript for Microsoft office products. However, very few Web applications have the infrastructure to allow custom scripts inside them. There are a few that does support; one example is Google Apps Script.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Let&#39;s build a search query parser in Go</title>
       <link>/go/simple-query-parser/</link>
       <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/simple-query-parser/</guid>
-      <description>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
-Imagine we are building an online store that allows searching for products using a simple but structured query language.</description>
+      <description>&lt;p&gt;Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.&lt;/p&gt;&#xA;&lt;p&gt;Imagine we are building an online store that allows searching for products using a simple but structured query language. You can search for a laptop with more than 8GB RAM and more than 512GB SSD using this query:&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>How to load from a JSON file to Javascript class object (Javascript/Typescript Serialization)</title>
       <link>/typescript/serialize-javascript-objects/</link>
       <pubDate>Fri, 11 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/typescript/serialize-javascript-objects/</guid>
-      <description>It is a common requirement to load a nested Javascript class from a JSON file. Sometimes you want to send the JSON across a network and load it back to a Javascript class.
-For better clarity, let us understand the difference between a Javascript class instance and an Object. Take this class for example:
-This is a class that draws a rectangle on the canvas
-class Rectangle{ public x:number=0 public y:number=0 public width:number=0 public height:number=0 public draw(ctx:CanvasRenderingContext2D) { ctx.</description>
+      <description>&lt;p&gt;It is a common requirement to load a nested Javascript class from a JSON file. Sometimes you want to send the JSON across a network and load it back to a Javascript class.&lt;/p&gt;&#xA;&lt;p&gt;For better clarity, let us understand the difference between a Javascript class instance and an Object. Take this class for example:&lt;/p&gt;&#xA;&lt;p&gt;This is a class that draws a rectangle on the canvas&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-typescript&#34; data-lang=&#34;typescript&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#cf222e&#34;&gt;class&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;Rectangle&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;{&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#cf222e&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;x&lt;/span&gt;:&lt;span style=&#34;color:#cf222e&#34;&gt;number&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;0&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#cf222e&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;y&lt;/span&gt;:&lt;span style=&#34;color:#cf222e&#34;&gt;number&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;0&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#cf222e&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;width&lt;/span&gt;:&lt;span style=&#34;color:#cf222e&#34;&gt;number&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;0&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#cf222e&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;height&lt;/span&gt;:&lt;span style=&#34;color:#cf222e&#34;&gt;number&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;=&lt;/span&gt;&lt;span style=&#34;color:#0550ae&#34;&gt;0&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#cf222e&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;draw&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;ctx&lt;/span&gt;:&lt;span style=&#34;color:#cf222e&#34;&gt;CanvasRenderingContext2D&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#1f2328&#34;&gt;{&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#1f2328&#34;&gt;ctx&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;strokeStyle&lt;/span&gt; &lt;span style=&#34;color:#0550ae&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;stroke&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#1f2328&#34;&gt;ctx&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;rect&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;x&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;,&lt;/span&gt;&lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;y&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;width&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;,&lt;/span&gt; &lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;height&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#1f2328&#34;&gt;ctx&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;stroke&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;();&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#1f2328&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#cf222e&#34;&gt;public&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;area&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;()&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#1f2328&#34;&gt;{&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#cf222e&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;width&lt;/span&gt; &lt;span style=&#34;color:#0550ae&#34;&gt;*&lt;/span&gt; &lt;span style=&#34;color:#cf222e&#34;&gt;this&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;height&lt;/span&gt;           &#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#1f2328&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;}&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;Suppose you have an instance of this rectangle and that you want to save the rectangle to a file. The easy solution would be to use &lt;code&gt;JSON.stringify(rect)&lt;/code&gt;. Once the object is converted into JSON string, it is easy to save to a file or send through wire to be saved to a database.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Creating an isolated cluster - provisioning a cluster and a Bastion host using Ansible</title>
       <link>/terraform/ansible-cloud-setup/</link>
       <pubDate>Sun, 22 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/terraform/ansible-cloud-setup/</guid>
-      <description>This is the second part of the series on setting up a cluster using Terraform and Ansible. In the first part, we had set up the bare cluster Virtual Machines. The set up included a virtual private network, a bastion server, and a separately configurable cluster of nodes.
-The nodes are ready but not software or configuration is done so far. In the next step, we will provision all the nodes in our cloud</description>
+      <description>&lt;p&gt;This is the second part of the series on setting up a cluster using Terraform and Ansible. In the &lt;a href=&#34;../terraform-hetzner-cloud-setup-example/&#34;&gt;first part&lt;/a&gt;, we had set up the bare cluster Virtual Machines.&#xA;The set up included a virtual private network, a bastion server, and a separately configurable cluster of nodes.&lt;/p&gt;&#xA;&lt;p&gt;The nodes are ready but not software or configuration is done so far. In the next step, we will provision all the nodes in our cloud&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Setting up a Bastion host and a three-node cluster on Hetzner cloud using Terraform and Ansible</title>
       <link>/terraform/terraform-hetzner-cloud-setup-example/</link>
       <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
-      
       <guid>/terraform/terraform-hetzner-cloud-setup-example/</guid>
-      <description>Infrastructure as code has a great benefit - you can make a cluster available in a few minutes. Then, switch the configuration with a few updates to the configuration. If you ever had long hours staring at blinking LEDs while it installed from a stack of CDs, you will know what a relief this is.
-Terraform makes it possible to declaratively create the cloud infrastructure, supports all major cloud providers, and is easy to learn if you can spare an afternoon.</description>
+      <description>&lt;p&gt;Infrastructure as code has a great benefit - you can make a cluster available in a few minutes. Then, switch the configuration with a few updates to the configuration. If you ever had long hours staring at blinking LEDs while it installed from a stack of CDs, you will know what a relief this is.&lt;/p&gt;&#xA;&lt;p&gt;Terraform makes it possible to declaratively create the cloud infrastructure, supports all major cloud providers, and is easy to learn if you can spare an afternoon.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Background task processor in Go with persistence support using BadgerDB</title>
       <link>/go/go-task-queue-with-badgerdb-backend/</link>
       <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/go-task-queue-with-badgerdb-backend/</guid>
-      <description>Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks. For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress. A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.</description>
+      <description>&lt;p&gt;Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks.&#xA;For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress.&#xA;A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.&#xA;qUP (called queue up) is a background task manager. It persists the task status and tracking information to the disc so that restarting the process does not lose the tasks that were in progress. BadgerDB is used for persistence.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>A Simple Wrapper to BadgerDB Key-Value store in Go</title>
       <link>/go/badgerdb-wrapper/</link>
       <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/badgerdb-wrapper/</guid>
-      <description>BadgerDB is an embeddable key-value store written in Go. It is a persistent store.
-In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.
-Usage import( &amp;#34;github.com/prasanthmj/sett&amp;#34; ) s := sett.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/dgraph-io/badger&#34;&gt;BadgerDB&lt;/a&gt; is an embeddable key-value store written in Go. It is a persistent store.&lt;/p&gt;&#xA;&lt;p&gt;In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.&lt;/p&gt;&#xA;&lt;h2 id=&#34;usage&#34;&gt;Usage&lt;/h2&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#cf222e&#34;&gt;import&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#0a3069&#34;&gt;&amp;#34;github.com/prasanthmj/sett&amp;#34;&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color:#0550ae&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;sett&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#6639ba&#34;&gt;Open&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;sett&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#6639ba&#34;&gt;DefaultOptions&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0a3069&#34;&gt;&amp;#34;./data/mydb&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;))&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;To set a string key-value pair, call &lt;code&gt;s.SetStr(k, v)&lt;/code&gt;&#xA;and to get it back, call &lt;code&gt;s.GetStr(k)&lt;/code&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Build a very fast, highly customizable static website using Hugo in less than 10 minutes</title>
       <link>/build-websites/build-static-website-hugo/</link>
       <pubDate>Fri, 12 Jun 2020 00:00:00 +0000</pubDate>
-      
       <guid>/build-websites/build-static-website-hugo/</guid>
-      <description>Hugo is a fast static website builder written in Go language. The advantage of static sites is that the site can be hosted easily since it does not require any server-side scripting like PHP, Ruby, or a database like MySql. Static sites are very fast since there is very little server-side processing involved. Most importantly, there are several platforms where you can host your website for Free! That&amp;rsquo;s right, absolute 0 monthly costs.</description>
+      <description>&lt;p&gt;Hugo is a fast static website builder written in Go language. The advantage of static sites is that the site can be hosted easily since it does not require any server-side scripting like PHP, Ruby, or a database like MySql.&#xA;Static sites are very fast since there is very little server-side processing involved. Most importantly, there are several platforms where you can host your website for Free! That&amp;rsquo;s right, absolute 0 monthly costs.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title></title>
       <link>/resume/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>/resume/</guid>
-      <description>Prasanth Janardhanan 15+ years of hands-on software product development experience. Certified Professional Scrum Product Owner. Hands-on full stack coding experience - Go (golang), Typescript, React. Experience working with customers gathering user stories, planning product roadmaps, and delivering value following agile methods.
-Work Experience Simfatic Solutions simfatic.com
-March 2009 – till date
-Develops Software products for Process automation and workflow management
-Senior Technical Manager Helped develop a work management product for a telecom tower construction company that included live streaming from multiple work sites.</description>
+      <description>&lt;h1 id=&#34;prasanth-janardhanan&#34;&gt;Prasanth Janardhanan&lt;/h1&gt;&#xA;&lt;p&gt;15+ years of hands-on software product development experience. Certified Professional Scrum Product Owner. Hands-on full stack coding experience - Go (golang), Typescript, React. Experience working with customers gathering user stories, planning product roadmaps, and delivering value following agile methods.&lt;/p&gt;&#xA;&lt;h2 id=&#34;work-experience&#34;&gt;Work Experience&lt;/h2&gt;&#xA;&lt;h3 id=&#34;simfatic-solutions&#34;&gt;Simfatic Solutions&lt;/h3&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://simfatic.com&#34;&gt;simfatic.com&lt;/a&gt;&lt;br&gt;&#xA;March 2009 – till date&lt;br&gt;&#xA;Develops Software products for Process automation and  workflow management&lt;/p&gt;&#xA;&lt;h4 id=&#34;senior-technical-manager&#34;&gt;Senior Technical Manager&lt;/h4&gt;&#xA;&lt;ul&gt;&#xA;&lt;li&gt;Helped develop a work management product for a telecom tower construction company that included live streaming from multiple work sites.&lt;/li&gt;&#xA;&lt;li&gt;Worked with Software teams to implement user stories delivering the best value to the target customers&lt;/li&gt;&#xA;&lt;li&gt;Managed to integrate a smart  support system right into the product that eventually helped reduce on-field errors users face.&lt;/li&gt;&#xA;&lt;/ul&gt;&#xA;&lt;h3 id=&#34;electronics-for-imaging-inc&#34;&gt;Electronics For Imaging, Inc,&lt;/h3&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.efi.com&#34;&gt;efi.com&lt;/a&gt;&lt;br&gt;&#xA;April 2004 – January 2009&lt;br&gt;&#xA;Electronics for Imaging  (Nasdaq: EFII) builds software products for large-scale printing and publishing businesses.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>About Prasanth Janardhanan</title>
       <link>/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>/about/</guid>
-      <description>Hi, I am Prasanth Janardhanan. I am a student of Computer Science - for more than 21 years and counting. I make a living by identifying and removing accidental complexity from systems. I believe most of the problems whether in a cluster of computers or a group of people, essentially boils down to a communication problem.
-Apart from the professional software development I work on for companies, I do build software that others may find useful.</description>
+      <description>&lt;p&gt;Hi, I am Prasanth Janardhanan. I am a student of Computer Science - for more than 21 years and counting. I make a living by identifying and removing accidental complexity from systems. I believe most of the problems whether in a cluster of computers or a group of people, essentially boils down to a communication problem.&lt;/p&gt;&#xA;&lt;p&gt;Apart from the professional software development I work on for companies, I do build software that others may find useful. See if some of those  adventures in the &lt;a href=&#34;/projects/&#34;&gt;projects&lt;/a&gt; page and my &lt;a href=&#34;https://github.com/prasanthmj&#34;&gt;Github page&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>My Projects</title>
       <link>/projects/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
       <guid>/projects/</guid>
-      <description>qUP qUP is a background task processor with persistence support written in Go. It uses BadgerDb for persistence.
-Machine Wrapper around the machinery Go library for background task execution.
-Chimes A JWT only API authentication library. The client-side is written in TypeScript and the server side in Go.
-Boel A Javascript Form Data validation library. The syntax is made to look naturally declarative. Boel also supports conditional validations and customization to the validation messages.</description>
+      <description>&lt;h3 id=&#34;quphttpsgithubcomprasanthmjqup&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/qup&#34;&gt;qUP&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;qUP is a background task processor with persistence support written in Go. It uses BadgerDb for persistence.&lt;/p&gt;&#xA;&lt;h3 id=&#34;machinehttpsgithubcomprasanthmjmachine&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/machine&#34;&gt;Machine&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;Wrapper around the &lt;a href=&#34;https://github.com/RichardKnop/machinery&#34;&gt;machinery&lt;/a&gt; Go library for background task execution.&lt;/p&gt;&#xA;&lt;h3 id=&#34;chimeshttpsgithubcomprasanthmjchimes&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/chimes&#34;&gt;Chimes&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;A JWT only API authentication library. The client-side is written in TypeScript and the server side in Go.&lt;/p&gt;&#xA;&lt;h3 id=&#34;boelhttpsgithubcomprasanthmjboel&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/boel&#34;&gt;Boel&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;A Javascript Form Data validation library. The syntax is made to look naturally declarative. Boel also supports conditional validations and customization to the validation messages.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

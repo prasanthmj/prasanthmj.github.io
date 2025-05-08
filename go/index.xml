@@ -4,79 +4,59 @@
     <title>Goes on Prasanth Janardhanan</title>
     <link>/go/</link>
     <description>Recent content in Goes on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Wed, 15 Jan 2025 00:00:00 +0000</lastBuildDate><atom:link href="/go/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 15 Jan 2025 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/go/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Lock-Free Data Structures and Wait-Free Algorithms in Go: From Theory to Practice</title>
       <link>/go/lock-free-data-structures/</link>
       <pubDate>Wed, 15 Jan 2025 00:00:00 +0000</pubDate>
-      
       <guid>/go/lock-free-data-structures/</guid>
-      <description>Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&amp;rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!
-The Concurrent Programming Challenge Let&amp;rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&amp;rsquo;s memory), and you&amp;rsquo;re both trying to make sandwiches (execute operations) at the same time.</description>
+      <description>&lt;p&gt;Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&amp;rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!&lt;/p&gt;&#xA;&lt;h2 id=&#34;the-concurrent-programming-challenge&#34;&gt;The Concurrent Programming Challenge&lt;/h2&gt;&#xA;&lt;p&gt;Let&amp;rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&amp;rsquo;s memory), and you&amp;rsquo;re both trying to make sandwiches (execute operations) at the same time. In traditional programming, we&amp;rsquo;d put a lock on the kitchen – &amp;ldquo;Hey, I&amp;rsquo;m using the kitchen, wait your turn!&amp;rdquo; But what if your roommate just needs to grab a glass of water? Should they really have to wait for your entire sandwich-making process to finish?&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>The Evolution of Concurrency Patterns in Go: From Goroutines to Advanced Worker Pools</title>
       <link>/go/concurrency-and-worker-pools/</link>
       <pubDate>Wed, 10 Jul 2024 00:00:00 +0000</pubDate>
-      
       <guid>/go/concurrency-and-worker-pools/</guid>
-      <description>Remember when you first dipped your toes into the world of concurrent programming? If you&amp;rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&amp;rsquo;s the thing: in today&amp;rsquo;s tech landscape, mastering concurrency isn&amp;rsquo;t just a cool party trick—it&amp;rsquo;s becoming as essential as knowing how to loop.
-Enter Go (or Golang, if you&amp;rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &amp;ldquo;concurrency made easy!</description>
+      <description>&lt;p&gt;&lt;img src=&#34;../images/gphers-1.webp&#34; alt=&#34;concurrent go out of control&#34;&gt;&lt;/p&gt;&#xA;&lt;p&gt;Remember when you first dipped your toes into the world of concurrent programming? If you&amp;rsquo;re like me, it probably felt like trying to juggle while riding a unicycle. But here&amp;rsquo;s the thing: in today&amp;rsquo;s tech landscape, mastering concurrency isn&amp;rsquo;t just a cool party trick—it&amp;rsquo;s becoming as essential as knowing how to loop.&lt;/p&gt;&#xA;&lt;p&gt;Enter Go (or Golang, if you&amp;rsquo;re feeling fancy). This language burst onto the scene in 2009 with a battle cry of &amp;ldquo;concurrency made easy!&amp;rdquo; And you know what? For the most part, it delivered. Go&amp;rsquo;s goroutines and channels made concurrent programming feel less like rocket science and more like, well, actual programming.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Building a simple query parser using PEG in Go</title>
       <link>/go/peg-parser-in-go/</link>
       <pubDate>Fri, 15 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/go/peg-parser-in-go/</guid>
-      <description>In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
-The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.</description>
+      <description>&lt;p&gt;In another post, &lt;a href=&#34;../simple-query-parser/&#34;&gt;Simple Query Parser&lt;/a&gt; we had built a simple query parser using &lt;a href=&#34;https://github.com/alecthomas/participle&#34;&gt;Participle&lt;/a&gt; - a parser builder for go lang.&#xA;&lt;a href=&#34;https://en.wikipedia.org/wiki/Parsing_expression_grammar&#34;&gt;Parsing expression grammar (PEG)&lt;/a&gt; is a type of grammar. The advantage of PEG is that it doesn&amp;rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.&lt;/p&gt;&#xA;&lt;p&gt;The go language port of PEG is &lt;a href=&#34;https://pkg.go.dev/github.com/mna/pigeon&#34;&gt;pigeon&lt;/a&gt;&#xA;The popular Javascript port of PEG is &lt;a href=&#34;https://pegjs.org/documentation&#34;&gt;pegjs&lt;/a&gt;. A good introduction to PEG grammar can be found in the &lt;a href=&#34;https://pegjs.org/documentation&#34;&gt;pegjs documentation&lt;/a&gt; and also &lt;a href=&#34;https://github.com/PhilippeSigaud/Pegged/wiki/PEG-Basics&#34;&gt;here&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>How to support custom Javascript scripting in Go Applications</title>
       <link>/go/javascript-parser-in-go/</link>
       <pubDate>Wed, 06 Jan 2021 00:00:00 +0000</pubDate>
-      
       <guid>/go/javascript-parser-in-go/</guid>
-      <description>Why will someone need a Javascript Parser, written natively in Go? Isn&amp;rsquo;t it a crazy, Architecture Astronauts solution that is looking for a problem? Not necessarily.
-There was a time when applications allowed some kind of scripting to extend them and to make them fit into any workflow. For example VBScript for Microsoft office products. However, very few Web applications have the infrastructure to allow custom scripts inside them. There are a few that does support; one example is Google Apps Script.</description>
+      <description>&lt;p&gt;Why will someone need a Javascript Parser, written natively in Go? Isn&amp;rsquo;t it a crazy, &lt;a href=&#34;https://www.joelonsoftware.com/2001/04/21/dont-let-architecture-astronauts-scare-you/&#34;&gt;Architecture Astronauts&lt;/a&gt; solution that is looking for a problem? Not necessarily.&lt;/p&gt;&#xA;&lt;p&gt;There was a time when applications allowed some kind of scripting to extend them and to make them fit into any workflow. For example VBScript for Microsoft office products. However, very few Web applications have the infrastructure to allow custom scripts inside them. There are a few that does support; one example is Google Apps Script.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Let&#39;s build a search query parser in Go</title>
       <link>/go/simple-query-parser/</link>
       <pubDate>Sun, 20 Dec 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/simple-query-parser/</guid>
-      <description>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
-Imagine we are building an online store that allows searching for products using a simple but structured query language.</description>
+      <description>&lt;p&gt;Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &amp;ldquo;some phrase&amp;rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.&lt;/p&gt;&#xA;&lt;p&gt;Imagine we are building an online store that allows searching for products using a simple but structured query language. You can search for a laptop with more than 8GB RAM and more than 512GB SSD using this query:&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Background task processor in Go with persistence support using BadgerDB</title>
       <link>/go/go-task-queue-with-badgerdb-backend/</link>
       <pubDate>Thu, 10 Sep 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/go-task-queue-with-badgerdb-backend/</guid>
-      <description>Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks. For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress. A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.</description>
+      <description>&lt;p&gt;Goroutines can run tasks concurrently. However, for most practical scenarios, you have to keep track of the status of those tasks. In case the process exited, killed, or power cycled, a mechanism should restart the unfinished tasks.&#xA;For example, imagine you moved order status emailing to a goroutine. If the process was terminated or restarted we have no way to keep track of the tasks that were in progress.&#xA;A background task manager can keep track of the task in progress, retry if required, and also manage scheduled and recurring tasks.&#xA;qUP (called queue up) is a background task manager. It persists the task status and tracking information to the disc so that restarting the process does not lose the tasks that were in progress. BadgerDB is used for persistence.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>A Simple Wrapper to BadgerDB Key-Value store in Go</title>
       <link>/go/badgerdb-wrapper/</link>
       <pubDate>Sat, 22 Aug 2020 00:00:00 +0000</pubDate>
-      
       <guid>/go/badgerdb-wrapper/</guid>
-      <description>BadgerDB is an embeddable key-value store written in Go. It is a persistent store.
-In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.
-Usage import( &amp;#34;github.com/prasanthmj/sett&amp;#34; ) s := sett.</description>
+      <description>&lt;p&gt;&lt;a href=&#34;https://github.com/dgraph-io/badger&#34;&gt;BadgerDB&lt;/a&gt; is an embeddable key-value store written in Go. It is a persistent store.&lt;/p&gt;&#xA;&lt;p&gt;In this article, we build a wrapper around badgerDB. The purpose of this wrapper is to make it simple to save simple values to the DB in &amp;ldquo;virtual tables&amp;rdquo;. The concept is an adaptation from the Sett project. Much of the code -especially the unit tests - are changed though.&lt;/p&gt;&#xA;&lt;h2 id=&#34;usage&#34;&gt;Usage&lt;/h2&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-go&#34; data-lang=&#34;go&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#cf222e&#34;&gt;import&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#0a3069&#34;&gt;&amp;#34;github.com/prasanthmj/sett&amp;#34;&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;)&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;s&lt;/span&gt; &lt;span style=&#34;color:#0550ae&#34;&gt;:=&lt;/span&gt; &lt;span style=&#34;color:#1f2328&#34;&gt;sett&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#6639ba&#34;&gt;Open&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;sett&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;.&lt;/span&gt;&lt;span style=&#34;color:#6639ba&#34;&gt;DefaultOptions&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;(&lt;/span&gt;&lt;span style=&#34;color:#0a3069&#34;&gt;&amp;#34;./data/mydb&amp;#34;&lt;/span&gt;&lt;span style=&#34;color:#1f2328&#34;&gt;))&lt;/span&gt;&#xA;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;p&gt;To set a string key-value pair, call &lt;code&gt;s.SetStr(k, v)&lt;/code&gt;&#xA;and to get it back, call &lt;code&gt;s.GetStr(k)&lt;/code&gt;.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

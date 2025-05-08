@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>medicine on Prasanth Janardhanan</title>
+    <title>Medicine on Prasanth Janardhanan</title>
     <link>/tags/medicine/</link>
-    <description>Recent content in medicine on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Medicine on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Mon, 06 May 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/medicine/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 06 May 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/medicine/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>The Art of the Algorithm: How AI&#39;s Gaming Strategies are Shaping the Future of Innovation</title>
       <link>/ai/gaming-and-ai/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/gaming-and-ai/</guid>
-      <description>Demis Hassabis is a name you might not have heard before, but trust me, you will. This guy is the real deal when it comes to artificial intelligence (AI). He&amp;rsquo;s the mastermind behind DeepMind, a company that&amp;rsquo;s been making waves in the AI world for years now. And recently, he gave a talk that blew my mind.
-Now, I&amp;rsquo;ve been around the block a few times when it comes to technology.</description>
+      <description>&lt;p&gt;Demis Hassabis is a name you might not have heard before, but trust me, you will. This guy is the real deal when it comes to artificial intelligence (AI). He&amp;rsquo;s the mastermind behind DeepMind, a company that&amp;rsquo;s been making waves in the AI world for years now. And recently, he gave a talk that blew my mind.&lt;/p&gt;&#xA;&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;&#xA;      &lt;iframe allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; allowfullscreen=&#34;allowfullscreen&#34; loading=&#34;eager&#34; referrerpolicy=&#34;strict-origin-when-cross-origin&#34; src=&#34;https://www.youtube.com/embed/0_M_syPuFos?autoplay=0&amp;amp;controls=1&amp;amp;end=0&amp;amp;loop=0&amp;amp;mute=0&amp;amp;start=0&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; title=&#34;YouTube video&#34;&gt;&lt;/iframe&gt;&#xA;    &lt;/div&gt;&#xA;&#xA;&lt;p&gt;Now, I&amp;rsquo;ve been around the block a few times when it comes to technology. I&amp;rsquo;ve seen my fair share of overhyped vaporware and empty promises. But Hassabis is different. This guy has a vision for AI that&amp;rsquo;s both thrilling and terrifying at the same time.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

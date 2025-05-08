@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>go </title><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Go </title><meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" href="/css/styles.css" />
 </head>
 <body class="antialiased text-grey-900">
@@ -31,8 +31,9 @@
         
             <h2><a href="/go/lock-free-data-structures/">Lock-Free Data Structures and Wait-Free Algorithms in Go: From Theory to Practice</a></h2>
             <p>
-                Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!
-The Concurrent Programming Challenge Let&rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&rsquo;s memory), and you&rsquo;re both trying to make sandwiches (execute operations) at the same time.
+                <p>Have you ever been stuck in a bank line where everyone needs to visit the same teller? Frustrating, right? Now imagine a bank where every customer could magically make their transaction without waiting for others to finish. Sounds like a dream? Well, that&rsquo;s exactly what lock-free and wait-free programming aims to achieve in the world of concurrent computing!</p>
+<h2 id="the-concurrent-programming-challenge">The Concurrent Programming Challenge</h2>
+<p>Let&rsquo;s start with a simple scenario. Imagine you and your roommate share a kitchen (our computer&rsquo;s memory), and you&rsquo;re both trying to make sandwiches (execute operations) at the same time. In traditional programming, we&rsquo;d put a lock on the kitchen – &ldquo;Hey, I&rsquo;m using the kitchen, wait your turn!&rdquo; But what if your roommate just needs to grab a glass of water? Should they really have to wait for your entire sandwich-making process to finish?</p>
             </p> 
             <p>
                 <a href="/go/lock-free-data-structures/" class="btn-continue">Continue Reading &rarr;</a>
@@ -42,8 +43,8 @@ The Concurrent Programming Challenge Let&rsquo;s start with a simple scenario. I
         
             <h2><a href="/ai/mcp-go/">Model Context Protocol (MCP): Lets Implement an MCP server in Go</a></h2>
             <p>
-                Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&rsquo;re witnessing fast-paced development in MCP tools and components.
-While a detailed introduction to MCP was covered in our previous post, here&rsquo;s a quick refresher: MCP servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks.
+                <p>Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&rsquo;re witnessing fast-paced development in MCP tools and components.</p>
+<p>While a detailed introduction to MCP was covered in our previous post, here&rsquo;s a quick refresher: MCP  servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks. The protocol standardizes how these components communicate, making it easy to build interoperable AI-powered applications.</p>
             </p> 
             <p>
                 <a href="/ai/mcp-go/" class="btn-continue">Continue Reading &rarr;</a>
@@ -53,8 +54,8 @@ While a detailed introduction to MCP was covered in our previous post, here&rsqu
         
             <h2><a href="/microservices/etl-go-temporal/">Building a Reliable ETL System with Go and Temporal: When Data Needs to Move Like a Marvel Superhero 🦸‍♂️</a></h2>
             <p>
-                Ever tried moving your entire apartment through a drinking straw? That&rsquo;s basically what building ETL (Extract, Transform, Load) systems feels like sometimes. You&rsquo;ve got terabytes of data that need to go from Point A to Point B, transform from one shape to another along the way, and arrive without losing a single byte. Oh, and it needs to happen yesterday.
-As a backend engineer who&rsquo;s battled these challenges at scale, I&rsquo;ve learned that building reliable ETL systems is less about writing perfect code (though that helps) and more about preparing for everything that could possibly go wrong.
+                <p>Ever tried moving your entire apartment through a drinking straw? That&rsquo;s basically what building ETL (Extract, Transform, Load) systems feels like sometimes. You&rsquo;ve got terabytes of data that need to go from Point A to Point B, transform from one shape to another along the way, and arrive without losing a single byte. Oh, and it needs to happen yesterday.</p>
+<p>As a backend engineer who&rsquo;s battled these challenges at scale, I&rsquo;ve learned that building reliable ETL systems is less about writing perfect code (though that helps) and more about preparing for everything that could possibly go wrong. Because trust me, Murphy&rsquo;s Law isn&rsquo;t just a suggestion when it comes to data pipelines – it&rsquo;s more like a promise.</p>
             </p> 
             <p>
                 <a href="/microservices/etl-go-temporal/" class="btn-continue">Continue Reading &rarr;</a>
@@ -64,8 +65,10 @@ As a backend engineer who&rsquo;s battled these challenges at scale, I&rsquo;ve 
         
             <h2><a href="/go/peg-parser-in-go/">Building a simple query parser using PEG in Go</a></h2>
             <p>
-                In another post, Simple Query Parser we had built a simple query parser using Participle - a parser builder for go lang. Parsing expression grammar (PEG) is a type of grammar. The advantage of PEG is that it doesn&rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.
-The go language port of PEG is pigeon The popular Javascript port of PEG is pegjs. A good introduction to PEG grammar can be found in the pegjs documentation and also here.
+                <p>In another post, <a href="../simple-query-parser/">Simple Query Parser</a> we had built a simple query parser using <a href="https://github.com/alecthomas/participle">Participle</a> - a parser builder for go lang.
+<a href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">Parsing expression grammar (PEG)</a> is a type of grammar. The advantage of PEG is that it doesn&rsquo;t tolerate ambiguous grammar definitions and so is better in error reporting.</p>
+<p>The go language port of PEG is <a href="https://pkg.go.dev/github.com/mna/pigeon">pigeon</a>
+The popular Javascript port of PEG is <a href="https://pegjs.org/documentation">pegjs</a>. A good introduction to PEG grammar can be found in the <a href="https://pegjs.org/documentation">pegjs documentation</a> and also <a href="https://github.com/PhilippeSigaud/Pegged/wiki/PEG-Basics">here</a>.</p>
             </p> 
             <p>
                 <a href="/go/peg-parser-in-go/" class="btn-continue">Continue Reading &rarr;</a>
@@ -75,8 +78,8 @@ The go language port of PEG is pigeon The popular Javascript port of PEG is pegj
         
             <h2><a href="/go/simple-query-parser/">Let&#39;s build a search query parser in Go</a></h2>
             <p>
-                Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &ldquo;some phrase&rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.
-Imagine we are building an online store that allows searching for products using a simple but structured query language.
+                <p>Mini languages are great. Makes it easy to express what you want in a concise manner. Sometimes a complex UI can be replaced with a mini-language. Some time back, google used to support a simple language in the search queries. For example: &ldquo;some phrase&rdquo; +required -not_required . Alas! they stopped it and Google search is less cool ever since. I would count regular expressions also as a mini-language.</p>
+<p>Imagine we are building an online store that allows searching for products using a simple but structured query language. You can search for a laptop with more than 8GB RAM and more than 512GB SSD using this query:</p>
             </p> 
             <p>
                 <a href="/go/simple-query-parser/" class="btn-continue">Continue Reading &rarr;</a>

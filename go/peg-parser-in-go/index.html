@@ -111,20 +111,20 @@ An identifier is defined as a sequence of alpha-numeric characters:</p>
 <pre tabindex="0"><code>pigeon -o query.go query.peg
 </code></pre><p>Then write the code that uses the generated parser:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">main</span>() {
-</span></span><span style="display:flex;"><span>	res, err <span style="color:#000;font-weight:bold">:=</span> qp.<span style="color:#900;font-weight:bold">Parse</span>(<span style="color:#d14">&#34;&#34;</span>, []<span style="color:#0086b3">byte</span>(<span style="color:#d14">&#34;some = another&#34;</span>))
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Println</span>(err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	result, err <span style="color:#000;font-weight:bold">:=</span> json.<span style="color:#900;font-weight:bold">MarshalIndent</span>(res, <span style="color:#d14">&#34;&#34;</span>, <span style="color:#d14">&#34;   &#34;</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Println</span>(err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">main</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">res</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">qp</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Parse</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">[]</span><span style="color:#6639ba">byte</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;some = another&#34;</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">result</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">json</span><span style="color:#1f2328">.</span><span style="color:#6639ba">MarshalIndent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">res</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;&#34;</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;   &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;output:\n%v\n&#34;</span>, <span style="color:#0086b3">string</span>(result))
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;output:\n%v\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">string</span><span style="color:#1f2328">(</span><span style="color:#1f2328">result</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>The output will look like this:</p>
 <pre tabindex="0"><code>{
    &#34;Key&#34;: &#34;some&#34;,
@@ -146,30 +146,30 @@ Source
   }
 </code></pre><p>Make a note of the Source grammar definition. <code>Identifier</code> then <code>.Identifier</code> that can repeat 0 or more times (* means 0 or more repetitions). So the path is optional and can repeat if required.</p>
 <p>Note that it is calling a function <code>makeSource</code> which extracts the parsed values to a <code>Source</code> struct. It has a number of type casting since name and path are of type interface{} We have to type assert and extract the parameters.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Key   <span style="color:#000;font-weight:bold">*</span>Source
-</span></span><span style="display:flex;"><span>	Value <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Field</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Key</span>   <span style="color:#0550ae">*</span><span style="color:#1f2328">Source</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Value</span> <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Source <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Name <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	Path []<span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Source</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Name</span> <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Path</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeSource</span>(name <span style="color:#000;font-weight:bold">interface</span>{}, path <span style="color:#000;font-weight:bold">interface</span>{}) (<span style="color:#000;font-weight:bold">*</span>Source, <span style="color:#458;font-weight:bold">error</span>) {
-</span></span><span style="display:flex;"><span>	ps <span style="color:#000;font-weight:bold">:=</span> path.([]<span style="color:#000;font-weight:bold">interface</span>{})
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">makeSource</span><span style="color:#1f2328">(</span><span style="color:#1f2328">name</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{},</span> <span style="color:#1f2328">path</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span> <span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">Source</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">error</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">ps</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">path</span><span style="color:#1f2328">.([]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	paths <span style="color:#000;font-weight:bold">:=</span> <span style="color:#0086b3">make</span>([]<span style="color:#458;font-weight:bold">string</span>, <span style="color:#099">0</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> _, p <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> ps {
-</span></span><span style="display:flex;"><span>		pa <span style="color:#000;font-weight:bold">:=</span> p.([]<span style="color:#000;font-weight:bold">interface</span>{})
-</span></span><span style="display:flex;"><span>		px <span style="color:#000;font-weight:bold">:=</span> pa[<span style="color:#099">1</span>:]
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">for</span> _, pi <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> px {
-</span></span><span style="display:flex;"><span>			paths = <span style="color:#0086b3">append</span>(paths, pi.(<span style="color:#458;font-weight:bold">string</span>))
-</span></span><span style="display:flex;"><span>		}
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">paths</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">make</span><span style="color:#1f2328">([]</span><span style="color:#cf222e">string</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">0</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">p</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">ps</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">pa</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">p</span><span style="color:#1f2328">.([]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">px</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">pa</span><span style="color:#1f2328">[</span><span style="color:#0550ae">1</span><span style="color:#1f2328">:]</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">pi</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">px</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">paths</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">paths</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">pi</span><span style="color:#1f2328">.(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">&amp;</span>Source{Name: name.(<span style="color:#458;font-weight:bold">string</span>), Path: paths}, <span style="color:#000;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">return</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">Source</span><span style="color:#1f2328">{</span><span style="color:#1f2328">Name</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">name</span><span style="color:#1f2328">.(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">),</span> <span style="color:#1f2328">Path</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">paths</span><span style="color:#1f2328">},</span> <span style="color:#cf222e">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>When the query <code>item.spec.ssd=another</code> is parsed, this is the output structure:</p>
 <pre tabindex="0"><code>{
    &#34;Key&#34;: {
@@ -216,49 +216,49 @@ Float
     }
     
 </code></pre><p>Notice the definition of <code>String</code> grammar. It extracts characters between two double quotes. Extraction requires series of deep casting to get it from interface{} slices to bytes and a string. This is the function that extracts the character sequence to the string:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">stringFromChars</span>(chars <span style="color:#000;font-weight:bold">interface</span>{}) <span style="color:#458;font-weight:bold">string</span> {
-</span></span><span style="display:flex;"><span>	str <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">&#34;&#34;</span>
-</span></span><span style="display:flex;"><span>	r <span style="color:#000;font-weight:bold">:=</span> chars.([]<span style="color:#000;font-weight:bold">interface</span>{})
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> _, i <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> r {
-</span></span><span style="display:flex;"><span>		j <span style="color:#000;font-weight:bold">:=</span> i.([]<span style="color:#458;font-weight:bold">uint8</span>)
-</span></span><span style="display:flex;"><span>		str <span style="color:#000;font-weight:bold">+=</span> <span style="color:#0086b3">string</span>(j[<span style="color:#099">0</span>])
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> str
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">stringFromChars</span><span style="color:#1f2328">(</span><span style="color:#1f2328">chars</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span> <span style="color:#cf222e">string</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">str</span> <span style="color:#0550ae">:=</span> <span style="color:#0a3069">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">r</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">chars</span><span style="color:#1f2328">.([]</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">i</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">r</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">j</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">i</span><span style="color:#1f2328">.([]</span><span style="color:#cf222e">uint8</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">str</span> <span style="color:#0550ae">+=</span> <span style="color:#6639ba">string</span><span style="color:#1f2328">(</span><span style="color:#1f2328">j</span><span style="color:#1f2328">[</span><span style="color:#0550ae">0</span><span style="color:#1f2328">])</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">return</span> <span style="color:#1f2328">str</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>The Value structure has members for each data type like this</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Value <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	String  <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	Int     <span style="color:#458;font-weight:bold">int64</span>
-</span></span><span style="display:flex;"><span>	Float   <span style="color:#458;font-weight:bold">float64</span>
-</span></span><span style="display:flex;"><span>	Measure <span style="color:#000;font-weight:bold">*</span>Measure
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Value</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">String</span>  <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Int</span>     <span style="color:#cf222e">int64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Float</span>   <span style="color:#cf222e">float64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Measure</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Measure</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Out of these, the <code>Measure</code> member is peculiar. It gets a number and its unit together. For example, <code>512gb</code>.</p>
 <h3 id="better-generic-value">Better Generic Value</h3>
 <p>Having all the field types in one Value struct is not an optimal method; it will take more space and could be confusing to use. It doesn&rsquo;t provide any advantage either because we will have to check the type of the value anyways. A better alternative would be to use <code>interface{}</code> for Value. Let us update the definitions.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Field <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Key   <span style="color:#000;font-weight:bold">*</span>Source
-</span></span><span style="display:flex;"><span>	Value <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#998;font-style:italic">// String / Int /Float /Measure
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Field</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Key</span>   <span style="color:#0550ae">*</span><span style="color:#1f2328">Source</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Value</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span> <span style="color:#57606a">// String / Int /Float /Measure</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Source <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Name <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	Path []<span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Source</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Name</span> <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Path</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Measure <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Number <span style="color:#000;font-weight:bold">interface</span>{} <span style="color:#998;font-style:italic">//int64/float64
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>	Units  <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Measure</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Number</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span> <span style="color:#57606a">//int64/float64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Units</span>  <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Then the capturing functions are updated as well:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeValue</span>(val <span style="color:#000;font-weight:bold">interface</span>{}) (<span style="color:#000;font-weight:bold">interface</span>{}, <span style="color:#458;font-weight:bold">error</span>) {
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> val, <span style="color:#000;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">makeValue</span><span style="color:#1f2328">(</span><span style="color:#1f2328">val</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span> <span style="color:#1f2328">(</span><span style="color:#cf222e">interface</span><span style="color:#1f2328">{},</span> <span style="color:#cf222e">error</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">return</span> <span style="color:#1f2328">val</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeMeasure</span>(num <span style="color:#000;font-weight:bold">interface</span>{}, units <span style="color:#000;font-weight:bold">interface</span>{}) (<span style="color:#000;font-weight:bold">*</span>Measure, <span style="color:#458;font-weight:bold">error</span>) {
-</span></span><span style="display:flex;"><span>	retVal <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>Measure{Number: num, Units: units.(<span style="color:#458;font-weight:bold">string</span>)}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">makeMeasure</span><span style="color:#1f2328">(</span><span style="color:#1f2328">num</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{},</span> <span style="color:#1f2328">units</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{})</span> <span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">Measure</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">error</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">retVal</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">Measure</span><span style="color:#1f2328">{</span><span style="color:#1f2328">Number</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">num</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">Units</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">units</span><span style="color:#1f2328">.(</span><span style="color:#cf222e">string</span><span style="color:#1f2328">)}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> retVal, <span style="color:#000;font-weight:bold">nil</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">return</span> <span style="color:#1f2328">retVal</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">nil</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><h2 id="supporting-comparison-operators">Supporting comparison operators</h2>
 <p>The next improvement we could attempt would be to support other comparison operators like Greater than , less than.</p>
 <pre tabindex="0"><code>Field

@@ -157,12 +157,12 @@ terraform init
 </code></pre><p>Run the script like this:</p>
 <pre tabindex="0"><code>./run.sh init base
 </code></pre><p>You can see the corresponding code in the bash script</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">function</span> initBase<span style="color:#000;font-weight:bold">(){</span>
-</span></span><span style="display:flex;"><span>   <span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#cf222e">function</span> initBase<span style="color:#0550ae">(){</span>
+</span></span><span style="display:flex;"><span>   <span style="color:#6639ba">cd</span> ./1-infra/mycluster/base
 </span></span><span style="display:flex;"><span>   terraform init
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#0550ae">}</span>
 </span></span></code></pre></div><p>Once the initialization is done, run the &ldquo;apply&rdquo; command</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#0086b3">cd</span> ./1-infra/mycluster/base
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#6639ba">cd</span> ./1-infra/mycluster/base
 </span></span><span style="display:flex;"><span>terraform apply
 </span></span></code></pre></div><p>If everything goes fine, this should build the base network and print out the IP address of the bastion host.</p>
 <p>(Alternatively, using the bash script: <code>./run.sh deploy base</code> )</p>

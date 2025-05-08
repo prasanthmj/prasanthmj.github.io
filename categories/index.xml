@@ -4,8 +4,9 @@
     <title>Categories on Prasanth Janardhanan</title>
     <link>/categories/</link>
     <description>Recent content in Categories on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <copyright>Prasanth Janardhanan</copyright><atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    <copyright>Prasanth Janardhanan</copyright>
+    <atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
   </channel>
 </rss>

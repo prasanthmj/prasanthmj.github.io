@@ -41,23 +41,23 @@
 <p>Of course, most web platforms support REST APIs. However, it requires running a separate server that runs your custom scripts that can call the APIs. There are IFTTTs and Zapiers that can do integration with other similar services. However, none of those solutions can match the seamless integration possible by allowing custom scripting inside the web app itself.</p>
 <p>Imagine you have an email service like Gmail or Hey.  Let&rsquo;s say your users want more control over their email workflow by using their own scripting. For example :</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>myemail.RegisterHook(<span style="color:#d14">&#34;onEmailReceived&#34;</span>, iGotEmail)
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">myemail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">RegisterHook</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;onEmailReceived&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">iGotEmail</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">function</span> iGotEmail(newEmail)
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(newEmail.subject.startsWith(<span style="color:#d14">&#34;URGENT:&#34;</span>))
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        newEmail.setPriority(<span style="color:#099">5</span>)
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">function</span> <span style="color:#1f2328">iGotEmail</span><span style="color:#1f2328">(</span><span style="color:#1f2328">newEmail</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span><span style="color:#1f2328">(</span><span style="color:#1f2328">newEmail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">subject</span><span style="color:#1f2328">.</span><span style="color:#1f2328">startsWith</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;URGENT:&#34;</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">newEmail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">setPriority</span><span style="color:#1f2328">(</span><span style="color:#0550ae">5</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>        newEmail.reply(<span style="color:#d14">&#34;Hello,\n Received your email. We will respond on priority basis. \n\nThanks\n&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">if</span>(newEmail.to.includes(<span style="color:#d14">&#34;sales@website&#34;</span>))
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        newEmail.moveTo(<span style="color:#d14">&#34;Sales&#34;</span>)
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">newEmail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">reply</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Hello,\n Received your email. We will respond on priority basis. \n\nThanks\n&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">else</span> <span style="color:#cf222e">if</span><span style="color:#1f2328">(</span><span style="color:#1f2328">newEmail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">to</span><span style="color:#1f2328">.</span><span style="color:#1f2328">includes</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;sales@website&#34;</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">newEmail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">moveTo</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Sales&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>If you have a Javascript interpreter that allows limited operations running in a sandbox, implementing scriptability will be much easier. That is where a parser for native Go becomes helpful.</p>
 <h2 id="why-javascript">Why Javascript?</h2>
 <p>The scripting language could be any of the many available. Why choose Javascript? Javascript is one of the most popular languages, has detailed documentation, books, StackOverflow answers, has very rich tooling (Translate from ES6, Typescript to ES5). So, you don&rsquo;t have to teach the language syntax to your users.</p>
@@ -73,53 +73,53 @@
 <h2 id="step-1-running-simple-javascript-code-from-go">Step 1: Running simple Javascript Code from Go</h2>
 <p>Let&rsquo;s try getting familiar with the goja library.
 We run Javascript from Go</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">package</span> mod2
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">package</span> <span style="color:#1f2328">mod2</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
-</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">SimpleJS</span>() {
-</span></span><span style="display:flex;"><span>	vm <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">New</span>()
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">SimpleJS</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">vm</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">New</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#0086b3">new</span>(require.Registry).<span style="color:#900;font-weight:bold">Enable</span>(vm)
-</span></span><span style="display:flex;"><span>	console.<span style="color:#900;font-weight:bold">Enable</span>(vm)
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">new</span><span style="color:#1f2328">(</span><span style="color:#1f2328">require</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Registry</span><span style="color:#1f2328">).</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">console</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	script <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">`
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		console.log(&#34;Hello world - from Javascript inside Go! &#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">	`</span>
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Compiling ... &#34;</span>)
-</span></span><span style="display:flex;"><span>	prog, err <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">Compile</span>(<span style="color:#d14">&#34;&#34;</span>, script, <span style="color:#000;font-weight:bold">true</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error compiling the script %v &#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Running ... \n &#34;</span>)
-</span></span><span style="display:flex;"><span>	_, err = vm.<span style="color:#900;font-weight:bold">RunProgram</span>(prog)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">script</span> <span style="color:#0550ae">:=</span> <span style="color:#0a3069">`
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		console.log(&#34;Hello world - from Javascript inside Go! &#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">	`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Compiling ... &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">prog</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Compile</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">script</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">true</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error compiling the script %v &#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Running ... \n &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">RunProgram</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prog</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><h2 id="mapping-values-from-go-to-javascript-and-vis-versa">Mapping values from Go, to Javascript and vis-versa</h2>
 <p>goja has a Value interface defined that is used to convert values to and from Go</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Value <span style="color:#000;font-weight:bold">interface</span> {
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ToInteger</span>() <span style="color:#458;font-weight:bold">int64</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Value</span> <span style="color:#cf222e">interface</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ToInteger</span><span style="color:#1f2328">()</span> <span style="color:#cf222e">int64</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ToString</span>() Value
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">String</span>() <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ToFloat</span>() <span style="color:#458;font-weight:bold">float64</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ToNumber</span>() Value
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ToBoolean</span>() <span style="color:#458;font-weight:bold">bool</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ToObject</span>(<span style="color:#000;font-weight:bold">*</span>Runtime) <span style="color:#000;font-weight:bold">*</span>Object
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">SameAs</span>(Value) <span style="color:#458;font-weight:bold">bool</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">Equals</span>(Value) <span style="color:#458;font-weight:bold">bool</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">StrictEquals</span>(Value) <span style="color:#458;font-weight:bold">bool</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">Export</span>() <span style="color:#000;font-weight:bold">interface</span>{}
-</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">ExportType</span>() reflect.Type
-</span></span><span style="display:flex;"><span>	<span style="color:#998;font-style:italic">// contains filtered or unexported methods
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ToString</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">Value</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">String</span><span style="color:#1f2328">()</span> <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ToFloat</span><span style="color:#1f2328">()</span> <span style="color:#cf222e">float64</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ToNumber</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">Value</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ToBoolean</span><span style="color:#1f2328">()</span> <span style="color:#cf222e">bool</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ToObject</span><span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">Runtime</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Object</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">SameAs</span><span style="color:#1f2328">(</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">)</span> <span style="color:#cf222e">bool</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">Equals</span><span style="color:#1f2328">(</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">)</span> <span style="color:#cf222e">bool</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">StrictEquals</span><span style="color:#1f2328">(</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">)</span> <span style="color:#cf222e">bool</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">Export</span><span style="color:#1f2328">()</span> <span style="color:#cf222e">interface</span><span style="color:#1f2328">{}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">ExportType</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">reflect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Type</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#57606a">// contains filtered or unexported methods</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>goja.Runtime has a function ToValue() that will convert from native Go type to internal representation for the Javascript VM.
 For example, <code>vm.ToValue(&quot;a string value&quot;)</code> converts from go string.</p>
 <p>Similarly, the values returned from the RunTime are also of Value type. You can convert to Go type using the <code>Value</code> interface functions like <code>value.ToBoolean()</code> or <code>value.ToString()</code>.</p>
@@ -127,51 +127,51 @@ For example, <code>vm.ToValue(&quot;a string value&quot;)</code> converts from g
 <h2 id="call-a-javascript-function-from-go">Call a Javascript function from Go</h2>
 <p>Next, let&rsquo;s try calling a Javascript function from Go</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
-</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">CallJSFunction</span>() {
-</span></span><span style="display:flex;"><span>	vm <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">New</span>()
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">CallJSFunction</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">vm</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">New</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#0086b3">new</span>(require.Registry).<span style="color:#900;font-weight:bold">Enable</span>(vm)
-</span></span><span style="display:flex;"><span>	console.<span style="color:#900;font-weight:bold">Enable</span>(vm)
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">new</span><span style="color:#1f2328">(</span><span style="color:#1f2328">require</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Registry</span><span style="color:#1f2328">).</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">console</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	script <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">`
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		function myFunction(param)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		{
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			console.log(&#34;myFunction running ...&#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			console.log(&#34;Param = &#34;, param)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			return &#34;Nice meeting you, Go&#34;
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		}
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">	`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">script</span> <span style="color:#0550ae">:=</span> <span style="color:#0a3069">`
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		function myFunction(param)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		{
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			console.log(&#34;myFunction running ...&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			console.log(&#34;Param = &#34;, param)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			return &#34;Nice meeting you, Go&#34;
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		}
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">	`</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	prog, err <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">Compile</span>(<span style="color:#d14">&#34;&#34;</span>, script, <span style="color:#000;font-weight:bold">true</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error compiling the script %v &#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	_, err = vm.<span style="color:#900;font-weight:bold">RunProgram</span>(prog)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">prog</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Compile</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">script</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">true</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error compiling the script %v &#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">RunProgram</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prog</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> myJSFunc goja.Callable
-</span></span><span style="display:flex;"><span>	err = vm.<span style="color:#900;font-weight:bold">ExportTo</span>(vm.<span style="color:#900;font-weight:bold">Get</span>(<span style="color:#d14">&#34;myFunction&#34;</span>), <span style="color:#000;font-weight:bold">&amp;</span>myJSFunc)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error exporting the function %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">var</span> <span style="color:#1f2328">myJSFunc</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Callable</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">err</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">ExportTo</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Get</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;myFunction&#34;</span><span style="color:#1f2328">),</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">myJSFunc</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error exporting the function %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	res, err <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">myJSFunc</span>(goja.<span style="color:#900;font-weight:bold">Undefined</span>(), vm.<span style="color:#900;font-weight:bold">ToValue</span>(<span style="color:#d14">&#34;message from go&#34;</span>))
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error calling function %v&#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Returned value from JS function\n%s \n&#34;</span>, res.<span style="color:#900;font-weight:bold">ToString</span>())
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">res</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">myJSFunc</span><span style="color:#1f2328">(</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Undefined</span><span style="color:#1f2328">(),</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">ToValue</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;message from go&#34;</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error calling function %v&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Returned value from JS function\n%s \n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">res</span><span style="color:#1f2328">.</span><span style="color:#6639ba">ToString</span><span style="color:#1f2328">())</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>goja.Runtime Get() function gets values from the global object. <code>myFunction</code> is defined in the global scope. So you can get the function calling: <code>vm.Get(&quot;myFunction&quot;)</code>. This returns the Value interface for the function. Then we use the <code>ExportTo</code> function to get the function to a variable of the right type.</p>
 <p>The first parameter to the function is the &ldquo;this&rdquo; of the Javascript function. Since this function is not meant to use &ldquo;this&rdquo; we can pass <code>Undefined()</code>. The second parameter of the Go function is the first parameter of the Javascript function - a simple string. We can convert from Go string to Value interface type by calling <code>RunTime.ToValue()</code> function.</p>
 <p>The return value from the function is also of <code>Value</code> type. Since we know that the return value is string, just calling <code>res.ToString()</code> works just fine.</p>
@@ -179,252 +179,252 @@ For example, <code>vm.ToValue(&quot;a string value&quot;)</code> converts from g
 <h2 id="making-a-specialized-object-available-in-javascript">Making a specialized object available in Javascript</h2>
 <p>Let&rsquo;s come back to our original intention of making your App scriptable. For the custom script to be useful, we have to expose parts of the App to the script. For example, in order to write custom script for Google Sheets, you have a <code>SpreadsheetApp</code> object that provides that access. For example, <code>SpreadsheetApp.getActiveSheet()</code> gets the active sheet. Then you can access the rows by calling <code>sheet.getDataRange().getValues()</code>.</p>
 <p>Now let&rsquo;s review the sample code in the beginning of this article.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span>myemail.RegisterHook(<span style="color:#d14">&#34;onEmailReceived&#34;</span>, iGotEmail)
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-javascript" data-lang="javascript"><span style="display:flex;"><span><span style="color:#1f2328">myemail</span><span style="color:#1f2328">.</span><span style="color:#1f2328">RegisterHook</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;onEmailReceived&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">iGotEmail</span><span style="color:#1f2328">)</span>
 </span></span></code></pre></div><p>Our scripting environment requires a <code>myemail</code> object through which the user can register a hook that will get called whenever an email is received.</p>
 <p>We can create an Object in Go and add it to the <code>globals</code> of the Javascript RunTime.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
-</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Hooks <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	OnNewEmail         []<span style="color:#000;font-weight:bold">*</span>goja.Value
-</span></span><span style="display:flex;"><span>	BeforeSendingEmail []<span style="color:#000;font-weight:bold">func</span>(e <span style="color:#000;font-weight:bold">*</span>Email)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Hooks</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">OnNewEmail</span>         <span style="color:#1f2328">[]</span><span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">BeforeSendingEmail</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Email <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Subject <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	Body    <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Email</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Subject</span> <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Body</span>    <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (h Hooks) <span style="color:#900;font-weight:bold">Init</span>() {
-</span></span><span style="display:flex;"><span>	h.OnNewEmail = <span style="color:#0086b3">make</span>([]<span style="color:#000;font-weight:bold">*</span>goja.Value, <span style="color:#099">0</span>)
-</span></span><span style="display:flex;"><span>	h.BeforeSendingEmail = <span style="color:#0086b3">make</span>([]<span style="color:#000;font-weight:bold">func</span>(e <span style="color:#000;font-weight:bold">*</span>Email), <span style="color:#099">0</span>)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">h</span> <span style="color:#1f2328">Hooks</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">Init</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">make</span><span style="color:#1f2328">([]</span><span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">0</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">BeforeSendingEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">make</span><span style="color:#1f2328">([]</span><span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">),</span> <span style="color:#0550ae">0</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (h <span style="color:#000;font-weight:bold">*</span>Hooks) <span style="color:#900;font-weight:bold">TriggerNewEmailEvent</span>(email <span style="color:#000;font-weight:bold">*</span>Email, vm <span style="color:#000;font-weight:bold">*</span>goja.Runtime) {
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">h</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Hooks</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">TriggerNewEmailEvent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vm</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Runtime</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> _, newEmail <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> h.OnNewEmail {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> newEmailCallBack <span style="color:#000;font-weight:bold">func</span>(e <span style="color:#000;font-weight:bold">*</span>Email)
-</span></span><span style="display:flex;"><span>		vm.<span style="color:#900;font-weight:bold">ExportTo</span>(<span style="color:#000;font-weight:bold">*</span>newEmail, <span style="color:#000;font-weight:bold">&amp;</span>newEmailCallBack)
-</span></span><span style="display:flex;"><span>		<span style="color:#900;font-weight:bold">newEmailCallBack</span>(email)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">newEmail</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">var</span> <span style="color:#1f2328">newEmailCallBack</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">ExportTo</span><span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">newEmail</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">newEmailCallBack</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#6639ba">newEmailCallBack</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">WorkWithHooks</span>() {
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> hooks Hooks
-</span></span><span style="display:flex;"><span>	hooks.<span style="color:#900;font-weight:bold">Init</span>()
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">WorkWithHooks</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">var</span> <span style="color:#1f2328">hooks</span> <span style="color:#1f2328">Hooks</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Init</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	vm <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">New</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">vm</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">New</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#0086b3">new</span>(require.Registry).<span style="color:#900;font-weight:bold">Enable</span>(vm)
-</span></span><span style="display:flex;"><span>	console.<span style="color:#900;font-weight:bold">Enable</span>(vm)
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">new</span><span style="color:#1f2328">(</span><span style="color:#1f2328">require</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Registry</span><span style="color:#1f2328">).</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">console</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	obj <span style="color:#000;font-weight:bold">:=</span> vm.<span style="color:#900;font-weight:bold">NewObject</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewObject</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;RegisterHook&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(hook <span style="color:#458;font-weight:bold">string</span>, fn goja.Value) {
-</span></span><span style="display:flex;"><span>		hooks.OnNewEmail = <span style="color:#0086b3">append</span>(hooks.OnNewEmail, <span style="color:#000;font-weight:bold">&amp;</span>fn)
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Registered the Hook &#34;</span>)
-</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;RegisterHook&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">hook</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fn</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">fn</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Registered the Hook &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	vm.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;myemail&#34;</span>, obj)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;myemail&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	script <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">`
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		console.log(&#34;JS code started &#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		myemail.RegisterHook(&#34;onEmailReceived&#34;, iGotEmail)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		function iGotEmail(newEmail)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		{
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			console.log(&#34;New Email callback received. \n&#34;,newEmail.Subject,&#34;\n&#34;, newEmail.Body)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		}
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">	`</span>
-</span></span><span style="display:flex;"><span>	prg, err <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">Compile</span>(<span style="color:#d14">&#34;&#34;</span>, script, <span style="color:#000;font-weight:bold">true</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error compiling the script %v &#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">script</span> <span style="color:#0550ae">:=</span> <span style="color:#0a3069">`
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		console.log(&#34;JS code started &#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		myemail.RegisterHook(&#34;onEmailReceived&#34;, iGotEmail)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		function iGotEmail(newEmail)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		{
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			console.log(&#34;New Email callback received. \n&#34;,newEmail.Subject,&#34;\n&#34;, newEmail.Body)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		}
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">	`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">prg</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Compile</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">script</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">true</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error compiling the script %v &#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	_, err = vm.<span style="color:#900;font-weight:bold">RunProgram</span>(prg)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">RunProgram</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prg</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	email <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>Email{
-</span></span><span style="display:flex;"><span>		Subject: <span style="color:#d14">&#34;Your order for blue widgets&#34;</span>,
-</span></span><span style="display:flex;"><span>		Body:    <span style="color:#d14">&#34;Will be delivered in 1.3 micro seconds&#34;</span>,
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">email</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">Subject</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;Your order for blue widgets&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">Body</span><span style="color:#1f2328">:</span>    <span style="color:#0a3069">&#34;Will be delivered in 1.3 micro seconds&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Triggering the event &#34;</span>)
-</span></span><span style="display:flex;"><span>	hooks.<span style="color:#900;font-weight:bold">TriggerNewEmailEvent</span>(email, vm)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Triggering the event &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#6639ba">TriggerNewEmailEvent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>First we add a method to the custom object that makes it possible for the users to register their &ldquo;hooks&rdquo;.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;RegisterHook&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(hook <span style="color:#458;font-weight:bold">string</span>, fn goja.Value) {
-</span></span><span style="display:flex;"><span>		hooks.OnNewEmail = <span style="color:#0086b3">append</span>(hooks.OnNewEmail, <span style="color:#000;font-weight:bold">&amp;</span>fn)
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Registered the Hook &#34;</span>)
-</span></span><span style="display:flex;"><span>	})
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;RegisterHook&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">hook</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fn</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">fn</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Registered the Hook &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span></code></pre></div><p>Hooks are pointers to functions inside the script.
 We keep the hooks in a table and call the hooks when an event occurs.
 Note that we are getting the <code>Value</code> object for the callback from the RunTime and keeping it in the <code>hooks</code> table.
 In the <code>TriggerNewEmailEvent</code> function, we convert the <code>Value</code> object to function and call it passing the Email object.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (h <span style="color:#000;font-weight:bold">*</span>Hooks) <span style="color:#900;font-weight:bold">TriggerNewEmailEvent</span>(email <span style="color:#000;font-weight:bold">*</span>Email, vm <span style="color:#000;font-weight:bold">*</span>goja.Runtime) {
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">h</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Hooks</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">TriggerNewEmailEvent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vm</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Runtime</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> _, newEmail <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> h.OnNewEmail {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> newEmailCallBack <span style="color:#000;font-weight:bold">func</span>(e <span style="color:#000;font-weight:bold">*</span>Email)
-</span></span><span style="display:flex;"><span>		vm.<span style="color:#900;font-weight:bold">ExportTo</span>(<span style="color:#000;font-weight:bold">*</span>newEmail, <span style="color:#000;font-weight:bold">&amp;</span>newEmailCallBack)
-</span></span><span style="display:flex;"><span>		<span style="color:#900;font-weight:bold">newEmailCallBack</span>(email)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">newEmail</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">var</span> <span style="color:#1f2328">newEmailCallBack</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">ExportTo</span><span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">newEmail</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">newEmailCallBack</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#6639ba">newEmailCallBack</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>goja can convert from go struct to Javascript object. This is useful in simple cases such as passing value. For more closer integration, we will have to make a custom <code>Object</code> like that of the <code>myemail</code> object.</p>
 <h2 id="exposing-more-programmable-objects-to-the-script">Exposing more Programmable objects to the script</h2>
 <p>The sample script at the beginning of this article has one more level of exposure. It calls <code>newEmail.reply()</code> and also <code>newEmail.moveTo()</code> to move the email to another folder. We have to build another goja.Object for the email object.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeEmailJSObject</span>(vm <span style="color:#000;font-weight:bold">*</span>goja.Runtime, email <span style="color:#000;font-weight:bold">*</span>Email) <span style="color:#000;font-weight:bold">*</span>goja.Object {
-</span></span><span style="display:flex;"><span>	obj <span style="color:#000;font-weight:bold">:=</span> vm.<span style="color:#900;font-weight:bold">NewObject</span>()
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;subject&#34;</span>, email.Subject)
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;body&#34;</span>, email.Body)
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;to&#34;</span>, email.To)
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;reply&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(body <span style="color:#458;font-weight:bold">string</span>) {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Replying:\n%s\n&#34;</span>, body)
-</span></span><span style="display:flex;"><span>	})
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;setPriority&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(p <span style="color:#458;font-weight:bold">int</span>) {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Set email priority to %d\n&#34;</span>, p)
-</span></span><span style="display:flex;"><span>	})
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">makeEmailJSObject</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Runtime</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Object</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewObject</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;subject&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Subject</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;body&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Body</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;to&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">.</span><span style="color:#1f2328">To</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;reply&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">body</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Replying:\n%s\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">body</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;setPriority&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">p</span> <span style="color:#cf222e">int</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Set email priority to %d\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">p</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;moveTo&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(folder <span style="color:#458;font-weight:bold">string</span>) {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Moving email to folder %s\n&#34;</span>, folder)
-</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;moveTo&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">folder</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Moving email to folder %s\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">folder</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> obj
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">return</span> <span style="color:#1f2328">obj</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>We can now update our original code to use this function and make use of the new Email object.</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> (
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;fmt&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">(</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;fmt&#34;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
-</span></span><span style="display:flex;"><span>	<span style="color:#d14">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
-</span></span><span style="display:flex;"><span>)
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/console&#34;</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#0a3069">&#34;github.com/dop251/goja_nodejs/require&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Hooks <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	OnNewEmail         []<span style="color:#000;font-weight:bold">*</span>goja.Value
-</span></span><span style="display:flex;"><span>	BeforeSendingEmail []<span style="color:#000;font-weight:bold">func</span>(e <span style="color:#000;font-weight:bold">*</span>Email)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Hooks</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">OnNewEmail</span>         <span style="color:#1f2328">[]</span><span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">BeforeSendingEmail</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">type</span> Email <span style="color:#000;font-weight:bold">struct</span> {
-</span></span><span style="display:flex;"><span>	Subject  <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	Body     <span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>	Priority <span style="color:#458;font-weight:bold">int</span>
-</span></span><span style="display:flex;"><span>	To       []<span style="color:#458;font-weight:bold">string</span>
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">Email</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Subject</span>  <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Body</span>     <span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">Priority</span> <span style="color:#cf222e">int</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">To</span>       <span style="color:#1f2328">[]</span><span style="color:#cf222e">string</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (h Hooks) <span style="color:#900;font-weight:bold">Init</span>() {
-</span></span><span style="display:flex;"><span>	h.OnNewEmail = <span style="color:#0086b3">make</span>([]<span style="color:#000;font-weight:bold">*</span>goja.Value, <span style="color:#099">0</span>)
-</span></span><span style="display:flex;"><span>	h.BeforeSendingEmail = <span style="color:#0086b3">make</span>([]<span style="color:#000;font-weight:bold">func</span>(e <span style="color:#000;font-weight:bold">*</span>Email), <span style="color:#099">0</span>)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">h</span> <span style="color:#1f2328">Hooks</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">Init</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">make</span><span style="color:#1f2328">([]</span><span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">0</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">BeforeSendingEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">make</span><span style="color:#1f2328">([]</span><span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">),</span> <span style="color:#0550ae">0</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> (h <span style="color:#000;font-weight:bold">*</span>Hooks) <span style="color:#900;font-weight:bold">TriggerNewEmailEvent</span>(email <span style="color:#000;font-weight:bold">*</span>Email, vm <span style="color:#000;font-weight:bold">*</span>goja.Runtime) {
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">h</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Hooks</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">TriggerNewEmailEvent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vm</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Runtime</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	eobj <span style="color:#000;font-weight:bold">:=</span> <span style="color:#900;font-weight:bold">makeEmailJSObject</span>(vm, email)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">eobj</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">makeEmailJSObject</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">for</span> _, newEmail <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">range</span> h.OnNewEmail {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">var</span> newEmailCallBack <span style="color:#000;font-weight:bold">func</span>(<span style="color:#000;font-weight:bold">*</span>goja.Object)
-</span></span><span style="display:flex;"><span>		vm.<span style="color:#900;font-weight:bold">ExportTo</span>(<span style="color:#000;font-weight:bold">*</span>newEmail, <span style="color:#000;font-weight:bold">&amp;</span>newEmailCallBack)
-</span></span><span style="display:flex;"><span>		<span style="color:#900;font-weight:bold">newEmailCallBack</span>(eobj)
-</span></span><span style="display:flex;"><span>	}
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">newEmail</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">h</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">var</span> <span style="color:#1f2328">newEmailCallBack</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Object</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">ExportTo</span><span style="color:#1f2328">(</span><span style="color:#0550ae">*</span><span style="color:#1f2328">newEmail</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">newEmailCallBack</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#6639ba">newEmailCallBack</span><span style="color:#1f2328">(</span><span style="color:#1f2328">eobj</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">makeEmailJSObject</span>(vm <span style="color:#000;font-weight:bold">*</span>goja.Runtime, email <span style="color:#000;font-weight:bold">*</span>Email) <span style="color:#000;font-weight:bold">*</span>goja.Object {
-</span></span><span style="display:flex;"><span>	obj <span style="color:#000;font-weight:bold">:=</span> vm.<span style="color:#900;font-weight:bold">NewObject</span>()
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;subject&#34;</span>, email.Subject)
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;body&#34;</span>, email.Body)
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;to&#34;</span>, email.To)
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;reply&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(body <span style="color:#458;font-weight:bold">string</span>) {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Replying:\n%s\n&#34;</span>, body)
-</span></span><span style="display:flex;"><span>	})
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;setPriority&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(p <span style="color:#458;font-weight:bold">int</span>) {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Set email priority to %d\n&#34;</span>, p)
-</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">makeEmailJSObject</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Runtime</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Object</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewObject</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;subject&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Subject</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;body&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Body</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;to&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">email</span><span style="color:#1f2328">.</span><span style="color:#1f2328">To</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;reply&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">body</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Replying:\n%s\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">body</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;setPriority&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">p</span> <span style="color:#cf222e">int</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Set email priority to %d\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">p</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;moveTo&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(folder <span style="color:#458;font-weight:bold">string</span>) {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Moving email to folder %s\n&#34;</span>, folder)
-</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;moveTo&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">folder</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Moving email to folder %s\n&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">folder</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> obj
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">return</span> <span style="color:#1f2328">obj</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">func</span> <span style="color:#900;font-weight:bold">WorkWithHooks</span>() {
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">var</span> hooks Hooks
-</span></span><span style="display:flex;"><span>	hooks.<span style="color:#900;font-weight:bold">Init</span>()
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">WorkWithHooks</span><span style="color:#1f2328">()</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">var</span> <span style="color:#1f2328">hooks</span> <span style="color:#1f2328">Hooks</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Init</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	vm <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">New</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">vm</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">New</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	<span style="color:#0086b3">new</span>(require.Registry).<span style="color:#900;font-weight:bold">Enable</span>(vm)
-</span></span><span style="display:flex;"><span>	console.<span style="color:#900;font-weight:bold">Enable</span>(vm)
+</span></span><span style="display:flex;"><span>	<span style="color:#6639ba">new</span><span style="color:#1f2328">(</span><span style="color:#1f2328">require</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Registry</span><span style="color:#1f2328">).</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">console</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Enable</span><span style="color:#1f2328">(</span><span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	obj <span style="color:#000;font-weight:bold">:=</span> vm.<span style="color:#900;font-weight:bold">NewObject</span>()
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewObject</span><span style="color:#1f2328">()</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	obj.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;RegisterHook&#34;</span>, <span style="color:#000;font-weight:bold">func</span>(hook <span style="color:#458;font-weight:bold">string</span>, fn goja.Value) {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">switch</span> hook {
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">case</span> <span style="color:#d14">&#34;onEmailReceived&#34;</span>:
-</span></span><span style="display:flex;"><span>			hooks.OnNewEmail = <span style="color:#0086b3">append</span>(hooks.OnNewEmail, <span style="color:#000;font-weight:bold">&amp;</span>fn)
-</span></span><span style="display:flex;"><span>			fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Registered onEmailReceived Hook &#34;</span>)
-</span></span><span style="display:flex;"><span>		}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;RegisterHook&#34;</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">func</span><span style="color:#1f2328">(</span><span style="color:#1f2328">hook</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">fn</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Value</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">switch</span> <span style="color:#1f2328">hook</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">case</span> <span style="color:#0a3069">&#34;onEmailReceived&#34;</span><span style="color:#1f2328">:</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#1f2328">OnNewEmail</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">fn</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>			<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Registered onEmailReceived Hook &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	})
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">})</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	vm.<span style="color:#900;font-weight:bold">Set</span>(<span style="color:#d14">&#34;myemail&#34;</span>, obj)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Set</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;myemail&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	script <span style="color:#000;font-weight:bold">:=</span> <span style="color:#d14">`
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		console.log(&#34;JS code started &#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		myemail.RegisterHook(&#34;onEmailReceived&#34;, iGotEmail)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		function iGotEmail(newEmail)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		{
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			console.log(&#34;newEmail, subject %s &#34;, newEmail.subject,  newEmail.to)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			if(newEmail.subject.startsWith(&#34;URGENT:&#34;))
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			{
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">				newEmail.setPriority(5)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">				
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">				newEmail.reply(&#34;Hello,\n Received your email. We will respond on priority basis. \n\nThanks\n&#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">				return
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			}
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			else if(newEmail.to.includes(&#34;sales@website&#34;))
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			{
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">				newEmail.moveTo(&#34;Sales&#34;)
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">				return
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">			}
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">		}
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">	`</span>
-</span></span><span style="display:flex;"><span>	prg, err <span style="color:#000;font-weight:bold">:=</span> goja.<span style="color:#900;font-weight:bold">Compile</span>(<span style="color:#d14">&#34;&#34;</span>, script, <span style="color:#000;font-weight:bold">true</span>)
-</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">if</span> err <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">nil</span> {
-</span></span><span style="display:flex;"><span>		fmt.<span style="color:#900;font-weight:bold">Printf</span>(<span style="color:#d14">&#34;Error compiling the script %v &#34;</span>, err)
-</span></span><span style="display:flex;"><span>		<span style="color:#000;font-weight:bold">return</span>
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">script</span> <span style="color:#0550ae">:=</span> <span style="color:#0a3069">`
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		console.log(&#34;JS code started &#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		myemail.RegisterHook(&#34;onEmailReceived&#34;, iGotEmail)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		function iGotEmail(newEmail)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		{
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			console.log(&#34;newEmail, subject %s &#34;, newEmail.subject,  newEmail.to)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			if(newEmail.subject.startsWith(&#34;URGENT:&#34;))
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			{
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">				newEmail.setPriority(5)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">				
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">				newEmail.reply(&#34;Hello,\n Received your email. We will respond on priority basis. \n\nThanks\n&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">				return
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			}
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			else if(newEmail.to.includes(&#34;sales@website&#34;))
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			{
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">				newEmail.moveTo(&#34;Sales&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">				return
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">			}
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">		}
+</span></span></span><span style="display:flex;"><span><span style="color:#0a3069">	`</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">prg</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">goja</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Compile</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;&#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">script</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">true</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#cf222e">if</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Printf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Error compiling the script %v &#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#cf222e">return</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	_, err = vm.<span style="color:#900;font-weight:bold">RunProgram</span>(prg)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#1f2328">=</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">.</span><span style="color:#6639ba">RunProgram</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prg</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	email1 <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>Email{
-</span></span><span style="display:flex;"><span>		Subject: <span style="color:#d14">&#34;URGENT: Systems down!&#34;</span>,
-</span></span><span style="display:flex;"><span>		Body:    <span style="color:#d14">&#34;5 of your systems are down at the moment&#34;</span>,
-</span></span><span style="display:flex;"><span>		To:      []<span style="color:#458;font-weight:bold">string</span>{<span style="color:#d14">&#34;some@one.cc&#34;</span>},
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">email1</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">Subject</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;URGENT: Systems down!&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">Body</span><span style="color:#1f2328">:</span>    <span style="color:#0a3069">&#34;5 of your systems are down at the moment&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">To</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">[]</span><span style="color:#cf222e">string</span><span style="color:#1f2328">{</span><span style="color:#0a3069">&#34;some@one.cc&#34;</span><span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Triggering the urgent email event &#34;</span>)
-</span></span><span style="display:flex;"><span>	hooks.<span style="color:#900;font-weight:bold">TriggerNewEmailEvent</span>(email1, vm)
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Triggering the urgent email event &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#6639ba">TriggerNewEmailEvent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email1</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	email2 <span style="color:#000;font-weight:bold">:=</span> <span style="color:#000;font-weight:bold">&amp;</span>Email{
-</span></span><span style="display:flex;"><span>		Subject: <span style="color:#d14">&#34;New order received!&#34;</span>,
-</span></span><span style="display:flex;"><span>		Body:    <span style="color:#d14">&#34;You got new order for 1k blue widgets!&#34;</span>,
-</span></span><span style="display:flex;"><span>		To:      []<span style="color:#458;font-weight:bold">string</span>{<span style="color:#d14">&#34;sales@website&#34;</span>},
-</span></span><span style="display:flex;"><span>	}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">email2</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">Email</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">Subject</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;New order received!&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">Body</span><span style="color:#1f2328">:</span>    <span style="color:#0a3069">&#34;You got new order for 1k blue widgets!&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>		<span style="color:#1f2328">To</span><span style="color:#1f2328">:</span>      <span style="color:#1f2328">[]</span><span style="color:#cf222e">string</span><span style="color:#1f2328">{</span><span style="color:#0a3069">&#34;sales@website&#34;</span><span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>	fmt.<span style="color:#900;font-weight:bold">Println</span>(<span style="color:#d14">&#34;Triggering the sales email event &#34;</span>)
-</span></span><span style="display:flex;"><span>	hooks.<span style="color:#900;font-weight:bold">TriggerNewEmailEvent</span>(email2, vm)
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Println</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;Triggering the sales email event &#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#1f2328">hooks</span><span style="color:#1f2328">.</span><span style="color:#6639ba">TriggerNewEmailEvent</span><span style="color:#1f2328">(</span><span style="color:#1f2328">email2</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vm</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>We first trigger the &ldquo;Urgent&rdquo; email event and then trigger the &ldquo;sales&rdquo; email event.
 The custom script directs the flow through the two cases handled in the script. That is the beauty of making the system scriptable. Now the user has the power to change and enhance the system behavior which was otherwise not possible.</p>
 

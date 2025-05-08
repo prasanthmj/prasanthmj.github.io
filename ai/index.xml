@@ -4,58 +4,52 @@
     <title>Ais on Prasanth Janardhanan</title>
     <link>/ai/</link>
     <description>Recent content in Ais on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Thu, 02 Jan 2025 09:55:45 +0000</lastBuildDate><atom:link href="/ai/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 07 May 2025 09:55:45 +0000</lastBuildDate>
+    <atom:link href="/ai/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Self-Hosted RAG Architecture for Privacy-Sensitive Document Search with Golang</title>
+      <link>/ai/self-hosted-rag-for-privacy/</link>
+      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <guid>/ai/self-hosted-rag-for-privacy/</guid>
+      <description>&lt;p&gt;Remember the days of boolean search operators? The frustrating experience of trying to find that one document by guessing the exact keywords it might contain? For decades, our ability to search through documents has been limited by keyword matching—a primitive approach that fails to capture the richness of human language and intent.&lt;/p&gt;&#xA;&lt;p&gt;Traditional search technology has evolved through several stages: from basic keyword matching to more sophisticated approaches involving stemming, lemmatization, and eventually, statistical methods like TF-IDF (Term Frequency-Inverse Document Frequency). Each iteration brought incremental improvements, but they all shared a fundamental limitation—they didn&amp;rsquo;t truly understand the meaning behind our queries.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Model Context Protocol (MCP): Lets Implement an MCP server in Go</title>
       <link>/ai/mcp-go/</link>
-      <pubDate>Thu, 02 Jan 2025 09:55:45 +0000</pubDate>
-      
+      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/ai/mcp-go/</guid>
-      <description>Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.
-While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks.</description>
+      <description>&lt;p&gt;Model Context Protocol (MCP) is rapidly transforming how we interact with computers by enabling natural language instructions to handle complex tasks. As we stand at the beginning of this revolution, we&amp;rsquo;re witnessing fast-paced development in MCP tools and components.&lt;/p&gt;&#xA;&lt;p&gt;While a detailed introduction to MCP was covered in our previous post, here&amp;rsquo;s a quick refresher: MCP  servers expose various capabilities (like resources, tools, and prompts) to clients. The clients can then use these capabilities in conjunction with Large Language Models (LLMs) to perform tasks. The protocol standardizes how these components communicate, making it easy to build interoperable AI-powered applications.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Model Context Protocol (MCP): Building Bridges Between AI and Your World</title>
       <link>/ai/mcp/</link>
-      <pubDate>Sat, 28 Dec 2024 10:42:12 +0000</pubDate>
-      
+      <pubDate>Sat, 28 Dec 2024 00:00:00 +0000</pubDate>
       <guid>/ai/mcp/</guid>
-      <description>Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.
-Enter the Model Context Protocol (MCP) - think of it as giving your AI assistant a complete office setup instead of just a mailbox.</description>
+      <description>&lt;p&gt;Imagine having a brilliant personal assistant who&amp;rsquo;s incredibly smart but can only communicate through a mailbox - they can receive your letters and write back, but can&amp;rsquo;t directly interact with your computer, check your calendar, or access your files. That&amp;rsquo;s essentially the situation with today&amp;rsquo;s Large Language Models (LLMs) like Claude or GPT-4. Sure, they&amp;rsquo;re incredibly capable, but they&amp;rsquo;re often trapped behind an API, limited to text-in, text-out interactions.&lt;/p&gt;&#xA;&lt;p&gt;&lt;img src=&#34;../images/mcp-intro-v2.webp&#34; alt=&#34;Need for Model Context Protocol&#34;&gt;&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>ChatGpt 4o, the Rise of Conversational Interfaces and the Shifting Landscape of Human-Computer Interaction</title>
       <link>/ai/llms-to-transform-ui/</link>
       <pubDate>Tue, 07 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/llms-to-transform-ui/</guid>
-      <description>Picture this: You&amp;rsquo;re a sales manager trying to stay on top of your team&amp;rsquo;s performance. Instead of navigating through complex menus and dashboards, you simply turn to your computer and say, &amp;ldquo;Get me the list of all new leads for the last month.&amp;rdquo; Instantly, your screen displays a neatly organized list of every new lead your team has generated, complete with contact information, lead source, and potential revenue.
-Or imagine this: You&amp;rsquo;re a business analyst tasked with identifying trends and opportunities in your company&amp;rsquo;s sales data.</description>
+      <description>&lt;p&gt;Picture this: You&amp;rsquo;re a sales manager trying to stay on top of your team&amp;rsquo;s performance. Instead of navigating through complex menus and dashboards, you simply turn to your computer and say, &amp;ldquo;Get me the list of all new leads for the last month.&amp;rdquo; Instantly, your screen displays a neatly organized list of every new lead your team has generated, complete with contact information, lead source, and potential revenue.&lt;/p&gt;&#xA;&lt;p&gt;Or imagine this: You&amp;rsquo;re a business analyst tasked with identifying trends and opportunities in your company&amp;rsquo;s sales data. Rather than writing complex queries and creating visualizations from scratch, you simply ask your computer, &amp;ldquo;Get me the sales report for the last month for California for blue widgets.&amp;rdquo; Moments later, you&amp;rsquo;re presented with a comprehensive report that breaks down sales by region, product, and customer segment, highlighting key insights and areas for growth.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>The Art of the Algorithm: How AI&#39;s Gaming Strategies are Shaping the Future of Innovation</title>
       <link>/ai/gaming-and-ai/</link>
       <pubDate>Mon, 06 May 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/gaming-and-ai/</guid>
-      <description>Demis Hassabis is a name you might not have heard before, but trust me, you will. This guy is the real deal when it comes to artificial intelligence (AI). He&amp;rsquo;s the mastermind behind DeepMind, a company that&amp;rsquo;s been making waves in the AI world for years now. And recently, he gave a talk that blew my mind.
-Now, I&amp;rsquo;ve been around the block a few times when it comes to technology.</description>
+      <description>&lt;p&gt;Demis Hassabis is a name you might not have heard before, but trust me, you will. This guy is the real deal when it comes to artificial intelligence (AI). He&amp;rsquo;s the mastermind behind DeepMind, a company that&amp;rsquo;s been making waves in the AI world for years now. And recently, he gave a talk that blew my mind.&lt;/p&gt;&#xA;&lt;div style=&#34;position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;&#34;&gt;&#xA;      &lt;iframe allow=&#34;accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share&#34; allowfullscreen=&#34;allowfullscreen&#34; loading=&#34;eager&#34; referrerpolicy=&#34;strict-origin-when-cross-origin&#34; src=&#34;https://www.youtube.com/embed/0_M_syPuFos?autoplay=0&amp;amp;controls=1&amp;amp;end=0&amp;amp;loop=0&amp;amp;mute=0&amp;amp;start=0&#34; style=&#34;position: absolute; top: 0; left: 0; width: 100%; height: 100%; border:0;&#34; title=&#34;YouTube video&#34;&gt;&lt;/iframe&gt;&#xA;    &lt;/div&gt;&#xA;&#xA;&lt;p&gt;Now, I&amp;rsquo;ve been around the block a few times when it comes to technology. I&amp;rsquo;ve seen my fair share of overhyped vaporware and empty promises. But Hassabis is different. This guy has a vision for AI that&amp;rsquo;s both thrilling and terrifying at the same time.&lt;/p&gt;</description>
     </item>
-    
     <item>
       <title>Exploring Chain-of-Thought: Enhancing Problem-Solving in Large Language Models</title>
       <link>/ai/chain-of-thought/</link>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/chain-of-thought/</guid>
-      <description>LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.</description>
+      <description>&lt;p&gt;LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

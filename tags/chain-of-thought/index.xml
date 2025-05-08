@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>chain of thought on Prasanth Janardhanan</title>
+    <title>Chain of Thought on Prasanth Janardhanan</title>
     <link>/tags/chain-of-thought/</link>
-    <description>Recent content in chain of thought on Prasanth Janardhanan</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <description>Recent content in Chain of Thought on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Mon, 25 Mar 2024 00:00:00 +0000</lastBuildDate><atom:link href="/tags/chain-of-thought/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 25 Mar 2024 00:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/chain-of-thought/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Exploring Chain-of-Thought: Enhancing Problem-Solving in Large Language Models</title>
       <link>/ai/chain-of-thought/</link>
       <pubDate>Mon, 25 Mar 2024 00:00:00 +0000</pubDate>
-      
       <guid>/ai/chain-of-thought/</guid>
-      <description>LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.</description>
+      <description>&lt;p&gt;LLMs are like enormous digital brains that have read a vast amount of text from the internet—books, articles, websites, and more. By doing so, they learn how to predict what word comes next in a sentence, which in turn helps them write essays, summarize texts, and even create poetry. However, despite their impressiveness in handling language, these models often struggled with tasks that required deeper levels of reasoning or problem-solving, such as math.&lt;/p&gt;</description>
     </item>
-    
   </channel>
 </rss>

@@ -41,248 +41,248 @@
 <p>It is a common requirement to load a nested Javascript class from a JSON file. Sometimes you want to send the JSON across a network and load it back to a Javascript class.</p>
 <p>For better clarity, let us understand the difference between a Javascript class instance and an Object. Take this class for example:</p>
 <p>This is a class that draws a rectangle on the canvas</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> Rectangle{
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> x:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> y:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> width:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> height:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">class</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">x</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">y</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">width</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">height</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> draw(ctx:<span style="color:#458;font-weight:bold">CanvasRenderingContext2D</span>)
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        ctx.strokeStyle <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">this</span>.stroke
-</span></span><span style="display:flex;"><span>        ctx.rect(<span style="color:#000;font-weight:bold">this</span>.x,<span style="color:#000;font-weight:bold">this</span>.y, <span style="color:#000;font-weight:bold">this</span>.width, <span style="color:#000;font-weight:bold">this</span>.height)
-</span></span><span style="display:flex;"><span>        ctx.stroke();
-</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">draw</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span>:<span style="color:#cf222e">CanvasRenderingContext2D</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">ctx</span><span style="color:#1f2328">.</span><span style="color:#1f2328">strokeStyle</span> <span style="color:#0550ae">=</span> <span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">stroke</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">ctx</span><span style="color:#1f2328">.</span><span style="color:#1f2328">rect</span><span style="color:#1f2328">(</span><span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">x</span><span style="color:#1f2328">,</span><span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">y</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">width</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">height</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">ctx</span><span style="color:#1f2328">.</span><span style="color:#1f2328">stroke</span><span style="color:#1f2328">();</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>        
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> area()
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">this</span>.width <span style="color:#000;font-weight:bold">*</span> <span style="color:#000;font-weight:bold">this</span>.height           
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">area</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">return</span> <span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">width</span> <span style="color:#0550ae">*</span> <span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">height</span>           
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Suppose you have an instance of this rectangle and that you want to save the rectangle to a file. The easy solution would be to use <code>JSON.stringify(rect)</code>. Once the object is converted into JSON string, it is easy to save to a file or send through wire to be saved to a database.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> rect <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">10</span>,<span style="color:#099">20</span>,<span style="color:#099">120</span>,<span style="color:#099">110</span>)
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> str <span style="color:#000;font-weight:bold">=</span> JSON.stringify(rect)
-</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// str will be this:
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// {&#34;x&#34;:10,&#34;y&#34;:20,&#34;width&#34;:120,&#34;height&#34;:110,&#34;stroke&#34;:&#34;#999&#34;}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">rect</span> <span style="color:#0550ae">=</span> <span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">20</span><span style="color:#1f2328">,</span><span style="color:#0550ae">120</span><span style="color:#1f2328">,</span><span style="color:#0550ae">110</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">str</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">JSON</span><span style="color:#1f2328">.</span><span style="color:#1f2328">stringify</span><span style="color:#1f2328">(</span><span style="color:#1f2328">rect</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a">// str will be this:
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">// {&#34;x&#34;:10,&#34;y&#34;:20,&#34;width&#34;:120,&#34;height&#34;:110,&#34;stroke&#34;:&#34;#999&#34;}
 </span></span></span></code></pre></div><p>However, how will you load the rectangle back from persistence?</p>
 <p>You can use JSON.parse() to parse the string to an object like this:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> str <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;{&#34;x&#34;:10,&#34;y&#34;:20,&#34;width&#34;:120,&#34;height&#34;:110,&#34;stroke&#34;:&#34;#999&#34;}&#39;</span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> obj <span style="color:#000;font-weight:bold">=</span> JSON.parse(str)
-</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">//obj will be a plain object like this:
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#998;font-style:italic">/*
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">{ 
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">    x: 10, 
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">    y: 20, 
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">    width: 120, 
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">    height: 110, 
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">    stroke: &#39;#999&#39; 
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">}
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">*/</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">str</span> <span style="color:#0550ae">=</span> <span style="color:#0a3069">&#39;{&#34;x&#34;:10,&#34;y&#34;:20,&#34;width&#34;:120,&#34;height&#34;:110,&#34;stroke&#34;:&#34;#999&#34;}&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">obj</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">JSON</span><span style="color:#1f2328">.</span><span style="color:#1f2328">parse</span><span style="color:#1f2328">(</span><span style="color:#1f2328">str</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a">//obj will be a plain object like this:
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a"></span><span style="color:#57606a">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">{ 
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">    x: 10, 
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">    y: 20, 
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">    width: 120, 
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">    height: 110, 
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">    stroke: &#39;#999&#39; 
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">}
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">*/</span>
 </span></span></code></pre></div><p>However, you can&rsquo;t call obj.draw() or obj.area() because obj is a plain Javascript object, not an instance of Rectangle()</p>
 <p>You can create and load Rectangle() from the plain object:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> rect <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> Rectangle()
-</span></span><span style="display:flex;"><span>rect.x <span style="color:#000;font-weight:bold">=</span> obj.x
-</span></span><span style="display:flex;"><span>rect.y <span style="color:#000;font-weight:bold">=</span> obj.y
-</span></span><span style="display:flex;"><span>rect.width <span style="color:#000;font-weight:bold">=</span> obj.width
-</span></span><span style="display:flex;"><span>rect.height <span style="color:#000;font-weight:bold">=</span> obj.height
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">rect</span> <span style="color:#0550ae">=</span> <span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">x</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#1f2328">x</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">y</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#1f2328">y</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">width</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#1f2328">width</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">height</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">.</span><span style="color:#1f2328">height</span>
 </span></span></code></pre></div><p>This solution can work; but it can become too verbose as you add more shapes and constructs that contain other shapes.</p>
 <h2 id="enter-serialization">Enter serialization</h2>
 <p>The module <a href="https://github.com/typestack/class-transformer">class-transformer</a> makes it easier to serialize nested class objects, and arrays in to a string. Later, you can  reconstruct the same nested structures from the string.</p>
 <p>Let us convert a JSON string to a Rectangle instance:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> { deserialize } <span style="color:#000;font-weight:bold">from</span> <span style="color:#d14">&#39;class-transformer&#39;</span>;
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">{</span> <span style="color:#1f2328">deserialize</span> <span style="color:#1f2328">}</span> <span style="color:#cf222e">from</span> <span style="color:#0a3069">&#39;class-transformer&#39;</span><span style="color:#1f2328">;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> str <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;{&#34;x&#34;:10,&#34;y&#34;:20,&#34;width&#34;:100,&#34;height&#34;:110,&#34;stroke&#34;:&#34;#999&#34;}&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">str</span> <span style="color:#0550ae">=</span> <span style="color:#0a3069">&#39;{&#34;x&#34;:10,&#34;y&#34;:20,&#34;width&#34;:100,&#34;height&#34;:110,&#34;stroke&#34;:&#34;#999&#34;}&#39;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> rect <span style="color:#000;font-weight:bold">=</span> deserialize(Rectangle, str)
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">rect</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">deserialize</span><span style="color:#1f2328">(</span><span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">str</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>expect(rect.area()).toBe(<span style="color:#099">11000</span>)
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">expect</span><span style="color:#1f2328">(</span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">area</span><span style="color:#1f2328">()).</span><span style="color:#1f2328">toBe</span><span style="color:#1f2328">(</span><span style="color:#0550ae">11000</span><span style="color:#1f2328">)</span>
 </span></span></code></pre></div><p>You can transform from plain object to class object as well. Example below:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> { plainToClass } <span style="color:#000;font-weight:bold">from</span> <span style="color:#d14">&#39;class-transformer&#39;</span>;
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">{</span> <span style="color:#1f2328">plainToClass</span> <span style="color:#1f2328">}</span> <span style="color:#cf222e">from</span> <span style="color:#0a3069">&#39;class-transformer&#39;</span><span style="color:#1f2328">;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> obj <span style="color:#000;font-weight:bold">=</span> {
-</span></span><span style="display:flex;"><span>    x:<span style="color:#458;font-weight:bold">20</span>,
-</span></span><span style="display:flex;"><span>    y:<span style="color:#458;font-weight:bold">10</span>,
-</span></span><span style="display:flex;"><span>    width:<span style="color:#458;font-weight:bold">100</span>,
-</span></span><span style="display:flex;"><span>    height:<span style="color:#458;font-weight:bold">110</span>
-</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">obj</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">x</span>:<span style="color:#cf222e">20</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">y</span>:<span style="color:#cf222e">10</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">width</span>:<span style="color:#cf222e">100</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">height</span>:<span style="color:#cf222e">110</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">};</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> rect <span style="color:#000;font-weight:bold">=</span> plainToClass(Rectangle, obj)
-</span></span><span style="display:flex;"><span>expect(rect.area()).toBe(<span style="color:#099">11000</span>)
-</span></span><span style="display:flex;"><span>expect(rect.hitTest(<span style="color:#099">20</span>,<span style="color:#099">30</span>)).toBe(<span style="color:#000;font-weight:bold">true</span>)
-</span></span><span style="display:flex;"><span>expect(rect.hitTest(<span style="color:#099">19</span>,<span style="color:#099">30</span>)).toBe(<span style="color:#000;font-weight:bold">false</span>)
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">rect</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">plainToClass</span><span style="color:#1f2328">(</span><span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">obj</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">expect</span><span style="color:#1f2328">(</span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">area</span><span style="color:#1f2328">()).</span><span style="color:#1f2328">toBe</span><span style="color:#1f2328">(</span><span style="color:#0550ae">11000</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">expect</span><span style="color:#1f2328">(</span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">hitTest</span><span style="color:#1f2328">(</span><span style="color:#0550ae">20</span><span style="color:#1f2328">,</span><span style="color:#0550ae">30</span><span style="color:#1f2328">)).</span><span style="color:#1f2328">toBe</span><span style="color:#1f2328">(</span><span style="color:#cf222e">true</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">expect</span><span style="color:#1f2328">(</span><span style="color:#1f2328">rect</span><span style="color:#1f2328">.</span><span style="color:#1f2328">hitTest</span><span style="color:#1f2328">(</span><span style="color:#0550ae">19</span><span style="color:#1f2328">,</span><span style="color:#0550ae">30</span><span style="color:#1f2328">)).</span><span style="color:#1f2328">toBe</span><span style="color:#1f2328">(</span><span style="color:#cf222e">false</span><span style="color:#1f2328">)</span>
 </span></span></code></pre></div><h2 id="nested-structures">Nested structures</h2>
 <p>When one object contains another object, the contained objects also can be serialized. Use the <code>@Type()</code> decorator.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">class</span> Rectangle <span style="color:#000;font-weight:bold">extends</span> Shape{
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">class</span> <span style="color:#1f2328">Rectangle</span> <span style="color:#cf222e">extends</span> <span style="color:#1f2328">Shape</span><span style="color:#1f2328">{</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> x:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> y:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> width:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> height:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">x</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">y</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">width</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">height</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">0</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">@Type</span>(()<span style="color:#000;font-weight:bold">=&gt;</span>StrokeStyle)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> stroke:<span style="color:#458;font-weight:bold">StrokeStyle</span><span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">new</span> StrokeStyle()
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">@Type</span><span style="color:#1f2328">(()</span><span style="color:#0550ae">=&gt;</span><span style="color:#1f2328">StrokeStyle</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">stroke</span>:<span style="color:#cf222e">StrokeStyle</span><span style="color:#0550ae">=</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">StrokeStyle</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><h2 id="excluding-certain-attributes">Excluding certain attributes</h2>
 <p>The canvas and context objects of the Drawing class are runtime only and we don&rsquo;t want to save those. In order to exclude those members, use the @Exclude() decorator.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> { Exclude } <span style="color:#000;font-weight:bold">from</span> <span style="color:#d14">&#39;class-transformer&#39;</span>;
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">{</span> <span style="color:#1f2328">Exclude</span> <span style="color:#1f2328">}</span> <span style="color:#cf222e">from</span> <span style="color:#0a3069">&#39;class-transformer&#39;</span><span style="color:#1f2328">;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">class</span> Drawing {
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">@Exclude</span>()
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">private</span> canvas: <span style="color:#458;font-weight:bold">HTMLCanvasElement</span><span style="color:#000;font-weight:bold">|</span><span style="color:#000;font-weight:bold">null</span> <span style="color:#000;font-weight:bold">=</span>  <span style="color:#000;font-weight:bold">null</span>;
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">class</span> <span style="color:#1f2328">Drawing</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">@Exclude</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">private</span> <span style="color:#1f2328">canvas</span>: <span style="color:#cf222e">HTMLCanvasElement</span><span style="color:#0550ae">|</span><span style="color:#cf222e">null</span> <span style="color:#0550ae">=</span>  <span style="color:#cf222e">null</span><span style="color:#1f2328">;</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">@Exclude</span>()
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">private</span> context: <span style="color:#458;font-weight:bold">CanvasRenderingContext2D</span><span style="color:#000;font-weight:bold">|</span><span style="color:#000;font-weight:bold">null</span><span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">null</span>;
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">@Exclude</span><span style="color:#1f2328">()</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">private</span> <span style="color:#1f2328">context</span>: <span style="color:#cf222e">CanvasRenderingContext2D</span><span style="color:#0550ae">|</span><span style="color:#cf222e">null</span><span style="color:#0550ae">=</span><span style="color:#cf222e">null</span><span style="color:#1f2328">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><h2 id="serializing-different-types-of-objects--in-an-array">Serializing Different types of objects  in an array</h2>
 <p>We have different types of drawing objects - like Circle, Rectangle, Line etc.
 All the objects inherit from an abstract class Shape. This works well for drawing making use of the polymorphic features.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">abstract</span> <span style="color:#000;font-weight:bold">class</span> Shape
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">abstract</span> draw(ctx:<span style="color:#458;font-weight:bold">CanvasRenderingContext2D</span>)<span style="color:#000;font-weight:bold">:</span><span style="color:#000;font-weight:bold">void</span>;
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">abstract</span> <span style="color:#cf222e">class</span> <span style="color:#1f2328">Shape</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">abstract</span> <span style="color:#1f2328">draw</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span>:<span style="color:#cf222e">CanvasRenderingContext2D</span><span style="color:#1f2328">)</span><span style="color:#0550ae">:</span><span style="color:#cf222e">void</span><span style="color:#1f2328">;</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">class</span> Drawing {
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> shapes: <span style="color:#458;font-weight:bold">Shape</span>[]<span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">class</span> <span style="color:#1f2328">Drawing</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">shapes</span>: <span style="color:#cf222e">Shape</span><span style="color:#1f2328">[]</span><span style="color:#0550ae">=</span> <span style="color:#1f2328">[]</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> draw(){
-</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">for</span>(<span style="color:#000;font-weight:bold">let</span> shape <span style="color:#000;font-weight:bold">of</span> <span style="color:#000;font-weight:bold">this</span>.shapes)
-</span></span><span style="display:flex;"><span>        {
-</span></span><span style="display:flex;"><span>            shape.draw(<span style="color:#000;font-weight:bold">this</span>.context)
-</span></span><span style="display:flex;"><span>        }
-</span></span><span style="display:flex;"><span>    }    
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">draw</span><span style="color:#1f2328">(){</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">for</span><span style="color:#1f2328">(</span><span style="color:#cf222e">let</span> <span style="color:#1f2328">shape</span> <span style="color:#cf222e">of</span> <span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">shapes</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">shape</span><span style="color:#1f2328">.</span><span style="color:#1f2328">draw</span><span style="color:#1f2328">(</span><span style="color:#cf222e">this</span><span style="color:#1f2328">.</span><span style="color:#1f2328">context</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>    
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>But, how do we save all the different types of objects in the shapes array?
 class-transformer has a discriminator feature precisely for this purpose.</p>
 <p>Here is how we can do it:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">class</span> Drawing {
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">class</span> <span style="color:#1f2328">Drawing</span> <span style="color:#1f2328">{</span>
 </span></span><span style="display:flex;"><span>   
 </span></span><span style="display:flex;"><span>   
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">@Type</span>(()<span style="color:#000;font-weight:bold">=&gt;</span>Shape, {
-</span></span><span style="display:flex;"><span>        discriminator<span style="color:#000;font-weight:bold">:</span> {
-</span></span><span style="display:flex;"><span>            property<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#39;type&#39;</span>,
-</span></span><span style="display:flex;"><span>            subTypes<span style="color:#000;font-weight:bold">:</span> [
-</span></span><span style="display:flex;"><span>                { value: <span style="color:#458;font-weight:bold">Line</span>, name<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#39;line&#39;</span> },
-</span></span><span style="display:flex;"><span>                { value: <span style="color:#458;font-weight:bold">Rectangle</span>, name<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#39;rectangle&#39;</span> },
-</span></span><span style="display:flex;"><span>                { value: <span style="color:#458;font-weight:bold">Circle</span>, name<span style="color:#000;font-weight:bold">:</span> <span style="color:#d14">&#39;circle&#39;</span> },
-</span></span><span style="display:flex;"><span>          ],
-</span></span><span style="display:flex;"><span>        },
-</span></span><span style="display:flex;"><span>    })
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> shapes: <span style="color:#458;font-weight:bold">Shape</span>[]<span style="color:#000;font-weight:bold">=</span> []
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">@Type</span><span style="color:#1f2328">(()</span><span style="color:#0550ae">=&gt;</span><span style="color:#1f2328">Shape</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">discriminator</span><span style="color:#0550ae">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">property</span><span style="color:#0550ae">:</span> <span style="color:#0a3069">&#39;type&#39;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">subTypes</span><span style="color:#0550ae">:</span> <span style="color:#1f2328">[</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">{</span> <span style="color:#1f2328">value</span>: <span style="color:#cf222e">Line</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">name</span><span style="color:#0550ae">:</span> <span style="color:#0a3069">&#39;line&#39;</span> <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">{</span> <span style="color:#1f2328">value</span>: <span style="color:#cf222e">Rectangle</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">name</span><span style="color:#0550ae">:</span> <span style="color:#0a3069">&#39;rectangle&#39;</span> <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">{</span> <span style="color:#1f2328">value</span>: <span style="color:#cf222e">Circle</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">name</span><span style="color:#0550ae">:</span> <span style="color:#0a3069">&#39;circle&#39;</span> <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#1f2328">],</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">})</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">shapes</span>: <span style="color:#cf222e">Shape</span><span style="color:#1f2328">[]</span><span style="color:#0550ae">=</span> <span style="color:#1f2328">[]</span>
 </span></span><span style="display:flex;"><span>    
 </span></span><span style="display:flex;"><span>   
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>The <code>@Type()</code> decorator can access a discriminator option. The <code>property</code> indicates the class of the object. Then we provide the class names and their corresponding types.</p>
 <p>Here is the serialized JSON of a Drawing:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>  <span style="color:#000080">&#34;shapes&#34;</span>: [
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;x&#34;</span>: <span style="color:#099">30</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;y&#34;</span>: <span style="color:#099">20</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;width&#34;</span>: <span style="color:#099">100</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;height&#34;</span>: <span style="color:#099">200</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;stroke&#34;</span>: {
-</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;width&#34;</span>: <span style="color:#099">2</span>,
-</span></span><span style="display:flex;"><span>        <span style="color:#000080">&#34;color&#34;</span>: <span style="color:#d14">&#34;#999&#34;</span>
-</span></span><span style="display:flex;"><span>      },
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;type&#34;</span>: <span style="color:#d14">&#34;rectangle&#34;</span>
-</span></span><span style="display:flex;"><span>    },
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;x1&#34;</span>: <span style="color:#099">30</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;y1&#34;</span>: <span style="color:#099">40</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;x2&#34;</span>: <span style="color:#099">140</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;y2&#34;</span>: <span style="color:#099">150</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;stroke&#34;</span>: <span style="color:#d14">&#34;#999&#34;</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;type&#34;</span>: <span style="color:#d14">&#34;line&#34;</span>
-</span></span><span style="display:flex;"><span>    },
-</span></span><span style="display:flex;"><span>    {
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;x&#34;</span>: <span style="color:#099">100</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;y&#34;</span>: <span style="color:#099">150</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;radius&#34;</span>: <span style="color:#099">30</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;stroke&#34;</span>: <span style="color:#d14">&#34;#999&#34;</span>,
-</span></span><span style="display:flex;"><span>      <span style="color:#000080">&#34;type&#34;</span>: <span style="color:#d14">&#34;circle&#34;</span>
-</span></span><span style="display:flex;"><span>    }
-</span></span><span style="display:flex;"><span>  ]
-</span></span><span style="display:flex;"><span>}
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#0550ae">&#34;shapes&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">[</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;x&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">30</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;y&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">20</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;width&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">100</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;height&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">200</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;stroke&#34;</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0550ae">&#34;width&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">2</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#0550ae">&#34;color&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;#999&#34;</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;type&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;rectangle&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;x1&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">30</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;y1&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">40</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;x2&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">140</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;y2&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">150</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;stroke&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;#999&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;type&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;line&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;x&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">100</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;y&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">150</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;radius&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">30</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;stroke&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;#999&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#0550ae">&#34;type&#34;</span><span style="color:#1f2328">:</span> <span style="color:#0a3069">&#34;circle&#34;</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">]</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>We can now deserialize to a drawing object and call the member functions of the Drawing class. Like so:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> sd <span style="color:#000;font-weight:bold">=</span> deserialize(Drawing, str)
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">const</span> <span style="color:#1f2328">sd</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">deserialize</span><span style="color:#1f2328">(</span><span style="color:#1f2328">Drawing</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">str</span><span style="color:#1f2328">)</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span>expect(sd.shapes[<span style="color:#099">0</span>].area()).toBe(<span style="color:#099">20000</span>); <span style="color:#998;font-style:italic">// 100 * 200
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">expect</span><span style="color:#1f2328">(</span><span style="color:#1f2328">sd</span><span style="color:#1f2328">.</span><span style="color:#1f2328">shapes</span><span style="color:#1f2328">[</span><span style="color:#0550ae">0</span><span style="color:#1f2328">].</span><span style="color:#1f2328">area</span><span style="color:#1f2328">()).</span><span style="color:#1f2328">toBe</span><span style="color:#1f2328">(</span><span style="color:#0550ae">20000</span><span style="color:#1f2328">);</span> <span style="color:#57606a">// 100 * 200
 </span></span></span></code></pre></div><h2 id="writing-custom-decorators">Writing Custom Decorators</h2>
 <p>As more objects are added and each having a large set of customizable attributes, the JSON becomes too complex and the attributes redundant.
 For example, check out this drawing:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">let</span> d <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> Drawing(<span style="color:#d14">&#39;canvas&#39;</span>);
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span>  <span style="color:#cf222e">let</span> <span style="color:#1f2328">d</span> <span style="color:#0550ae">=</span> <span style="color:#cf222e">new</span> <span style="color:#1f2328">Drawing</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#39;canvas&#39;</span><span style="color:#1f2328">);</span>
 </span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>  d.addShape(<span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">10</span>,<span style="color:#099">10</span>,<span style="color:#099">200</span>,<span style="color:#099">300</span>))
-</span></span><span style="display:flex;"><span>  d.addShape(<span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">30</span>,<span style="color:#099">10</span>,<span style="color:#099">300</span>,<span style="color:#099">150</span>))
-</span></span><span style="display:flex;"><span>  d.addShape(<span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">20</span>,<span style="color:#099">50</span>,<span style="color:#099">120</span>,<span style="color:#099">110</span>))
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">d</span><span style="color:#1f2328">.</span><span style="color:#1f2328">addShape</span><span style="color:#1f2328">(</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">200</span><span style="color:#1f2328">,</span><span style="color:#0550ae">300</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">d</span><span style="color:#1f2328">.</span><span style="color:#1f2328">addShape</span><span style="color:#1f2328">(</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">30</span><span style="color:#1f2328">,</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">300</span><span style="color:#1f2328">,</span><span style="color:#0550ae">150</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">d</span><span style="color:#1f2328">.</span><span style="color:#1f2328">addShape</span><span style="color:#1f2328">(</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">20</span><span style="color:#1f2328">,</span><span style="color:#0550ae">50</span><span style="color:#1f2328">,</span><span style="color:#0550ae">120</span><span style="color:#1f2328">,</span><span style="color:#0550ae">110</span><span style="color:#1f2328">))</span>
 </span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">const</span> sd <span style="color:#000;font-weight:bold">=</span> serialize(d)
-</span></span><span style="display:flex;"><span>  console.log(<span style="color:#d14">&#34;drawing serialized &#34;</span>, sd)
-</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic">/**
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"> {&#34;shapes&#34;:[
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     {&#34;x&#34;:10,&#34;y&#34;:10,&#34;width&#34;:200,&#34;height&#34;:300,
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     &#34;stroke&#34;:{&#34;width&#34;:1,&#34;color&#34;:&#34;#999&#34;},
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     &#34;type&#34;:&#34;rectangle&#34;},
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     {&#34;x&#34;:30,&#34;y&#34;:10,&#34;width&#34;:300,&#34;height&#34;:150,
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     &#34;stroke&#34;:{&#34;width&#34;:1,&#34;color&#34;:&#34;#999&#34;},
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     &#34;type&#34;:&#34;rectangle&#34;},
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     {&#34;x&#34;:20,&#34;y&#34;:50,&#34;width&#34;:120,&#34;height&#34;:110,
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     &#34;stroke&#34;:{&#34;width&#34;:1,&#34;color&#34;:&#34;#999&#34;},
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     &#34;type&#34;:&#34;rectangle&#34;}
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">]}
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#cf222e">const</span> <span style="color:#1f2328">sd</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">serialize</span><span style="color:#1f2328">(</span><span style="color:#1f2328">d</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">console</span><span style="color:#1f2328">.</span><span style="color:#1f2328">log</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;drawing serialized &#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sd</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#57606a">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a"> {&#34;shapes&#34;:[
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     {&#34;x&#34;:10,&#34;y&#34;:10,&#34;width&#34;:200,&#34;height&#34;:300,
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     &#34;stroke&#34;:{&#34;width&#34;:1,&#34;color&#34;:&#34;#999&#34;},
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     &#34;type&#34;:&#34;rectangle&#34;},
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     {&#34;x&#34;:30,&#34;y&#34;:10,&#34;width&#34;:300,&#34;height&#34;:150,
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     &#34;stroke&#34;:{&#34;width&#34;:1,&#34;color&#34;:&#34;#999&#34;},
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     &#34;type&#34;:&#34;rectangle&#34;},
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     {&#34;x&#34;:20,&#34;y&#34;:50,&#34;width&#34;:120,&#34;height&#34;:110,
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     &#34;stroke&#34;:{&#34;width&#34;:1,&#34;color&#34;:&#34;#999&#34;},
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     &#34;type&#34;:&#34;rectangle&#34;}
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">]}
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">  */</span>
 </span></span></code></pre></div><p>Notice that the stroke class has default values saved and that makes the JSON export too large with redundant values.
 One way to avoid this redundancy is to skip saving the default values. However, there is no feature at the moment to skip the default value.
 The good news is that adding a custom decorator is easy.</p>
 <p>Let us add an ExcludeDefault() decorator:</p>
 <div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">function</span> ExcludeDefault(
-</span></span><span style="display:flex;"><span>    default_value:<span style="color:#458;font-weight:bold">string</span><span style="color:#000;font-weight:bold">|</span><span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">|</span><span style="color:#000;font-weight:bold">boolean</span>,
-</span></span><span style="display:flex;"><span>    options: <span style="color:#458;font-weight:bold">TransformOptions</span> <span style="color:#000;font-weight:bold">=</span> {}
-</span></span><span style="display:flex;"><span>  ) 
-</span></span><span style="display:flex;"><span>  {
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">function</span> <span style="color:#1f2328">ExcludeDefault</span><span style="color:#1f2328">(</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">default_value</span>:<span style="color:#cf222e">string</span><span style="color:#0550ae">|</span><span style="color:#cf222e">number</span><span style="color:#0550ae">|</span><span style="color:#cf222e">boolean</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">options</span>: <span style="color:#cf222e">TransformOptions</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">{}</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">)</span> 
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">{</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> Transform(({value,<span style="color:#000;font-weight:bold">type</span>})<span style="color:#000;font-weight:bold">=&gt;</span>
-</span></span><span style="display:flex;"><span>          {
-</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">type</span> <span style="color:#000;font-weight:bold">==</span> TransformationType.CLASS_TO_PLAIN){
-</span></span><span style="display:flex;"><span>              <span style="color:#000;font-weight:bold">if</span>(value <span style="color:#000;font-weight:bold">===</span> default_value){
-</span></span><span style="display:flex;"><span>                <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">undefined</span>;
-</span></span><span style="display:flex;"><span>              }
-</span></span><span style="display:flex;"><span>            }
-</span></span><span style="display:flex;"><span>            <span style="color:#000;font-weight:bold">return</span> value;
-</span></span><span style="display:flex;"><span>          }, options)
-</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">return</span> <span style="color:#1f2328">Transform</span><span style="color:#1f2328">(({</span><span style="color:#1f2328">value</span><span style="color:#1f2328">,</span><span style="color:#cf222e">type</span><span style="color:#1f2328">})</span><span style="color:#0550ae">=&gt;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cf222e">if</span><span style="color:#1f2328">(</span><span style="color:#cf222e">type</span> <span style="color:#0550ae">==</span> <span style="color:#1f2328">TransformationType</span><span style="color:#1f2328">.</span><span style="color:#1f2328">CLASS_TO_PLAIN</span><span style="color:#1f2328">){</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#cf222e">if</span><span style="color:#1f2328">(</span><span style="color:#1f2328">value</span> <span style="color:#0550ae">===</span> <span style="color:#1f2328">default_value</span><span style="color:#1f2328">){</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#cf222e">return</span> <span style="color:#cf222e">undefined</span><span style="color:#1f2328">;</span>
+</span></span><span style="display:flex;"><span>              <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cf222e">return</span> <span style="color:#1f2328">value</span><span style="color:#1f2328">;</span>
+</span></span><span style="display:flex;"><span>          <span style="color:#1f2328">},</span> <span style="color:#1f2328">options</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p><code>ExcludeDefault</code> is really a thin wrapper around the Transform() decorator that class-transformer provides. It checks the value is default value itself and then skips saving it if default.</p>
 <p>Let us now use this custom decorator to save the drawing above.</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">import</span> { ExcludeDefault } <span style="color:#000;font-weight:bold">from</span> <span style="color:#d14">&#39;./exclude&#39;</span>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span><span style="color:#cf222e">import</span> <span style="color:#1f2328">{</span> <span style="color:#1f2328">ExcludeDefault</span> <span style="color:#1f2328">}</span> <span style="color:#cf222e">from</span> <span style="color:#0a3069">&#39;./exclude&#39;</span>
 </span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">export</span> <span style="color:#000;font-weight:bold">default</span> <span style="color:#000;font-weight:bold">class</span> StrokeStyle{
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">@ExcludeDefault</span>(<span style="color:#099">1</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> width:<span style="color:#458;font-weight:bold">number</span><span style="color:#000;font-weight:bold">=</span><span style="color:#099">1</span>;
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">export</span> <span style="color:#cf222e">default</span> <span style="color:#cf222e">class</span> <span style="color:#1f2328">StrokeStyle</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">@ExcludeDefault</span><span style="color:#1f2328">(</span><span style="color:#0550ae">1</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">width</span>:<span style="color:#cf222e">number</span><span style="color:#0550ae">=</span><span style="color:#0550ae">1</span><span style="color:#1f2328">;</span>
 </span></span><span style="display:flex;"><span>    
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">@ExcludeDefault</span>(<span style="color:#d14">&#39;#999&#39;</span>)
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">public</span> color:<span style="color:#458;font-weight:bold">string</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;#999&#34;</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">@ExcludeDefault</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#39;#999&#39;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">public</span> <span style="color:#1f2328">color</span>:<span style="color:#cf222e">string</span><span style="color:#0550ae">=</span><span style="color:#0a3069">&#34;#999&#34;</span><span style="color:#1f2328">;</span>
 </span></span><span style="display:flex;"><span>   
-</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
 </span></span></code></pre></div><p>Then if we serialize the drawing, you can see that the generated JSON is much more simplified:</p>
-<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">let</span> d <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> Drawing(<span style="color:#d14">&#39;canvas&#39;</span>);
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-typescript" data-lang="typescript"><span style="display:flex;"><span>  <span style="color:#cf222e">let</span> <span style="color:#1f2328">d</span> <span style="color:#0550ae">=</span> <span style="color:#cf222e">new</span> <span style="color:#1f2328">Drawing</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#39;canvas&#39;</span><span style="color:#1f2328">);</span>
 </span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>  d.addShape(<span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">10</span>,<span style="color:#099">10</span>,<span style="color:#099">200</span>,<span style="color:#099">300</span>))
-</span></span><span style="display:flex;"><span>  d.addShape(<span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">30</span>,<span style="color:#099">10</span>,<span style="color:#099">300</span>,<span style="color:#099">150</span>))
-</span></span><span style="display:flex;"><span>  d.addShape(<span style="color:#000;font-weight:bold">new</span> Rectangle(<span style="color:#099">20</span>,<span style="color:#099">50</span>,<span style="color:#099">120</span>,<span style="color:#099">110</span>))
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">d</span><span style="color:#1f2328">.</span><span style="color:#1f2328">addShape</span><span style="color:#1f2328">(</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">200</span><span style="color:#1f2328">,</span><span style="color:#0550ae">300</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">d</span><span style="color:#1f2328">.</span><span style="color:#1f2328">addShape</span><span style="color:#1f2328">(</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">30</span><span style="color:#1f2328">,</span><span style="color:#0550ae">10</span><span style="color:#1f2328">,</span><span style="color:#0550ae">300</span><span style="color:#1f2328">,</span><span style="color:#0550ae">150</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">d</span><span style="color:#1f2328">.</span><span style="color:#1f2328">addShape</span><span style="color:#1f2328">(</span><span style="color:#cf222e">new</span> <span style="color:#1f2328">Rectangle</span><span style="color:#1f2328">(</span><span style="color:#0550ae">20</span><span style="color:#1f2328">,</span><span style="color:#0550ae">50</span><span style="color:#1f2328">,</span><span style="color:#0550ae">120</span><span style="color:#1f2328">,</span><span style="color:#0550ae">110</span><span style="color:#1f2328">))</span>
 </span></span><span style="display:flex;"><span>  
-</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">const</span> sd <span style="color:#000;font-weight:bold">=</span> serialize(d)
-</span></span><span style="display:flex;"><span>  console.log(<span style="color:#d14">&#34;drawing serialized &#34;</span>, sd)
-</span></span><span style="display:flex;"><span>  <span style="color:#998;font-style:italic">/**
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">     {&#34;shapes&#34;:[
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">        {&#34;x&#34;:10,&#34;y&#34;:10,&#34;width&#34;:200,&#34;height&#34;:300,&#34;stroke&#34;:{},&#34;type&#34;:&#34;rectangle&#34;},{&#34;x&#34;:30,&#34;y&#34;:10,&#34;width&#34;:300,&#34;height&#34;:150,&#34;stroke&#34;:{},&#34;type&#34;:&#34;rectangle&#34;},
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">        {&#34;x&#34;:20,&#34;y&#34;:50,&#34;width&#34;:120,&#34;height&#34;:110,&#34;stroke&#34;:{},&#34;type&#34;:&#34;rectangle&#34;}
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">        ]
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">    }
-</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">  */</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#cf222e">const</span> <span style="color:#1f2328">sd</span> <span style="color:#0550ae">=</span> <span style="color:#1f2328">serialize</span><span style="color:#1f2328">(</span><span style="color:#1f2328">d</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#1f2328">console</span><span style="color:#1f2328">.</span><span style="color:#1f2328">log</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;drawing serialized &#34;</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sd</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#57606a">/**
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">     {&#34;shapes&#34;:[
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">        {&#34;x&#34;:10,&#34;y&#34;:10,&#34;width&#34;:200,&#34;height&#34;:300,&#34;stroke&#34;:{},&#34;type&#34;:&#34;rectangle&#34;},{&#34;x&#34;:30,&#34;y&#34;:10,&#34;width&#34;:300,&#34;height&#34;:150,&#34;stroke&#34;:{},&#34;type&#34;:&#34;rectangle&#34;},
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">        {&#34;x&#34;:20,&#34;y&#34;:50,&#34;width&#34;:120,&#34;height&#34;:110,&#34;stroke&#34;:{},&#34;type&#34;:&#34;rectangle&#34;}
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">        ]
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">    }
+</span></span></span><span style="display:flex;"><span><span style="color:#57606a">  */</span>
 </span></span></code></pre></div><p>As you can see, it is not very difficult to define custom decorators. Decorators can be used to define custom object models that fit the requirements of your application. Most of the time, <code>Transform()</code> itself can be used for the data transformations.</p>
 
 
