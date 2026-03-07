@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Why Semantic Search Alone Fails on Legal Text (And How Hybrid Search Fixed It) </title><meta name="keywords" content="rag, hybrid-search, vector-search, bm25, qdrant, golang, eu-ai-act" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Why Semantic Search Alone Fails on Legal Text (And How Hybrid Search Fixed It)</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/rag" class="text-gray-600">rag</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/hybrid-search" class="text-gray-600">hybrid-search</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/vector-search" class="text-gray-600">vector-search</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/bm25" class="text-gray-600">bm25</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/qdrant" class="text-gray-600">qdrant</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/golang" class="text-gray-600">golang</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/eu-ai-act" class="text-gray-600">eu-ai-act</a> </li>
+    
+</ul>
+  
+<p>I was building a RAG pipeline to classify AI systems under the EU AI Act — feed in a plain-English description of your AI system, get back the risk tier, the relevant articles, and a compliance checklist with citations. Classification was working perfectly. All 8 test scenarios nailed the correct risk tier.</p>
+<p>But the confidence scores were stuck at <strong>36%</strong>.</p>
+<p>The problem wasn&rsquo;t the LLM. It wasn&rsquo;t the prompts. It was the retrieval. And the fix taught me something worth sharing about when semantic search falls short — and when adding keyword search actually makes things worse.</p>
+<h2 id="the-setup-a-5-stage-rag-pipeline-over-legal-text">The Setup: A 5-Stage RAG Pipeline Over Legal Text</h2>
+<p>Quick context on what this pipeline does. It&rsquo;s a 5-stage chain, all in Go:</p>
+<ol>
+<li><strong>Classifier</strong> — LLM reads the user&rsquo;s description, infers the domain (employment, biometrics, etc.) and candidate risk tiers</li>
+<li><strong>Retriever</strong> — Multi-hop search across a Qdrant vector database of ~300 chunks of EU AI Act text</li>
+<li><strong>Obligation Mapper</strong> — LLM maps the retrieved legal text to specific compliance obligations</li>
+<li><strong>Confidence Scorer</strong> — Verifies each obligation is actually grounded in the retrieved text (not hallucinated)</li>
+<li><strong>Checklist Generator</strong> — Produces a structured compliance checklist with article citations</li>
+</ol>
+<p>The vector database holds the full EU AI Act — 113 articles, 180 recitals, 13 annexes — chunked at the article level with cross-reference metadata linking them together.</p>
+<p>Stage 2 is where the problem lived.</p>
+<h2 id="why-dense-only-search-fails-on-legal-text">Why Dense-Only Search Fails on Legal Text</h2>
+<p>The initial retriever used pure semantic search: embed the query with <code>text-embedding-3-small</code>, find the closest vectors by cosine similarity, return the top results. Standard stuff.</p>
+<p>Here&rsquo;s why that doesn&rsquo;t work well for legal text. Consider a user query like:</p>
+<blockquote>
+<p>&ldquo;An AI tool that screens CVs and ranks job candidates for recruitment&rdquo;</p></blockquote>
+<p>The relevant legal text in Annex III of the EU AI Act says:</p>
+<blockquote>
+<p>&ldquo;AI systems intended to be used for making decisions affecting terms of work-related relationships, the promotion or termination thereof, to allocate tasks based on individual behaviour, personal traits or characteristics&hellip;&rdquo;</p></blockquote>
+<p>These are <em>semantically related</em> — both about employment. But the vocabulary is completely different. The user says &ldquo;screens CVs&rdquo; while the law says &ldquo;decisions affecting terms of work-related relationships.&rdquo; Dense embeddings capture the general theme but produce a moderate similarity score, not a strong one.</p>
+<p><img src="../images/rag-vocab-mismatch.jpeg" alt="The vocabulary mismatch between developer language and legal text"></p>
+<p>It gets worse with precise legal terminology. The EU AI Act uses specific phrases that function as terms of art:</p>
+<ul>
+<li>&ldquo;biometric categorisation&rdquo;</li>
+<li>&ldquo;real-time remote biometric identification&rdquo;</li>
+<li>&ldquo;profiling of natural persons&rdquo;</li>
+<li>&ldquo;social scoring&rdquo;</li>
+</ul>
+<p>These exact phrases carry precise legal meaning. When a user&rsquo;s query contains one of these terms, the retriever should match hard. But dense embeddings treat these as just more words in the vector space — their signal gets diluted across hundreds of dimensions.</p>
+<h2 id="the-cascade-effect">The Cascade Effect</h2>
+<p>Weak retrieval at Stage 2 doesn&rsquo;t just mean bad search results. It cascades through every downstream stage:</p>
+<ul>
+<li><strong>Obligation Mapper</strong> receives less relevant context, so the LLM starts <em>inferring</em> obligations rather than grounding them in retrieved text</li>
+<li><strong>Confidence Scorer</strong> sees low similarity scores and poor corroboration between retrieved chunks and mapped obligations — so it scores low</li>
+<li><strong>Checklist</strong> output looks reasonable (the LLM is doing heavy lifting) but the citation backing is thin</li>
+</ul>
+<p>The pipeline was producing correct answers for the wrong reasons. The LLM was papering over bad retrieval with its own knowledge. That&rsquo;s exactly the failure mode you don&rsquo;t want in a legal compliance tool.</p>
+<h2 id="the-fix-adding-bm25-sparse-vectors">The Fix: Adding BM25 Sparse Vectors</h2>
+<p>The idea is simple: instead of searching one way, search two ways and combine the results.</p>
+<p><strong>Dense search</strong> finds documents that <em>mean</em> similar things. &ldquo;CV screening tool&rdquo; and &ldquo;employment decision-making system&rdquo; end up near each other in vector space. Good at understanding intent, bad at matching specific terms.</p>
+<p><strong>Sparse search</strong> (BM25) finds documents that <em>share vocabulary</em>. If the query contains &ldquo;biometric&rdquo; and the legal text contains &ldquo;biometric,&rdquo; that&rsquo;s a direct hit. Good at matching specific terms, bad at understanding paraphrased intent.</p>
+<p><strong>Hybrid search</strong>: Run both, then combine the ranked results using Reciprocal Rank Fusion (RRF).</p>
+<p><img src="../images/rag-dense-sparse-hybrid.jpeg" alt="Dense search sees the general area but blurry. Sparse search hits one exact match but misses context. Hybrid search combines both for the right result."></p>
+<h3 id="the-bm25-encoder-in-90-lines-of-go">The BM25 Encoder in ~90 Lines of Go</h3>
+<p>No SPLADE. No neural sparse encoder. No Python dependency. For a corpus of ~300 legal documents, a simple BM25 encoder is more than enough. Here&rsquo;s the core of it:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">type</span> <span style="color:#1f2328">SparseEncoder</span> <span style="color:#cf222e">struct</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">docFreq</span>  <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">uint32</span><span style="color:#1f2328">]</span><span style="color:#cf222e">int</span> <span style="color:#57606a">// term hash -&gt; docs containing it</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">numDocs</span>  <span style="color:#cf222e">int</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">vocabMax</span> <span style="color:#cf222e">uint32</span>         <span style="color:#57606a">// hash space size (1M buckets)</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a">// Fit computes document frequencies from the full corpus.</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">SparseEncoder</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">Fit</span><span style="color:#1f2328">(</span><span style="color:#1f2328">texts</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">e</span><span style="color:#1f2328">.</span><span style="color:#1f2328">numDocs</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">len</span><span style="color:#1f2328">(</span><span style="color:#1f2328">texts</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">text</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">texts</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">seen</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">uint32</span><span style="color:#1f2328">]</span><span style="color:#cf222e">bool</span><span style="color:#1f2328">{}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">token</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#6639ba">tokenize</span><span style="color:#1f2328">(</span><span style="color:#1f2328">text</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">h</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">hashToken</span><span style="color:#1f2328">(</span><span style="color:#1f2328">token</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">e</span><span style="color:#1f2328">.</span><span style="color:#1f2328">vocabMax</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cf222e">if</span> <span style="color:#1f2328">!</span><span style="color:#1f2328">seen</span><span style="color:#1f2328">[</span><span style="color:#1f2328">h</span><span style="color:#1f2328">]</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">e</span><span style="color:#1f2328">.</span><span style="color:#1f2328">docFreq</span><span style="color:#1f2328">[</span><span style="color:#1f2328">h</span><span style="color:#1f2328">]</span><span style="color:#0550ae">++</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">seen</span><span style="color:#1f2328">[</span><span style="color:#1f2328">h</span><span style="color:#1f2328">]</span> <span style="color:#1f2328">=</span> <span style="color:#cf222e">true</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a">// Encode produces a sparse vector for a single text.</span>
+</span></span><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">e</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">SparseEncoder</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">Encode</span><span style="color:#1f2328">(</span><span style="color:#1f2328">text</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">SparseVector</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">tokens</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">tokenize</span><span style="color:#1f2328">(</span><span style="color:#1f2328">text</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">tf</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">uint32</span><span style="color:#1f2328">]</span><span style="color:#cf222e">int</span><span style="color:#1f2328">{}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">token</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">tokens</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">tf</span><span style="color:#1f2328">[</span><span style="color:#6639ba">hashToken</span><span style="color:#1f2328">(</span><span style="color:#1f2328">token</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">e</span><span style="color:#1f2328">.</span><span style="color:#1f2328">vocabMax</span><span style="color:#1f2328">)]</span><span style="color:#0550ae">++</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">const</span> <span style="color:#1f2328">k1</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">b</span> <span style="color:#1f2328">=</span> <span style="color:#0550ae">1.2</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">0.75</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">avgDL</span> <span style="color:#0550ae">:=</span> <span style="color:#0550ae">200.0</span> <span style="color:#57606a">// approximate average doc length for legal text</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">dl</span> <span style="color:#0550ae">:=</span> <span style="color:#6639ba">float64</span><span style="color:#1f2328">(</span><span style="color:#6639ba">len</span><span style="color:#1f2328">(</span><span style="color:#1f2328">tokens</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">var</span> <span style="color:#1f2328">indices</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">uint32</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">var</span> <span style="color:#1f2328">values</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">float32</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">for</span> <span style="color:#1f2328">h</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">count</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">tf</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">df</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">e</span><span style="color:#1f2328">.</span><span style="color:#1f2328">docFreq</span><span style="color:#1f2328">[</span><span style="color:#1f2328">h</span><span style="color:#1f2328">]</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">if</span> <span style="color:#1f2328">df</span> <span style="color:#0550ae">==</span> <span style="color:#0550ae">0</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">df</span> <span style="color:#1f2328">=</span> <span style="color:#0550ae">1</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">idf</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">math</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Log</span><span style="color:#1f2328">(</span><span style="color:#6639ba">float64</span><span style="color:#1f2328">(</span><span style="color:#1f2328">e</span><span style="color:#1f2328">.</span><span style="color:#1f2328">numDocs</span><span style="color:#0550ae">-</span><span style="color:#1f2328">df</span><span style="color:#1f2328">)</span><span style="color:#0550ae">+</span><span style="color:#0550ae">0.5</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">/</span>
+</span></span><span style="display:flex;"><span>               <span style="color:#6639ba">float64</span><span style="color:#1f2328">(</span><span style="color:#1f2328">df</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">+</span> <span style="color:#0550ae">0.5</span> <span style="color:#0550ae">+</span> <span style="color:#0550ae">1.0</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">tfNorm</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">(</span><span style="color:#6639ba">float64</span><span style="color:#1f2328">(</span><span style="color:#1f2328">count</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">*</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">k1</span> <span style="color:#0550ae">+</span> <span style="color:#0550ae">1</span><span style="color:#1f2328">))</span> <span style="color:#0550ae">/</span>
+</span></span><span style="display:flex;"><span>                  <span style="color:#1f2328">(</span><span style="color:#6639ba">float64</span><span style="color:#1f2328">(</span><span style="color:#1f2328">count</span><span style="color:#1f2328">)</span> <span style="color:#0550ae">+</span> <span style="color:#1f2328">k1</span><span style="color:#0550ae">*</span><span style="color:#1f2328">(</span><span style="color:#0550ae">1</span><span style="color:#0550ae">-</span><span style="color:#1f2328">b</span><span style="color:#0550ae">+</span><span style="color:#1f2328">b</span><span style="color:#0550ae">*</span><span style="color:#1f2328">dl</span><span style="color:#0550ae">/</span><span style="color:#1f2328">avgDL</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">if</span> <span style="color:#1f2328">weight</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">idf</span> <span style="color:#0550ae">*</span> <span style="color:#1f2328">tfNorm</span><span style="color:#1f2328">;</span> <span style="color:#1f2328">weight</span> <span style="color:#1f2328">&gt;</span> <span style="color:#0550ae">0</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">indices</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">indices</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">h</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">values</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">values</span><span style="color:#1f2328">,</span> <span style="color:#6639ba">float32</span><span style="color:#1f2328">(</span><span style="color:#1f2328">weight</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">return</span> <span style="color:#1f2328">SparseVector</span><span style="color:#1f2328">{</span><span style="color:#1f2328">Indices</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">indices</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">Values</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">values</span><span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
+</span></span></code></pre></div><p>A few things to note:</p>
+<ul>
+<li><strong>FNV hashing instead of a vocabulary map.</strong> Tokens are hashed to uint32 indices within a 1M bucket space. Some collisions, but it keeps memory flat and avoids maintaining a separate vocabulary file. For ~300 documents, this is fine.</li>
+<li><strong>The encoder is fitted on the full corpus during ingestion.</strong> It needs to know which terms are common (&ldquo;shall&rdquo;, &ldquo;system&rdquo;, &ldquo;provider&rdquo;) versus distinctive (&ldquo;biometric&rdquo;, &ldquo;profiling&rdquo;, &ldquo;creditworthiness&rdquo;). The fitted state serializes to JSON for reuse at query time.</li>
+<li><strong><code>avgDL = 200</code> is hardcoded.</strong> Legal articles are verbose. This constant controls BM25&rsquo;s length normalization — it&rsquo;s a heuristic, not a tuned parameter.</li>
+<li><strong>Stop words include &ldquo;shall&rdquo;.</strong> Legal text is full of &ldquo;shall&rdquo; — it appears in almost every article but carries zero discriminative value.</li>
+</ul>
+<h3 id="the-hybrid-search-query">The Hybrid Search Query</h3>
+<p>Each document in Qdrant is stored with two named vectors: <code>dense</code> (1536-dim embedding) and <code>sparse</code> (BM25). At query time, Qdrant&rsquo;s Query API handles the fusion server-side:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#1f2328">(</span><span style="color:#1f2328">s</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">Searcher</span><span style="color:#1f2328">)</span> <span style="color:#6639ba">HybridSearch</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span> <span style="color:#1f2328">context</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Context</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">collection</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">denseVector</span> <span style="color:#1f2328">[]</span><span style="color:#cf222e">float32</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sparse</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">SparseQuery</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">limit</span> <span style="color:#cf222e">uint64</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">([]</span><span style="color:#1f2328">SearchResult</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">error</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">prefetch</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">[]</span><span style="color:#0550ae">*</span><span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#1f2328">PrefetchQuery</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Query</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewQueryDense</span><span style="color:#1f2328">(</span><span style="color:#1f2328">denseVector</span><span style="color:#1f2328">),</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Using</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">denseUsing</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Limit</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">prefetchLimit</span><span style="color:#1f2328">,</span> <span style="color:#57606a">// 100</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">},</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">if</span> <span style="color:#1f2328">sparse</span> <span style="color:#0550ae">!=</span> <span style="color:#cf222e">nil</span> <span style="color:#0550ae">&amp;&amp;</span> <span style="color:#6639ba">len</span><span style="color:#1f2328">(</span><span style="color:#1f2328">sparse</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Indices</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">&gt;</span> <span style="color:#0550ae">0</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">prefetch</span> <span style="color:#1f2328">=</span> <span style="color:#6639ba">append</span><span style="color:#1f2328">(</span><span style="color:#1f2328">prefetch</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#1f2328">PrefetchQuery</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Query</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewQuerySparse</span><span style="color:#1f2328">(</span><span style="color:#1f2328">sparse</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Indices</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sparse</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Values</span><span style="color:#1f2328">),</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Using</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">sparseUsing</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">Limit</span><span style="color:#1f2328">:</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">prefetchLimit</span><span style="color:#1f2328">,</span> <span style="color:#57606a">// 100</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">})</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">points</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">err</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">s</span><span style="color:#1f2328">.</span><span style="color:#1f2328">client</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Query</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#1f2328">QueryPoints</span><span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">CollectionName</span><span style="color:#1f2328">:</span> <span style="color:#1f2328">collection</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">Prefetch</span><span style="color:#1f2328">:</span>       <span style="color:#1f2328">prefetch</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">Query</span><span style="color:#1f2328">:</span>          <span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewQueryFusion</span><span style="color:#1f2328">(</span><span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Fusion_RRF</span><span style="color:#1f2328">),</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">Limit</span><span style="color:#1f2328">:</span>          <span style="color:#0550ae">&amp;</span><span style="color:#1f2328">limit</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">WithPayload</span><span style="color:#1f2328">:</span>    <span style="color:#1f2328">pb</span><span style="color:#1f2328">.</span><span style="color:#6639ba">NewWithPayload</span><span style="color:#1f2328">(</span><span style="color:#cf222e">true</span><span style="color:#1f2328">),</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">})</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// ...</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
+</span></span></code></pre></div><p>Both dense and sparse searches prefetch 100 candidates each. RRF then fuses and re-ranks them. A document that ranks high in <em>both</em> gets the strongest combined score. A document that ranks high in only one still appears, but lower.</p>
+<p>The RRF formula is straightforward: for each document, sum <code>1/(k + rank)</code> across both result lists. The constant <code>k</code> (Qdrant uses 60) prevents top-ranked results from dominating too aggressively.</p>
+<h3 id="multi-hop-retrieval-following-the-cross-reference-chain">Multi-Hop Retrieval: Following the Cross-Reference Chain</h3>
+<p>Hybrid search is only Hop 1 of the retrieval. Legal compliance questions require following a chain of cross-references:</p>
+<ol>
+<li><strong>Hop 1</strong> — Hybrid search annexes: &ldquo;CV screening&rdquo; matches Annex III §4 (employment)</li>
+<li><strong>Hop 2</strong> — Follow cross-references to articles: Annex III §4 links to Article 6, which links to Articles 9-15 (the actual obligations)</li>
+<li><strong>Hop 3</strong> — Follow cross-references to recitals: Articles link to recitals that provide interpretive context</li>
+</ol>
+<p><img src="../images/rag-multi-hop-retrieval.jpeg" alt="Multi-hop retrieval follows cross-references like a detective following leads — from annexes to articles to recitals"></p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-go" data-lang="go"><span style="display:flex;"><span><span style="color:#cf222e">func</span> <span style="color:#6639ba">Retrieve</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span> <span style="color:#1f2328">context</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Context</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">searcher</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">rag</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Searcher</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">embedFn</span> <span style="color:#1f2328">EmbedFn</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sparseEmbedFn</span> <span style="color:#1f2328">SparseEmbedFn</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">classification</span> <span style="color:#0550ae">*</span><span style="color:#1f2328">ClassifyResult</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">description</span> <span style="color:#cf222e">string</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">([]</span><span style="color:#1f2328">RetrievedChunk</span><span style="color:#1f2328">,</span> <span style="color:#cf222e">error</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Enrich query with classification context</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">query</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">fmt</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Sprintf</span><span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;%s (domain: %s, risk: %s)&#34;</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">description</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">classification</span><span style="color:#1f2328">.</span><span style="color:#1f2328">Domain</span><span style="color:#1f2328">,</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">strings</span><span style="color:#1f2328">.</span><span style="color:#6639ba">Join</span><span style="color:#1f2328">(</span><span style="color:#1f2328">classification</span><span style="color:#1f2328">.</span><span style="color:#1f2328">RiskTiers</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;, &#34;</span><span style="color:#1f2328">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Hop 1: Hybrid search annexes</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">annexResults</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">_</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">searcher</span><span style="color:#1f2328">.</span><span style="color:#6639ba">HybridSearch</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">annexCollection</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">vector</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">sparse</span><span style="color:#1f2328">,</span> <span style="color:#0550ae">5</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">articleIDs</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">map</span><span style="color:#1f2328">[</span><span style="color:#cf222e">string</span><span style="color:#1f2328">]</span><span style="color:#cf222e">bool</span><span style="color:#1f2328">{</span><span style="color:#0a3069">&#34;article_3&#34;</span><span style="color:#1f2328">:</span> <span style="color:#cf222e">true</span><span style="color:#1f2328">}</span> <span style="color:#57606a">// Always include definitions</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">r</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">annexResults</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#cf222e">for</span> <span style="color:#1f2328">_</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">ref</span> <span style="color:#0550ae">:=</span> <span style="color:#cf222e">range</span> <span style="color:#1f2328">r</span><span style="color:#1f2328">.</span><span style="color:#1f2328">CrossRefs</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#cf222e">if</span> <span style="color:#1f2328">strings</span><span style="color:#1f2328">.</span><span style="color:#6639ba">HasPrefix</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ref</span><span style="color:#1f2328">,</span> <span style="color:#0a3069">&#34;article_&#34;</span><span style="color:#1f2328">)</span> <span style="color:#1f2328">{</span>
+</span></span><span style="display:flex;"><span>                <span style="color:#1f2328">articleIDs</span><span style="color:#1f2328">[</span><span style="color:#1f2328">ref</span><span style="color:#1f2328">]</span> <span style="color:#1f2328">=</span> <span style="color:#cf222e">true</span>
+</span></span><span style="display:flex;"><span>            <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>        <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Hop 2: Lookup linked articles</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">articleResults</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">_</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">searcher</span><span style="color:#1f2328">.</span><span style="color:#6639ba">LookupByDocIDs</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">articleCollection</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">artIDs</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Hop 3: Lookup linked recitals</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#1f2328">recitalResults</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">_</span> <span style="color:#0550ae">:=</span> <span style="color:#1f2328">searcher</span><span style="color:#1f2328">.</span><span style="color:#6639ba">LookupByDocIDs</span><span style="color:#1f2328">(</span><span style="color:#1f2328">ctx</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">recitalCollection</span><span style="color:#1f2328">,</span> <span style="color:#1f2328">recIDs</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// Each chunk is tagged with its hop number for downstream weighting</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#57606a">// ...</span>
+</span></span><span style="display:flex;"><span><span style="color:#1f2328">}</span>
+</span></span></code></pre></div><p>Two things worth highlighting:</p>
+<ul>
+<li><strong>Article 3 (definitions) is always injected.</strong> Legal text references defined terms constantly. Without the definitions, the LLM misinterprets words that have precise legal meanings.</li>
+<li><strong>The query is enriched with classification context.</strong> Instead of searching with just the raw user description, the retriever appends the domain and risk tier from Stage 1. So a query about &ldquo;CV screening&rdquo; becomes &ldquo;CV screening (domain: employment, risk: HIGH_RISK)&rdquo; — which helps the dense search zero in on employment-related annexes.</li>
+</ul>
+<h2 id="the-results">The Results</h2>
+<p>Classification accuracy was unchanged — 8/8 correct. That&rsquo;s expected since classification happens before retrieval.</p>
+<p>The confidence scores told the real story:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Scenario</th>
+          <th>Before (dense only)</th>
+          <th>After (hybrid)</th>
+          <th>Change</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>CV Screening</td>
+          <td>~36%</td>
+          <td><strong>51%</strong></td>
+          <td>+15pp</td>
+      </tr>
+      <tr>
+          <td>Education AI</td>
+          <td>~36%</td>
+          <td><strong>51%</strong></td>
+          <td>+15pp</td>
+      </tr>
+      <tr>
+          <td>Biometric ID</td>
+          <td>~36%</td>
+          <td><strong>50%</strong></td>
+          <td>+14pp</td>
+      </tr>
+      <tr>
+          <td>Predictive Policing</td>
+          <td>~36%</td>
+          <td><strong>30%</strong></td>
+          <td><strong>-6pp</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>Three out of four improved substantially. Average confidence went from ~36% to ~46%.</p>
+<p>But look at that last row.</p>
+<h2 id="when-hybrid-search-makes-things-worse">When Hybrid Search Makes Things Worse</h2>
+<p>The predictive policing scenario actually scored <em>lower</em> after adding hybrid search. This is the most interesting result.</p>
+<p>The query was: &ldquo;predictive policing system that identifies high-crime areas and suggests patrol routes.&rdquo;</p>
+<p>The relevant Annex III text says: &ldquo;AI systems intended to be used by law enforcement authorities&hellip; for making assessments of risks of natural persons for offending or reoffending.&rdquo;</p>
+<p>The words &ldquo;predictive,&rdquo; &ldquo;policing,&rdquo; &ldquo;crime areas,&rdquo; and &ldquo;patrol routes&rdquo; don&rsquo;t appear anywhere in the legal text. There&rsquo;s essentially zero vocabulary overlap.</p>
+<p>So what happened? Sparse search returned no strong keyword matches. But through RRF fusion, those non-matches still influenced the final ranking — they diluted the dense search results that <em>were</em> finding the right documents semantically. Dense search alone was doing better for this paraphrased query.</p>
+<p><img src="../images/rag-hybrid-search-outlier.jpeg" alt="When keyword search has no scent to follow, it drags semantic search off course"></p>
+<p>This is a useful lesson: <strong>hybrid search is not universally better.</strong> It helps most when the query and the documents share vocabulary — exact legal terms, domain-specific phrases. It helps less (or actively hurts) when the query is a colloquial paraphrase of formal language.</p>
+<h2 id="what-i-took-away">What I Took Away</h2>
+<p><strong>Dense-only search is insufficient for legal text.</strong> Legal documents use precise, formal language that users often paraphrase informally. But when exact legal terms appear in queries, dense search underweights them.</p>
+<p><strong>BM25 sparse vectors are cheap to build.</strong> The entire encoder is ~90 lines of Go. No neural model, no Python dependency. For a small corpus of structured documents, simple TF-IDF with BM25 weighting is plenty.</p>
+<p><strong>RRF fusion is simple and effective — no tuning required.</strong> Qdrant handles it server-side. I didn&rsquo;t have to normalize scores or tune weights between dense and sparse.</p>
+<p><strong>But hybrid search can hurt paraphrased queries.</strong> When there&rsquo;s no vocabulary overlap between query and document, sparse search adds noise. The mitigation I&rsquo;m exploring: weighted RRF that gives dense search higher weight (say 0.7/0.3 instead of equal), plus query expansion that enriches the user&rsquo;s colloquial description with formal legal terms before the sparse search runs.</p>
+<p><strong>Confidence scores at 51% are honest, not broken.</strong> The scores are moderate because the Confidence Scorer only accepts evidence from retrieved chunks — it won&rsquo;t verify an obligation using its own training knowledge. That&rsquo;s by design. In a legal tool, conservative confidence that says &ldquo;I&rsquo;m not sure, check with a lawyer&rdquo; is better than a confident hallucination.</p>
+<p>The retriever is one piece of a larger system. The code is part of an open-source EU AI Act compliance navigator I&rsquo;m building — an agentic RAG pipeline exposed as both a web app and an MCP server, so AI agents can check their own regulatory status during development. More on the full architecture in a follow-up post.</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="/ai/self-hosted-rag-for-privacy/" class="pr-4">&larr; Self-Hosted RAG Architecture for Privacy-Sensitive Document Search with Golang</a>
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2026 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

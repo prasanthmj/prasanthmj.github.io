@@ -3,21 +3,42 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>/ai/</loc>
-    <lastmod>2025-05-07T09:55:45+00:00</lastmod>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/bm25/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/eu-ai-act/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/golang/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/hybrid-search/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
   </url><url>
     <loc>/</loc>
-    <lastmod>2025-05-07T09:55:45+00:00</lastmod>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/qdrant/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/rag/</loc>
-    <lastmod>2025-05-07T09:55:45+00:00</lastmod>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/vector-search/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/ai/hybrid-search-legal-rag/</loc>
+    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/search-privacy/</loc>
     <lastmod>2025-05-07T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/ai/self-hosted-rag-for-privacy/</loc>
-    <lastmod>2025-05-07T09:55:45+00:00</lastmod>
-  </url><url>
-    <loc>/tags/</loc>
     <lastmod>2025-05-07T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/data-structures/</loc>
@@ -36,9 +57,6 @@
     <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/claude/</loc>
-    <lastmod>2025-01-02T09:55:45+00:00</lastmod>
-  </url><url>
-    <loc>/tags/golang/</loc>
     <lastmod>2025-01-02T09:55:45+00:00</lastmod>
   </url><url>
     <loc>/tags/mcp/</loc>

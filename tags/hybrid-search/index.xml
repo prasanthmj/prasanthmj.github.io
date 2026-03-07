@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Hybrid-Search on Prasanth Janardhanan</title>
+    <link>/tags/hybrid-search/</link>
+    <description>Recent content in Hybrid-Search on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Sat, 07 Mar 2026 10:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/hybrid-search/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Why Semantic Search Alone Fails on Legal Text (And How Hybrid Search Fixed It)</title>
+      <link>/ai/hybrid-search-legal-rag/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/ai/hybrid-search-legal-rag/</guid>
+      <description>&lt;p&gt;I was building a RAG pipeline to classify AI systems under the EU AI Act — feed in a plain-English description of your AI system, get back the risk tier, the relevant articles, and a compliance checklist with citations. Classification was working perfectly. All 8 test scenarios nailed the correct risk tier.&lt;/p&gt;&#xA;&lt;p&gt;But the confidence scores were stuck at &lt;strong&gt;36%&lt;/strong&gt;.&lt;/p&gt;&#xA;&lt;p&gt;The problem wasn&amp;rsquo;t the LLM. It wasn&amp;rsquo;t the prompts. It was the retrieval. And the fix taught me something worth sharing about when semantic search falls short — and when adding keyword search actually makes things worse.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

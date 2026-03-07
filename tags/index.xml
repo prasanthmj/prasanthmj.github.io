@@ -7,13 +7,55 @@
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Wed, 07 May 2025 09:55:45 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 07 Mar 2026 10:00:00 +0000</lastBuildDate>
     <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bm25</title>
+      <link>/tags/bm25/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/bm25/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Eu-Ai-Act</title>
+      <link>/tags/eu-ai-act/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/eu-ai-act/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Golang</title>
+      <link>/tags/golang/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/golang/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Hybrid-Search</title>
+      <link>/tags/hybrid-search/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/hybrid-search/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Qdrant</title>
+      <link>/tags/qdrant/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/qdrant/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Rag</title>
       <link>/tags/rag/</link>
-      <pubDate>Wed, 07 May 2025 00:00:00 +0000</pubDate>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
       <guid>/tags/rag/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Vector-Search</title>
+      <link>/tags/vector-search/</link>
+      <pubDate>Sat, 07 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/vector-search/</guid>
       <description></description>
     </item>
     <item>
@@ -49,13 +91,6 @@
       <link>/tags/claude/</link>
       <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
       <guid>/tags/claude/</guid>
-      <description></description>
-    </item>
-    <item>
-      <title>Golang</title>
-      <link>/tags/golang/</link>
-      <pubDate>Thu, 02 Jan 2025 00:00:00 +0000</pubDate>
-      <guid>/tags/golang/</guid>
       <description></description>
     </item>
     <item>
