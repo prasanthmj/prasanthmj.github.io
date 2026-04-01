@@ -2,8 +2,38 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>/tags/accessibility/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
     <loc>/ai/</loc>
-    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/braille/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/ai/grade-2-braille-transformer/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/byt5/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/machine-learning/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/ocr/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/python/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
+  </url><url>
+    <loc>/tags/transformer/</loc>
+    <lastmod>2026-03-12T10:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/bm25/</loc>
     <lastmod>2026-03-07T10:00:00+00:00</lastmod>
@@ -17,16 +47,10 @@
     <loc>/tags/hybrid-search/</loc>
     <lastmod>2026-03-07T10:00:00+00:00</lastmod>
   </url><url>
-    <loc>/</loc>
-    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
-  </url><url>
     <loc>/tags/qdrant/</loc>
     <lastmod>2026-03-07T10:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/rag/</loc>
-    <lastmod>2026-03-07T10:00:00+00:00</lastmod>
-  </url><url>
-    <loc>/tags/</loc>
     <lastmod>2026-03-07T10:00:00+00:00</lastmod>
   </url><url>
     <loc>/tags/vector-search/</loc>

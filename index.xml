@@ -7,8 +7,15 @@
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Sat, 07 Mar 2026 10:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 12 Mar 2026 10:00:00 +0000</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building the First ML Model for Grade 2 Braille — And Why It Took Three Tries</title>
+      <link>/ai/grade-2-braille-transformer/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/ai/grade-2-braille-transformer/</guid>
+      <description>&lt;p&gt;Here&amp;rsquo;s a scenario that plays out in classrooms every day. A visually impaired student finishes a written exam — on paper, in Braille, the way they&amp;rsquo;ve been taught. The teacher collects it. And then&amp;hellip; stares at it. Because the teacher can&amp;rsquo;t read Braille.&lt;/p&gt;&#xA;&lt;p&gt;This isn&amp;rsquo;t some edge case. Most teachers of visually impaired students cannot read Braille. They need a way to convert that embossed page into readable English text. So they reach for one of the Braille OCR apps on their phone. They snap a photo. And they get garbage.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Why Semantic Search Alone Fails on Legal Text (And How Hybrid Search Fixed It)</title>
       <link>/ai/hybrid-search-legal-rag/</link>
@@ -168,14 +175,14 @@
       <link>/about/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>/about/</guid>
-      <description>&lt;p&gt;Hi, I am Prasanth Janardhanan. I am a student of Computer Science - for more than 21 years and counting. I make a living by identifying and removing accidental complexity from systems. I believe most of the problems whether in a cluster of computers or a group of people, essentially boils down to a communication problem.&lt;/p&gt;&#xA;&lt;p&gt;Apart from the professional software development I work on for companies, I do build software that others may find useful. See if some of those  adventures in the &lt;a href=&#34;/projects/&#34;&gt;projects&lt;/a&gt; page and my &lt;a href=&#34;https://github.com/prasanthmj&#34;&gt;Github page&lt;/a&gt;.&lt;/p&gt;</description>
+      <description>&lt;p&gt;I&amp;rsquo;m Prasanth Janardhanan — AI Developer, LLM Systems Architect, and ML Researcher with 15+ years of engineering experience. I specialise in production LLM systems, agentic RAG pipelines, and AI agent infrastructure.&lt;/p&gt;&#xA;&lt;h3 id=&#34;projects&#34;&gt;Projects&lt;/h3&gt;&#xA;&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://github.com/prasanthmj/gomcpgo&#34;&gt;gomcpgo&lt;/a&gt;&lt;/strong&gt; — An open-source Go framework for building MCP (Model Context Protocol) servers. MCP is now a Linux Foundation standard under the Agentic AI Foundation. I&amp;rsquo;ve published 12+ MCP servers using the framework.&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;&lt;a href=&#34;https://github.com/braille-reader/braille-transcriber&#34;&gt;Braille OCR Transcriber&lt;/a&gt;&lt;/strong&gt; — The first ML model for Grade 2 contracted Braille OCR. A ByT5 seq2seq model achieving 92.9% exact match on real-world Braille, 9x better than existing baselines. Published on &lt;a href=&#34;https://huggingface.co/prasanthmj/braille-byt5-v3&#34;&gt;Hugging Face&lt;/a&gt;.&lt;/p&gt;</description>
     </item>
     <item>
       <title>My Projects</title>
       <link>/projects/</link>
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       <guid>/projects/</guid>
-      <description>&lt;h3 id=&#34;quphttpsgithubcomprasanthmjqup&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/qup&#34;&gt;qUP&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;qUP is a background task processor with persistence support written in Go. It uses BadgerDb for persistence.&lt;/p&gt;&#xA;&lt;h3 id=&#34;machinehttpsgithubcomprasanthmjmachine&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/machine&#34;&gt;Machine&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;Wrapper around the &lt;a href=&#34;https://github.com/RichardKnop/machinery&#34;&gt;machinery&lt;/a&gt; Go library for background task execution.&lt;/p&gt;&#xA;&lt;h3 id=&#34;chimeshttpsgithubcomprasanthmjchimes&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/chimes&#34;&gt;Chimes&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;A JWT only API authentication library. The client-side is written in TypeScript and the server side in Go.&lt;/p&gt;&#xA;&lt;h3 id=&#34;boelhttpsgithubcomprasanthmjboel&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/boel&#34;&gt;Boel&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;A Javascript Form Data validation library. The syntax is made to look naturally declarative. Boel also supports conditional validations and customization to the validation messages.&lt;/p&gt;</description>
+      <description>&lt;h3 id=&#34;eu-ai-act-compliance-navigatorhttpsgithubcomprasanthmjeu-ai-act-rag&#34;&gt;&lt;a href=&#34;https://github.com/prasanthmj/eu-ai-act-rag&#34;&gt;EU AI Act Compliance Navigator&lt;/a&gt;&lt;/h3&gt;&#xA;&lt;p&gt;An agentic RAG system that helps developers and product teams determine the regulatory status of their AI system under the EU AI Act. Given a plain-English description of an AI system, it classifies the risk tier (Prohibited / High-Risk / Limited-Risk / Minimal-Risk), identifies the specific Articles and Annexes that apply, and generates a prioritized, actionable compliance checklist with direct citations.&lt;/p&gt;&#xA;&lt;p&gt;Built as a Go monolith — the RAG pipeline, API gateway, and MCP server are all in a single binary. The MCP server (built with the &lt;a href=&#34;https://github.com/prasanthmj/gomcpgo&#34;&gt;gomcpgo&lt;/a&gt; framework) lets any AI agent call compliance checks as a live tool during development. Uses hybrid search (semantic + keyword) for retrieval and LLM-based confidence scoring for classification.&lt;/p&gt;</description>
     </item>
   </channel>
 </rss>

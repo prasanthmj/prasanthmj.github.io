@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Why No App Can Read 90% of Real Braille </title><meta name="keywords" content="braille, ocr, accessibility, machine-learning, python, byt5" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Why No App Can Read 90% of Real Braille</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/braille" class="text-gray-600">braille</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/ocr" class="text-gray-600">ocr</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/accessibility" class="text-gray-600">accessibility</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/machine-learning" class="text-gray-600">machine-learning</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/python" class="text-gray-600">python</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/byt5" class="text-gray-600">byt5</a> </li>
+    
+</ul>
+  
+<p>Here&rsquo;s a scenario that plays out in classrooms every day. A visually impaired student finishes a written exam — on paper, in Braille, the way they&rsquo;ve been taught. The teacher collects it. And then&hellip; stares at it. Because the teacher can&rsquo;t read Braille.</p>
+<p>This isn&rsquo;t some edge case. Most teachers of visually impaired students cannot read Braille. They need a way to convert that embossed page into readable English text. So they reach for one of the Braille OCR apps on their phone. They snap a photo. And they get garbage.</p>
+<p>&ldquo;Eight of us scanned 28 documents multiple times&hellip; not one word was translated.&rdquo;</p>
+<p>That&rsquo;s an actual app store review. And it&rsquo;s not an outlier. I started digging into <em>why</em> these apps fail so consistently — and found a gap so big I decided to build a solution myself.</p>
+<p><img src="../images/braille-classroom-problem.jpeg" alt="Teacher puzzling over a Braille exam while the student waits"></p>
+<h2 id="what-is-grade-2-braille">What Is Grade 2 Braille?</h2>
+<p>If you&rsquo;ve ever seen Braille, you probably think of it as a one-to-one code. Each cell (a 2x3 grid of raised dots) maps to one letter. &ldquo;A&rdquo; is dot 1. &ldquo;B&rdquo; is dots 1-2. Simple lookup.</p>
+<p>That&rsquo;s Grade 1 Braille. And almost nobody uses it.</p>
+<p>Within the first few months of learning Braille, students move to <strong>Grade 2</strong> — contracted Braille. It&rsquo;s like the shorthand version. Common words and letter combinations get compressed into fewer cells. &ldquo;The&rdquo; becomes a single cell. &ldquo;And&rdquo; becomes a single cell. &ldquo;ing&rdquo; at the end of a word? One cell.</p>
+<p>There are over 180 contraction rules, and here&rsquo;s what makes it genuinely hard: <strong>the same cell can mean completely different things depending on context.</strong></p>
+<p>Take the cell with dots 1-2 (⠃). It could mean:</p>
+<ul>
+<li>The letter <strong>&ldquo;b&rdquo;</strong> (when it&rsquo;s part of a word)</li>
+<li>The word <strong>&ldquo;but&rdquo;</strong> (when it stands alone between spaces)</li>
+<li>Part of the contraction <strong>&ldquo;bl&rdquo;</strong> (in specific positions)</li>
+</ul>
+<p>And it gets trickier. You can&rsquo;t use the &ldquo;can&rdquo; contraction inside the word &ldquo;Duncan.&rdquo; The &ldquo;th&rdquo; contraction applies in &ldquo;think&rdquo; but not in &ldquo;pothole.&rdquo; These are position-dependent, pronunciation-dependent rules that require understanding the surrounding text.</p>
+<p><strong>90-95% of all real Braille documents use Grade 2.</strong> Every book, every magazine, every exam paper from a student past their first semester. Grade 1 is training wheels.</p>
+<p><img src="../images/braille-grade1-vs-grade2.jpeg" alt="Grade 1 is a simple one-to-one mapping, Grade 2 is context-dependent and complex"></p>
+<h2 id="why-every-existing-app-fails">Why Every Existing App Fails</h2>
+<p>Here&rsquo;s the punchline: <strong>every existing Braille OCR app only supports Grade 1.</strong></p>
+<p>That means they only work on 5-10% of real-world Braille. When a Grade 2 document hits a Grade 1 reader, the result isn&rsquo;t just inaccurate — it&rsquo;s incomprehensible.</p>
+<p>A student writes: <em>&ldquo;The children will go shopping&rdquo;</em></p>
+<p>A Grade 1 reader sees something like: <em>&ldquo;t ch w g shop&rdquo;</em></p>
+<p>The contractions for &ldquo;the,&rdquo; &ldquo;children,&rdquo; &ldquo;will,&rdquo; and &ldquo;go&rdquo; get interpreted as individual letters, producing nonsense. The teacher is no closer to reading the exam.</p>
+<p>And it&rsquo;s not like the technology for <em>generating</em> Braille doesn&rsquo;t exist. Libraries like <a href="https://github.com/liblouis/liblouis">liblouis</a> can translate English text <em>into</em> Grade 2 Braille perfectly well. Screen readers use it every day. But going the other direction — from a Braille image back to English text — is where everything breaks down.</p>
+<p>The tools exist to write Braille. Nothing exists to read it back from a photograph.</p>
+<h2 id="braille-ocr-is-two-problems-not-one">Braille OCR Is Two Problems, Not One</h2>
+<p><img src="images/braille-two-stage-architecture.jpeg" alt="Two-stage architecture: detection is solved, interpretation isn&rsquo;t"></p>
+<p>When I started researching this, the first insight that changed my approach was realizing that Braille OCR is really <strong>two separate problems</strong> — and one of them is already solved.</p>
+<p><strong>Stage 1: Cell Detection</strong> — Look at the image, find each Braille cell, determine which dots are raised. This is computer vision. And it&rsquo;s a solved problem. Models like YOLOv8 achieve 98-99% accuracy on cell detection. Each Braille cell is a binary structure — six positions, each either raised or flat. That&rsquo;s 2^6 = 64 possible patterns. Compared to handwriting recognition (infinite variation in how people write the letter &ldquo;a&rdquo;), detecting Braille dots is straightforward.</p>
+<p><strong>Stage 2: Interpretation</strong> — Take the sequence of detected cell patterns and figure out what English text they represent. For Grade 1, this is a simple lookup table. For Grade 2, this is an unsolved research problem.</p>
+<pre tabindex="0"><code>┌─────────────┐
+│   Image     │
+└──────┬──────┘
+       │
+       ▼
+┌─────────────────────────────┐
+│  Stage 1: Cell Detection    │
+│  YOLOv8 — 98-99% accurate  │
+│  SOLVED                     │
+└──────────┬──────────────────┘
+           │ Binary dot patterns
+           ▼
+┌─────────────────────────────┐
+│  Stage 2: Interpretation    │
+│  Grade 1: Simple lookup     │
+│  Grade 2: UNSOLVED          │
+└──────────┬──────────────────┘
+           │
+           ▼
+      ┌────────┐
+      │  Text  │
+      └────────┘
+</code></pre><p>This separation matters for a practical reason: <strong>don&rsquo;t re-solve what&rsquo;s already solved.</strong> I didn&rsquo;t need to build a better dot detector. I needed to build a better interpreter — one that understands Grade 2 contractions in context.</p>
+<p>The architecture decision was to use existing YOLOv8 models for Stage 1, and focus all research effort on Stage 2: building a seq2seq model that takes a sequence of Unicode Braille characters and outputs English text.</p>
+<h2 id="the-challenge-no-data-no-models-no-baselines">The Challenge: No Data, No Models, No Baselines</h2>
+<p>Here&rsquo;s what makes this a genuine research problem rather than an engineering exercise: <strong>there is no training data.</strong></p>
+<p>Every existing Braille dataset is Grade 1 only. Nobody has published a parallel corpus of Grade 2 Braille paired with English text. No model has been trained on Grade 2 interpretation. There are no benchmarks, no baselines, no published results to compare against.</p>
+<p>The closest thing to a &ldquo;baseline&rdquo; is using liblouis in reverse — its back-translation mode. But liblouis was designed for <em>forward</em> translation (English to Braille), and its reverse mode produces garbled output:</p>
+<pre tabindex="0"><code>Input:    &#34;Way down south where the jungle grows,&#34;
+Liblouis: &#34;WAY D\2467/N S\12567/th where the JUNGLE GR\2467/S,&#34;
+</code></pre><p>Those backslash-number sequences are escape codes for contractions that liblouis can&rsquo;t resolve in reverse. On a test set, liblouis back-translation achieves about 10% exact match with a character error rate of 0.26. Not even close to usable.</p>
+<p>So I needed to create training data, choose a model architecture, and solve the tokenization problem for a script that no language model was designed to handle.</p>
+<p>It took three attempts. The first two failed completely — 2.9% and 0% accuracy respectively. The third attempt, using a model called ByT5 that processes raw bytes instead of tokens, achieved <strong>92.9% exact match on real-world Braille</strong> that the model had never seen during training.</p>
+<p>That story — the failures, the breakthrough, and what made the difference — is <a href="/ai/braille-ocr-part2/">Part 2</a>.</p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="//localhost:1313/ai/hybrid-search-legal-rag/" class="pr-4">&larr; Why Semantic Search Alone Fails on Legal Text (And How Hybrid Search Fixed It)</a>
+    
+    
+    <a href="//localhost:1313/ai/grade-2-braille-transformer/" class="pl-4">Building the First ML Model for Grade 2 Braille — And Why It Took Three Tries &rarr;</a>
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2026 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+

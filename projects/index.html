@@ -30,14 +30,26 @@
     
 </ul>
   
-<h3 id="quphttpsgithubcomprasanthmjqup"><a href="https://github.com/prasanthmj/qup">qUP</a></h3>
-<p>qUP is a background task processor with persistence support written in Go. It uses BadgerDb for persistence.</p>
-<h3 id="machinehttpsgithubcomprasanthmjmachine"><a href="https://github.com/prasanthmj/machine">Machine</a></h3>
-<p>Wrapper around the <a href="https://github.com/RichardKnop/machinery">machinery</a> Go library for background task execution.</p>
-<h3 id="chimeshttpsgithubcomprasanthmjchimes"><a href="https://github.com/prasanthmj/chimes">Chimes</a></h3>
-<p>A JWT only API authentication library. The client-side is written in TypeScript and the server side in Go.</p>
-<h3 id="boelhttpsgithubcomprasanthmjboel"><a href="https://github.com/prasanthmj/boel">Boel</a></h3>
-<p>A Javascript Form Data validation library. The syntax is made to look naturally declarative. Boel also supports conditional validations and customization to the validation messages.</p>
+<h3 id="eu-ai-act-compliance-navigatorhttpsgithubcomprasanthmjeu-ai-act-rag"><a href="https://github.com/prasanthmj/eu-ai-act-rag">EU AI Act Compliance Navigator</a></h3>
+<p>An agentic RAG system that helps developers and product teams determine the regulatory status of their AI system under the EU AI Act. Given a plain-English description of an AI system, it classifies the risk tier (Prohibited / High-Risk / Limited-Risk / Minimal-Risk), identifies the specific Articles and Annexes that apply, and generates a prioritized, actionable compliance checklist with direct citations.</p>
+<p>Built as a Go monolith — the RAG pipeline, API gateway, and MCP server are all in a single binary. The MCP server (built with the <a href="https://github.com/prasanthmj/gomcpgo">gomcpgo</a> framework) lets any AI agent call compliance checks as a live tool during development. Uses hybrid search (semantic + keyword) for retrieval and LLM-based confidence scoring for classification.</p>
+<p><strong>Stack:</strong> Go, React, PostgreSQL + pgvector, OpenAI embeddings, gomcpgo MCP framework</p>
+<h3 id="gomcpgo--go-mcp-frameworkhttpsgithubcomgomcpgomcp"><a href="https://github.com/gomcpgo/mcp">gomcpgo — Go MCP Framework</a></h3>
+<p>An open-source Go framework for building Model Context Protocol (MCP) servers that enable LLMs to securely access tools and data sources. MCP is now a Linux Foundation standard under the Agentic AI Foundation. The framework supports tool, resource, and prompt handlers with a clean registry-based architecture — making it straightforward to expose any Go service as an MCP server for AI agents like Claude, GPT-4, or Cursor.</p>
+<p>The <a href="https://github.com/gomcpgo">gomcpgo GitHub org</a> includes 12+ published MCP servers built with the framework, covering filesystem operations, email, audio transcription, image generation (Replicate), video AI, web fetching, Perplexity search, and document generation.</p>
+<p><strong>Stack:</strong> Go<br>
+<strong>GitHub Org:</strong> <a href="https://github.com/gomcpgo">github.com/gomcpgo</a></p>
+<h3 id="braille-ocr-transcriberhttpsgithubcombraille-readerbraille-transcriber"><a href="https://github.com/braille-reader/braille-transcriber">Braille OCR Transcriber</a></h3>
+<p>A research-driven Braille OCR system with the first working ML model for Grade 2 (contracted) Braille — covering the 90-95% of real Braille documents that no other system supports. Existing OCR tools only handle Grade 1 (uncontracted), which represents just 5-10% of real-world usage.</p>
+<p>Uses a two-stage architecture: YOLOv8 for cell detection (98-99% accuracy), then a ByT5 sequence-to-sequence model for context-aware interpretation of contracted Braille. The ByT5 model achieves 92.9% normalized match accuracy with 0.004 CER on real-world data — roughly 9x better than the liblouis back-translation baseline.</p>
+<p><strong>Stack:</strong> Python, PyTorch, ByT5 (Hugging Face Transformers), YOLOv8<br>
+<strong>Model:</strong> <a href="https://huggingface.co/prasanthmj/braille-byt5-v3">prasanthmj/braille-byt5-v3 on Hugging Face</a></p>
+<hr>
+<h3 id="other-projects">Other Projects</h3>
+<p><strong><a href="https://github.com/prasanthmj/qup">qUP</a></strong> — A background task processor with BadgerDb persistence, written in Go.</p>
+<p><strong><a href="https://github.com/prasanthmj/machine">Machine</a></strong> — Wrapper around the <a href="https://github.com/RichardKnop/machinery">machinery</a> Go library for background task execution.</p>
+<p><strong><a href="https://github.com/prasanthmj/chimes">Chimes</a></strong> — A JWT-only API authentication library. TypeScript client, Go server.</p>
+<p><strong><a href="https://github.com/prasanthmj/boel">Boel</a></strong> — A JavaScript form data validation library with declarative syntax and conditional validations.</p>
 
 
 <div class="mt-6 py-6 border-gray-200 border-t flex justify-between">

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Python on Prasanth Janardhanan</title>
+    <link>/tags/python/</link>
+    <description>Recent content in Python on Prasanth Janardhanan</description>
+    <generator>Hugo</generator>
+    <language>en-us</language>
+    <copyright>Prasanth Janardhanan</copyright>
+    <lastBuildDate>Thu, 12 Mar 2026 10:00:00 +0000</lastBuildDate>
+    <atom:link href="/tags/python/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Building the First ML Model for Grade 2 Braille — And Why It Took Three Tries</title>
+      <link>/ai/grade-2-braille-transformer/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/ai/grade-2-braille-transformer/</guid>
+      <description>&lt;p&gt;Here&amp;rsquo;s a scenario that plays out in classrooms every day. A visually impaired student finishes a written exam — on paper, in Braille, the way they&amp;rsquo;ve been taught. The teacher collects it. And then&amp;hellip; stares at it. Because the teacher can&amp;rsquo;t read Braille.&lt;/p&gt;&#xA;&lt;p&gt;This isn&amp;rsquo;t some edge case. Most teachers of visually impaired students cannot read Braille. They need a way to convert that embossed page into readable English text. So they reach for one of the Braille OCR apps on their phone. They snap a photo. And they get garbage.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

@@ -7,8 +7,57 @@
     <generator>Hugo</generator>
     <language>en-us</language>
     <copyright>Prasanth Janardhanan</copyright>
-    <lastBuildDate>Sat, 07 Mar 2026 10:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 12 Mar 2026 10:00:00 +0000</lastBuildDate>
     <atom:link href="/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Accessibility</title>
+      <link>/tags/accessibility/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/accessibility/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Braille</title>
+      <link>/tags/braille/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/braille/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Byt5</title>
+      <link>/tags/byt5/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/byt5/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Machine-Learning</title>
+      <link>/tags/machine-learning/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/machine-learning/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Ocr</title>
+      <link>/tags/ocr/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/ocr/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Python</title>
+      <link>/tags/python/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/python/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Transformer</title>
+      <link>/tags/transformer/</link>
+      <pubDate>Thu, 12 Mar 2026 00:00:00 +0000</pubDate>
+      <guid>/tags/transformer/</guid>
+      <description></description>
+    </item>
     <item>
       <title>Bm25</title>
       <link>/tags/bm25/</link>

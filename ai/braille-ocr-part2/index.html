@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+
+<head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Three Model Failures and a Braille Breakthrough with ByT5 </title><meta name="keywords" content="braille, ocr, byt5, transformer, accessibility, machine-learning, python" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body class="antialiased text-grey-900">
+    
+    <div class="container mx-auto max-w-screen-lg">
+    <header class="flex items-center justify-between h-16 px-3 border-b border-gray-300">
+    <div >
+        <a href="/" class="flex items-center">
+            <span class="text-lg text-gray-800 font-semibold">Prasanth Janardhanan</span>
+        </a>
+    </div>
+    <div>
+        <ul class="flex">
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/" class="hover:underline">Articles</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/projects/" class="hover:underline">Projects</a></li>
+            <li class="t ml-5 text-md text-gray-700 hover:text-red-800"><a href="/about/" class="hover:underline">About</a></li>
+        </ul>
+    </div>
+</header>
+    
+    <article class="mt-6 mx-auto md:w-9/12 min-h-screen">
+<h1 class="mt-5">Three Model Failures and a Braille Breakthrough with ByT5</h1>
+<ul class="flex mb-2 list-none px-0 text-sm mt-0 ml-0 pt-0">
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/braille" class="text-gray-600">braille</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/ocr" class="text-gray-600">ocr</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/byt5" class="text-gray-600">byt5</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/transformer" class="text-gray-600">transformer</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/accessibility" class="text-gray-600">accessibility</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/machine-learning" class="text-gray-600">machine-learning</a> </li>
+    
+      <li class="pr-4 list-none">&#x1f3f7; <a href="/tags/python" class="text-gray-600">python</a> </li>
+    
+</ul>
+  
+<p>In <a href="/ai/braille-ocr-part1/">Part 1</a>, I explained why Braille OCR is broken: every existing app only handles Grade 1 (uncontracted) Braille, while 90-95% of real Braille documents use Grade 2 — a contracted form with 180+ context-dependent rules. No datasets exist. No models support it. Teachers literally cannot read their students&rsquo; exams.</p>
+<p>I decided to build the first ML model for Grade 2 Braille interpretation. It took three attempts. The first two failed completely. Here&rsquo;s the full story.</p>
+<h2 id="first-problem-where-do-you-get-training-data-that-doesnt-exist">First Problem: Where Do You Get Training Data That Doesn&rsquo;t Exist?</h2>
+<p>No one has published a parallel corpus of Grade 2 Braille paired with English text. I needed to create one from scratch.</p>
+<p>The key insight: while no <em>image-to-text</em> dataset exists, the reverse direction is well-supported. <a href="https://github.com/liblouis/liblouis">Liblouis</a> — the open-source Braille translation library used by every major screen reader — can translate English text into Grade 2 Braille with near-perfect accuracy.</p>
+<p>So I flipped the pipeline. Take English text from Project Gutenberg books, run it through Liblouis to generate Grade 2 Braille, and use the pairs as training data — with the Braille as input and the English as the target.</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#57606a"># Simplified version of the data generation</span>
+</span></span><span style="display:flex;"><span>english <span style="color:#0550ae">=</span> <span style="color:#0a3069">&#34;The children will go shopping&#34;</span>
+</span></span><span style="display:flex;"><span>braille <span style="color:#0550ae">=</span> liblouis<span style="color:#0550ae">.</span>translate<span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;en-ueb-g2.ctb&#34;</span><span style="color:#1f2328">,</span> english<span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a"># braille → &#34;⠠⠮⠀⠡⠝⠀⠺⠀⠛⠀⠩⠕⠏⠏⠬&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a"># Training pair: (braille, english)</span>
+</span></span></code></pre></div><p>Five Gutenberg books produced 25,138 sentence pairs. I also hand-collected 42 real-world samples from a children&rsquo;s Braille book (Jellybean Jungle) — manually transcribing the Braille and its English equivalent. These 42 samples were held out entirely from training. They&rsquo;d be the real test: can a model trained on synthetic Liblouis data generalize to actual human-written Braille?</p>
+<h2 id="v1-custom-tokens-meet-random-embeddings-29">v1: Custom Tokens Meet Random Embeddings (2.9%)</h2>
+<p>My first attempt used T5-small — Google&rsquo;s 60-million parameter seq2seq model. Solid choice for translation tasks. The question was how to represent Braille input.</p>
+<p>Braille has 64 possible cell patterns (2^6 dots). I created 64 custom tokens — <code>c0</code> through <code>c63</code> — and added them to T5&rsquo;s vocabulary. Each token maps to one Braille cell pattern. Clean, explicit encoding.</p>
+<p>The problem? Those 64 new tokens got <strong>randomly initialized embeddings</strong>. T5&rsquo;s existing 32,000 tokens have embeddings refined through massive pre-training. My 64 Braille tokens were random noise dropped into a carefully tuned embedding space.</p>
+<p>The result: the model memorized fragments of the training corpus. It would output the same few phrases regardless of input. Every Braille sequence produced something like &ldquo;the project gutenberg ebook of&rdquo; — a phrase it had seen repeatedly in training headers.</p>
+<p><strong>2.9% accuracy.</strong> And that 2.9% was just lucky overlaps, not real understanding.</p>
+<p><strong>Lesson:</strong> Randomly initialized embeddings in a pre-trained model don&rsquo;t learn well during a small fine-tune. The gradient signal from 25K examples isn&rsquo;t enough to drag 64 tokens from random noise into meaningful positions in embedding space.</p>
+<h2 id="v2-the-tokenizer-was-blind-0">v2: The Tokenizer Was Blind (0%)</h2>
+<p>OK, so custom tokens don&rsquo;t work. What if I skip them entirely and feed Unicode Braille characters directly into T5? Braille characters live at Unicode code points U+2800 through U+283F. They&rsquo;re real characters. T5 should be able to handle them.</p>
+<p>I reformatted the training data to use raw Unicode Braille and kicked off training. The loss curves looked plausible. Surely this would work better.</p>
+<p><strong>0% accuracy.</strong> Worse than random.</p>
+<p>I dug into the predictions and found the model repeating a single phrase for every input — same symptom as v1 but even more extreme. Then I checked what T5&rsquo;s tokenizer actually does with Braille characters:</p>
+<div class="highlight"><pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-python" data-lang="python"><span style="display:flex;"><span><span style="color:#cf222e">from</span> <span style="color:#24292e">transformers</span> <span style="color:#cf222e">import</span> T5Tokenizer
+</span></span><span style="display:flex;"><span>tokenizer <span style="color:#0550ae">=</span> T5Tokenizer<span style="color:#0550ae">.</span>from_pretrained<span style="color:#1f2328">(</span><span style="color:#0a3069">&#34;t5-small&#34;</span><span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>braille_text <span style="color:#0550ae">=</span> <span style="color:#0a3069">&#34;⠠⠮⠀⠡⠝&#34;</span>
+</span></span><span style="display:flex;"><span>tokens <span style="color:#0550ae">=</span> tokenizer<span style="color:#0550ae">.</span>tokenize<span style="color:#1f2328">(</span>braille_text<span style="color:#1f2328">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#57606a"># tokens = [&#39;▁&#39;, &#39;&lt;unk&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;&lt;unk&gt;&#39;, &#39;&lt;unk&gt;&#39;]</span>
+</span></span></code></pre></div><p>Every single Braille character mapped to <code>&lt;unk&gt;</code>. T5&rsquo;s SentencePiece tokenizer was trained on Common Crawl text — it has never seen Braille Unicode characters. They&rsquo;re all unknown tokens. The model received the same input for every training example: a sequence of identical <code>&lt;unk&gt;</code> tokens. It was literally blind to its input.</p>
+<p><strong>Lesson:</strong> Always check what your tokenizer actually does with your input before training. A quick <code>tokenizer.tokenize()</code> call would have saved me hours of GPU time. This is especially important when working with non-Latin scripts, specialized Unicode ranges, or any text outside the tokenizer&rsquo;s training distribution.</p>
+<p><img src="images/braille-three-attempts.jpeg" alt="Three attempts: random pieces, blindfolded, clear vision"></p>
+<h2 id="v3-byt5--when-bytes-beat-tokens">v3: ByT5 — When Bytes Beat Tokens</h2>
+<p>Two failures, same root cause: the model couldn&rsquo;t properly see Braille input. Custom tokens had random embeddings. Standard tokenization collapsed everything to <code>&lt;unk&gt;</code>. I needed a model that could handle arbitrary Unicode characters natively.</p>
+<p>Enter <a href="https://arxiv.org/abs/2105.13626">ByT5</a>.</p>
+<p>ByT5 is a variant of T5 that operates on raw UTF-8 bytes instead of subword tokens. Its vocabulary is just 259 entries: 256 byte values plus 3 special tokens. Every UTF-8 byte has a pre-trained embedding. There is no tokenizer to collapse unknown characters — because there are no unknown characters. Everything is just bytes.</p>
+<p>Each Unicode Braille character encodes as 3 UTF-8 bytes. All three bytes exist in ByT5&rsquo;s vocabulary with pre-trained embeddings. No random initialization. No <code>&lt;unk&gt;</code>. The model can see every part of the input.</p>
+<pre tabindex="0"><code>T5 tokenizer:  &#34;⠠⠮&#34; → [&lt;unk&gt;, &lt;unk&gt;]           # blind
+ByT5:          &#34;⠠⠮&#34; → [0xE2, 0xA0, 0xA0,       # sees everything
+                         0xE2, 0xAE, 0xAE]
+</code></pre><p>This was the key insight: <strong>for non-standard scripts and symbols, byte-level models sidestep the entire tokenizer problem.</strong></p>
+<h3 id="the-infrastructure-gauntlet">The Infrastructure Gauntlet</h3>
+<p>Switching to ByT5 solved the representation problem. But byte-level processing means sequences are roughly 3x longer than subword sequences — and that creates GPU headaches.</p>
+<p><strong>Attempt on T4 (16GB), fp16:</strong></p>
+<ul>
+<li>Out-of-memory at batch size 8. Byte sequences are long.</li>
+<li>Reduced batch to 4, got it running&hellip; with a training loss of 10^17 and validation loss of NaN.</li>
+</ul>
+<p>The NaN wasn&rsquo;t a bug in my code. It&rsquo;s a fundamental limitation of fp16 precision. fp16&rsquo;s maximum value is ~65,504. ByT5&rsquo;s attention matrices over long byte sequences produce intermediate values that exceed this during softmax computation. The numbers overflow. Training literally cannot work in fp16 with ByT5.</p>
+<p><strong>This is a concrete, practical takeaway: ByT5 requires bf16 or fp32.</strong> bf16 has the same exponent range as fp32 (max ~3.4 × 10^38) but with reduced mantissa precision — enough for training, and it avoids the overflow. But bf16 requires an A100 or newer GPU.</p>
+<p><strong>Final setup — A100 80GB with bf16:</strong></p>
+<table>
+  <thead>
+      <tr>
+          <th>Parameter</th>
+          <th>Value</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Model</td>
+          <td>google/byt5-small (300M params)</td>
+      </tr>
+      <tr>
+          <td>Hardware</td>
+          <td>A100 80GB (Colab Pro)</td>
+      </tr>
+      <tr>
+          <td>Precision</td>
+          <td>bf16</td>
+      </tr>
+      <tr>
+          <td>Batch size</td>
+          <td>8 (effective 32 with grad accumulation)</td>
+      </tr>
+      <tr>
+          <td>Learning rate</td>
+          <td>1e-4, cosine decay with 10% warmup</td>
+      </tr>
+      <tr>
+          <td>Epochs</td>
+          <td>10</td>
+      </tr>
+      <tr>
+          <td>GPU memory used</td>
+          <td>~10GB of 80GB</td>
+      </tr>
+  </tbody>
+</table>
+<h3 id="the-moment-it-clicked">The Moment It Clicked</h3>
+<p>Training started. Epoch 1: training loss 10.6, val loss 2.25. Epoch 2: training loss 6.4, val loss 1.40. Standard early descent.</p>
+<p>Then epoch 3 hit.</p>
+<table>
+  <thead>
+      <tr>
+          <th>Epoch</th>
+          <th>Training Loss</th>
+          <th>Validation Loss</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>1</td>
+          <td>10.637</td>
+          <td>2.254</td>
+      </tr>
+      <tr>
+          <td>2</td>
+          <td>6.404</td>
+          <td>1.402</td>
+      </tr>
+      <tr>
+          <td><strong>3</strong></td>
+          <td><strong>0.691</strong></td>
+          <td><strong>0.072</strong></td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>0.220</td>
+          <td>0.024</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>0.116</td>
+          <td>0.015</td>
+      </tr>
+      <tr>
+          <td>&hellip;</td>
+          <td>&hellip;</td>
+          <td>&hellip;</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td>0.049</td>
+          <td>0.008</td>
+      </tr>
+  </tbody>
+</table>
+<p><img src="images/braille-breakthrough-moment.jpeg" alt="The dramatic loss drop between epoch 2 and 3"></p>
+<p>Validation loss went from 1.40 to 0.07 in a single epoch. A 20x drop. The model went from confused to competent between epoch 2 and 3 — it &ldquo;got&rdquo; the mapping from Braille byte sequences to English text. The remaining 7 epochs were refinement.</p>
+<p>No overfitting either. Validation loss kept decreasing through all 10 epochs, ending at 0.008. On a seq2seq task, that&rsquo;s remarkably low.</p>
+<h2 id="results-the-first-working-grade-2-model">Results: The First Working Grade 2 Model</h2>
+<p>Time for the real test. Remember those 42 hand-transcribed Jellybean Jungle samples the model had never seen?</p>
+<table>
+  <thead>
+      <tr>
+          <th>Dataset</th>
+          <th>Samples</th>
+          <th>Exact Match</th>
+          <th>Character Error Rate</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Jellybean (real-world)</td>
+          <td>42</td>
+          <td><strong>92.9%</strong></td>
+          <td><strong>0.004</strong></td>
+      </tr>
+      <tr>
+          <td>Synthetic test set</td>
+          <td>1,396</td>
+          <td><strong>89.8%</strong></td>
+          <td><strong>0.019</strong></td>
+      </tr>
+  </tbody>
+</table>
+<p>A character error rate of 0.004 means the average prediction is 99.6% character-accurate on real-world Braille. And this model was trained entirely on synthetic Liblouis-generated data — it had never seen human-transcribed Braille during training.</p>
+<p><strong>The synthetic data generalized.</strong> That was the gamble, and it paid off.</p>
+<h3 id="versus-the-baseline">Versus the Baseline</h3>
+<p>How does liblouis back-translation compare?</p>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>ByT5-small</th>
+          <th>Liblouis</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Exact match (real-world)</td>
+          <td><strong>92.9%</strong></td>
+          <td>9.5%</td>
+      </tr>
+      <tr>
+          <td>Exact match (synthetic)</td>
+          <td><strong>89.8%</strong></td>
+          <td>10.3%</td>
+      </tr>
+      <tr>
+          <td>CER (real-world)</td>
+          <td><strong>0.004</strong></td>
+          <td>0.236</td>
+      </tr>
+      <tr>
+          <td>CER (synthetic)</td>
+          <td><strong>0.019</strong></td>
+          <td>0.260</td>
+      </tr>
+  </tbody>
+</table>
+<p>Roughly 9x better on exact match. Here&rsquo;s what the difference looks like in practice:</p>
+<pre tabindex="0"><code>Input:    &#34;Sherlock Holmes sat moodily at one side of the fireplace&#34;
+Liblouis: &#34;Shall\124567/LOCK HOLMES SAT MOODILY AT \5/O SIDE of the FIREPLACE&#34;
+ByT5:     &#34;Sherlock Holmes sat moodily at one side of the fireplace&#34;
+</code></pre><pre tabindex="0"><code>Input:    &#34;Way down south where the jungle grows,&#34;
+Liblouis: &#34;WAY D\2467/N S\12567/th where the JUNGLE GR\2467/S,&#34;
+ByT5:     &#34;Way down south where the jungle grows,&#34;
+</code></pre><p>Those <code>\124567/</code> sequences in the liblouis output are escape codes — contractions it can&rsquo;t resolve in reverse. The ByT5 model handles them cleanly.</p>
+<p>And critically: <strong>zero hallucinations.</strong> Every prediction is input-dependent and grounded in the actual Braille sequence. v1 would hallucinate memorized corpus text regardless of input. v3 produces correct, contextual translations.</p>
+<h3 id="across-all-three-versions">Across All Three Versions</h3>
+<table>
+  <thead>
+      <tr>
+          <th></th>
+          <th>v1</th>
+          <th>v2</th>
+          <th>v3</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>Model</td>
+          <td>T5-small (60M)</td>
+          <td>T5-small (60M)</td>
+          <td>ByT5-small (300M)</td>
+      </tr>
+      <tr>
+          <td>Braille encoding</td>
+          <td>Custom tokens</td>
+          <td>Unicode direct</td>
+          <td>Unicode as bytes</td>
+      </tr>
+      <tr>
+          <td>Tokenizer result</td>
+          <td>Random embeddings</td>
+          <td>All → <code>&lt;unk&gt;</code></td>
+          <td>Native byte processing</td>
+      </tr>
+      <tr>
+          <td>Real-world match</td>
+          <td>0%</td>
+          <td>0%</td>
+          <td><strong>92.9%</strong></td>
+      </tr>
+      <tr>
+          <td>Prediction quality</td>
+          <td>Hallucinated corpus text</td>
+          <td>Single repeated phrase</td>
+          <td>Correct, input-dependent</td>
+      </tr>
+  </tbody>
+</table>
+<h2 id="what-the-errors-reveal">What the Errors Reveal</h2>
+<p>Of the 3 misses on the real-world jellybean set (after normalizing smart quotes to ASCII), all are minor:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Expected</th>
+          <th>Predicted</th>
+          <th>Issue</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>sides-- covering</code></td>
+          <td><code>sides--covering</code></td>
+          <td>Missing space after dash</td>
+      </tr>
+      <tr>
+          <td><code>hanging on the trees, my mouth</code></td>
+          <td><code>hanging on the tree jes, so, my mouth</code></td>
+          <td>Contraction decoding error</td>
+      </tr>
+      <tr>
+          <td><code>if I hadn't</code></td>
+          <td><code>ifI hadn't</code></td>
+          <td>Missing space</td>
+      </tr>
+  </tbody>
+</table>
+<p>On the synthetic test set, the dominant error source is <strong>output truncation</strong> — the model&rsquo;s max output length was set to 256 bytes, and long sentences simply got cut off. The predicted text is correct up to the truncation point. This is a configuration fix, not a model problem.</p>
+<p>The other error patterns:</p>
+<ul>
+<li><strong>Number encoding:</strong> The model knows number indicators exist but sometimes maps to wrong digits. Likely cause: too few number examples in training data (mostly prose, few chapter headings).</li>
+<li><strong>Special characters:</strong> Ligatures like &ldquo;æ&rdquo; and currency symbols like &ldquo;£&rdquo; — rare in training data, no reliable mapping learned.</li>
+</ul>
+<p>None of these are fundamental limitations. More training data and a higher max length would address most of them.</p>
+<h2 id="what-i-learned-building-this">What I Learned Building This</h2>
+<p><strong>Tokenizer choice can make or break your model.</strong> This is the single biggest takeaway. Two failed attempts, both caused by how the model&rsquo;s tokenizer handled Braille input. If I&rsquo;d checked <code>tokenizer.tokenize()</code> on Braille characters before v2, I would have caught the <code>&lt;unk&gt;</code> problem immediately.</p>
+<p><strong>ByT5 is the right tool for non-standard scripts.</strong> If your input contains characters outside a model&rsquo;s tokenizer vocabulary — specialized Unicode ranges, mathematical symbols, emoji, rare scripts — ByT5 sidesteps the problem entirely. It&rsquo;s under-discussed in the ML community for these use cases.</p>
+<p><strong>bf16 is not fp16.</strong> They are not interchangeable. fp16 has a max value of ~65,504 and will overflow on ByT5&rsquo;s long attention sequences. bf16 has the same range as fp32. This distinction cost me a failed training run and several hours of debugging.</p>
+<p><strong>Synthetic data can generalize to real-world data.</strong> The model was trained entirely on Liblouis-generated pairs and achieved 92.9% exact match on human-transcribed Braille it had never seen. The quality of the synthetic generation pipeline matters — Liblouis is a well-maintained, standards-compliant library — but the result validates the approach.</p>
+<p><strong>Decouple solved problems from unsolved ones.</strong> The two-stage architecture meant I never needed to touch cell detection. Stage 1 (YOLOv8, 98-99% accurate) just works. All effort went into Stage 2 — the part that actually needed solving.</p>
+<h2 id="whats-next">What&rsquo;s Next</h2>
+<p>The model is published on <a href="https://huggingface.co/prasanthmj/braille-byt5-v3">Hugging Face</a> — the first publicly available ML model for Grade 2 contracted Braille.</p>
+<p>Next steps:</p>
+<ul>
+<li><strong>More training data</strong> — expanding from 5 books to 20+ to improve coverage of rare contractions and numbers</li>
+<li><strong>ByT5-base (580M params)</strong> — more model capacity for edge cases</li>
+<li><strong>End-to-end pipeline</strong> — connecting Stage 1 (YOLOv8 image detection) directly to Stage 2 (this model) for a photo-in, text-out workflow</li>
+<li><strong>Nemeth Code</strong> — mathematical Braille, which adds 2D spatial layout parsing on top of everything. That&rsquo;s a whole other problem.</li>
+</ul>
+<p>The goal: a teacher photographs a student&rsquo;s Braille exam, and gets readable English text back in seconds. We&rsquo;re not there yet on the full pipeline — but the hardest piece, Grade 2 interpretation, now works.</p>
+<p><em>The model and code are open source. If you work with Braille, accessibility tools, or non-standard OCR — I&rsquo;d love to hear from you.</em></p>
+
+
+<div class="mt-6 py-6 border-gray-200 border-t flex justify-between">
+    
+    <a href="//localhost:1313/ai/grade-2-braille-transformer/" class="pr-4">&larr; Building the First ML Model for Grade 2 Braille — And Why It Took Three Tries</a>
+    
+        
+</div>
+
+
+
+    </article>
+    </div>
+    <footer class="container mx-auto pl-5 pt-3 pb-5 mt-32 border-t border-gray-400">
+        <div class="text-xs text-gray-700 float-right h-24">
+            &copy; 2026 Prasanth Janardhanan
+        </div>
+    </footer>
+</body>
+</html>
+
